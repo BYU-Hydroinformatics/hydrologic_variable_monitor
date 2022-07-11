@@ -4,7 +4,7 @@ from tethys_sdk.app_settings import CustomSetting
 
 class HydroVarMonitor(TethysAppBase):
     """
-    Tethys app class for Hydrologic Trends Monitor.
+    Tethys app class for Hydrologic Variable Monitor.
     """
 
     name = 'Hydrologic Variable Monitor'

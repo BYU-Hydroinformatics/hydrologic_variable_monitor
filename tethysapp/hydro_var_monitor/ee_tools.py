@@ -22,9 +22,25 @@ gfs_ic = ee.ImageCollection("NOAA/GFS0P25")
 # https://developers.google.com/earth-engine/datasets/catalog/OREGONSTATE_PRISM_AN81d
 prism_ic = ee.ImageCollection("OREGONSTATE/PRISM/AN81d")
 
+era5_ic = ee.ImageCollection("")
 
-def get_map_id(ic: ee.ImageCollection, vis_opts: dict = {}) -> str:
+gldas_ic = ee.ImageCollection([])
+GLDAS_VAR_LOOKUP = {
+    'air_temp': 'Tair_f_inst',
+}
+
+
+def get_map_id(variable: str, source: str) -> str:
     """
     Get the map id for a given image collection.
     """
+    ic = {
+        'gldas': gldas_ic,
+        'era5': era5_ic,
+        'gfs': gfs_ic,
+        'chirps': chirps_daily_ic,
+        'imerg': imerg_1m_ic,
+        'smap': smap_ic,
+    }[source]
+
     return ic.getMapId(vis_opts)['tile_fetcher'].url_format

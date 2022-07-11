@@ -29,20 +29,21 @@ const App = (() => {
     const getVarSourceJSON = () => {return {"variable": selectVariable.value, "source": selectSource.value}}
 
     btnLoadMap.onclick = () => {
+        const selectedVarSource = getVarSourceJSON()
+        if (selectedVarSource.variable === "" || selectedVarSource.source === "") return
+
         const fetchParams = {
             method: "POST",
             headers: {'X-CSRFToken': csrftoken},
-            body: JSON.stringify(getVarSourceJSON())
+            body: JSON.stringify(selectedVarSource)
         }
-
-        if (fetchParams.body.variable === "" || fetchParams.body.source === "") return
 
         fetch(URL_GETMAPID, fetchParams)
             .then(response => response.json())
             .then(map_url => {
                 eeTileLayer.setUrl(map_url.url)
                 mapLyrCtrl.removeLayer(eeTileLayer)
-                mapLyrCtrl.addOverlay(eeTileLayer, `${map_url.variable} (${map_url.source})`)
+                mapLyrCtrl.addOverlay(eeTileLayer, `${selectedVarSource.variable} (${selectedVarSource.source})`)
             })
             .catch(error => console.log(error))
             .finally(() => {})
@@ -50,7 +51,10 @@ const App = (() => {
 
     selectVariable.onchange = (e) => selectSource.innerHTML = SOURCES[e.target.value].map(src => `<option value="${src}">${src}</option>`).join("")
 
-    btnClearMap.onclick = () => eeTileLayer.setUrl("")
+    btnClearMap.onclick = () => {
+        eeTileLayer.setUrl("")
+        mapLyrCtrl.removeLayer(eeTileLayer)
+    }
 
     return {}
 })();
