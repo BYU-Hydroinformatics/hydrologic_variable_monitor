@@ -6,12 +6,21 @@ from .plots import get_current_date, get_collection
 import numpy as np
 
 
-def precip_compare(region):
+def precip_compare(region, isPoint):
     # get needed functions
+    print("inprecip_compare")
+    print(region)
+    if isPoint == True:
+        print("true")
+        print(region[0])
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        print(get_coord["coordinates"])
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
+    print(area)
 
     now, avg_start, y2d_start = get_current_date()
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     def get_val_at_xypoint(img):
         # reduction function
@@ -181,17 +190,23 @@ def precip_compare(region):
     return (Dict)
 
 
-def air_temp_compare(region):
+def air_temp_compare(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
 
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        print("true")
+        print(region[0])
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        print(get_coord["coordinates"])
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
+    print(area)
 
     def avg_gldas(img):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=area,
-            scale=1e6,
         ))
 
     def get_val_at_xypoint(img):
@@ -254,19 +269,21 @@ def air_temp_compare(region):
     return (Dict)
 
 
-def surface_temp_compare(region):
+def surface_temp_compare(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
 
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
-    print("insurface")
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
+    #print(area)
 
     # define functions that will be mapped
     def avg_gldas(img):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=area,
-            scale=1e6,
         ))
 
     def get_val_at_xypoint(img):

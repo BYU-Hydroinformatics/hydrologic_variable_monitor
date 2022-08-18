@@ -17,6 +17,9 @@ const App = (() => {
     const btnCompare = document.getElementById("compare")
     const btnInstructions = document.getElementById("instructions")
     const btnDownload = document.getElementById("download")
+    const btnLatLong = document.getElementById("lat-lon")
+    const usrLat = document.getElementById('lat')
+    const usrLon = document.getElementById('lon')
 
 
     const download = function (data, file_name) {
@@ -44,21 +47,22 @@ const App = (() => {
 
     ////////////////////////////////////////////////// Map and Map Layers
 
-    var image_layer;
-    var map;
-    var controlL;
-    var input_spatial = "";
+    let image_layer;
+    let map;
+    let controlL;
+    let input_spatial = "";
+    let isPoint = false;
 
     L.Control.Layers.include({
     getOverlays: function() {
       // create hash to hold all layers
-      var control, layers;
+      let control, layers;
       layers = {};
       control = this;
 
       // loop thru all layers in control
       control._layers.forEach(function(obj) {
-        var layerName;
+        let layerName;
 
         // check if layer is an overlay
         if (obj.overlay) {
@@ -79,12 +83,12 @@ const App = (() => {
           '<a href="https://earthengine.google.com" target="_">' +
           'Google Earth Engine</a>;'}).addTo(map);
 
-     var positron = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+     let positron = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '©OpenStreetMap, ©CartoDB'
         }).addTo(map);
 
-    var baseMaps = {"Basemap":positron}
-    var varMaps = {"Satellite Observation":image_layer}
+    let baseMaps = {"Basemap":positron}
+    let varMaps = {"Satellite Observation":image_layer}
 
     controlL = L.control.layers(baseMaps,varMaps,{position: 'bottomleft'})
     controlL.addTo(map);
@@ -109,14 +113,33 @@ const App = (() => {
      });
      map.addControl(drawControl);
 
-    const getVarSourceJSON = () => {return {"variable": selectVariable.value, "source": selectSource.value, "region" : input_spatial}}
-
     btnInstructions.onclick = () => {
         $('#myModal').modal()
     }
 
+    const getVarSourceJSON = () => {return {"variable": selectVariable.value, "source": selectSource.value, "region" : input_spatial, "isPoint":isPoint}}
+
+
+    btnLatLong.onclick = ()=>{
+        //console.log(dataParams)
+        console.log("lat")
+        $('#lat-lon-modal').modal()
+        console.log("lat")
+        const btnSave = document.getElementById('save')
+        btnSave.onclick = () =>{
+            console.log("check")
+            console.log(usrLat.value)
+            console.log(usrLon.value)
+            let marker = L.marker([usrLon.value, usrLat.value]).addTo(map);
+            isPoint = true;
+            //dataParams.region = [usrLat.value, usrLon.value]
+
+        }
+    }
+
     btnLoadMap.onclick = () => {
         const dataParams = getVarSourceJSON()
+        console.log(dataParams)
         if (dataParams.variable === "" || dataParams.source === "") return
         $("#loading-icon").addClass("appear");
 
@@ -146,7 +169,11 @@ const App = (() => {
     }
 
     btnCompare.onclick = () => {
+        //console.log(dataParams)
         const dataParams = getVarSourceJSON()
+        if (dataParams.isPoint == true){
+            dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
+        }
         //check that it is a variable that can be compared
         if (dataParams.variable === "" || dataParams.variable === "soil_moisture"|| dataParams.variable === "ndvi"|| dataParams.region === "") return
         $("#loading-icon").addClass("appear");
@@ -279,6 +306,9 @@ const App = (() => {
 
     btnPlotSeries.onclick = () => {
         const dataParams = getVarSourceJSON()
+        if (dataParams.isPoint == true){
+            dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
+        }
         if (dataParams.variable === "" || dataParams.source === "" || dataParams.region === "") return
         console.log(dataParams)
         //$('#chart_modal').modal("show")

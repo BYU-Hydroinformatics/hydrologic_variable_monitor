@@ -33,11 +33,14 @@ def set_ymd_properties(img):
     })
 
 
-def plot_ERA5(region, band, title, yaxis):
+def plot_ERA5(region, band, title, yaxis, isPoint):
     now, avg_start, y2d_start = get_current_date()
 
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
     # read in img col
     img_col_avg = ee.ImageCollection(
         [f'users/rachelshaylahuber55/era5_monthly_avg/era5_monthly_{i:02}' for i in range(1, 13)])
@@ -71,7 +74,6 @@ def plot_ERA5(region, band, title, yaxis):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=area,
-            scale=1e6,
         ))
 
     avg_img = img_col_avg.select(band).map(avg_era)
@@ -116,11 +118,14 @@ def plot_ERA5(region, band, title, yaxis):
     return {'avg': avg_df, 'y2d': y2d_df, 'title': title, 'yaxis': yaxis}
 
 
-def plot_GLDAS(region, band, title, yaxis):
+def plot_GLDAS(region, band, title, yaxis, isPoint):
     now, avg_start, y2d_start = get_current_date()
     print(region)
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     gldas_ic = ee.ImageCollection("NASA/GLDAS/V021/NOAH/G025/T3H")
 
@@ -184,10 +189,13 @@ def plot_GLDAS(region, band, title, yaxis):
     return Dict
 
 
-def plot_IMERG(region):
+def plot_IMERG(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     def avg_in_bounds(img):
         return img.set('avg_value', img.reduceRegion(
@@ -252,10 +260,13 @@ def plot_IMERG(region):
     return Dict
 
 
-def plot_CHIRPS(region):
+def plot_CHIRPS(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
     chirps_daily_ic = ee.ImageCollection('UCSB-CHG/CHIRPS/DAILY')
     chirps_pentad_ic = ee.ImageCollection(
         [f'users/rachelshaylahuber55/chirps_monthly_avg/chirps_monthly_avg_{i:02}' for i in range(1, 13)])
