@@ -30,7 +30,6 @@ def home(request):
 
 
 def compare(request):
-    print("woohoo!")
     response_data = {'success': False}
     try:
         # log.debug(f'GET: {request.GET}')
@@ -43,12 +42,9 @@ def compare(request):
             dict = air_temp_compare(json.loads(region),json.loads(isPoint))
 
         if var == "precip":
-            print (json.loads(isPoint))
-            print(region)
             dict = precip_compare(json.loads(region),json.loads(isPoint))
 
         if var == "soil_temperature":
-            print(var)
             dict = surface_temp_compare(json.loads(region),json.loads(isPoint))
 
         response_data.update({
@@ -145,7 +141,6 @@ def get_plot(request):
         var = request.GET.get('variable', None)
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
-        print (region)
 
         if sensor == "ERA5":
             if var == "air_temp":
@@ -160,7 +155,7 @@ def get_plot(request):
                 band = "skin_temperature"
                 title = "Temperatura del Suelo- ERA5"
                 yaxis = "temperatura in K"
-            dict = plot_ERA5(json.loads(region), band, title, yaxis, json.loads(isPoint))
+            plot_data = plot_ERA5(json.loads(region), band, title, yaxis, json.loads(isPoint))
 
         if sensor == "GLDAS":
             if var == "precip":
@@ -179,16 +174,17 @@ def get_plot(request):
                 band = "AvgSurfT_inst"
                 title = "Temperatura del Suelo - GLDAS"
                 yaxis = "temperatura in K"
-            dict = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint))
+
+            plot_data = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint))
 
         if sensor == "IMERG":
-            dict = plot_IMERG(json.loads(region), json.loads(isPoint))
+            plot_data = plot_IMERG(json.loads(region), json.loads(isPoint))
 
         if sensor == "CHIRPS":
-            dict = plot_CHIRPS(json.loads(region), json.loads(isPoint))
+            plot_data = plot_CHIRPS(json.loads(region), json.loads(isPoint))
 
         if sensor == "Landsat":
-            dict = plot_NDVI(json.loads(region), json.loads(isPoint))
+            plot_data = plot_NDVI(json.loads(region), json.loads(isPoint))
 
         response_data.update({
             'success': True,
@@ -196,4 +192,4 @@ def get_plot(request):
 
     except Exception as e:
         response_data['error'] = f'Error Processing Request: {e}'
-    return JsonResponse(json.loads(json.dumps(dict)))
+    return JsonResponse(json.loads(json.dumps(plot_data)))
