@@ -7,7 +7,8 @@
 
 {% block app_navigation_items %}
     <button  id="instructions" type="button" class="btn btn-primary btn-block" >Instrucciones</button>
-    <button  id="lat-lon" type="button" class="btn btn-primary btn-block" >Lat Long</button>
+    <button  id="lat-lon" type="button" class="btn btn-primary btn-block" >Entrar Lat/Lon</button>
+    <button  id="clear-lat-lon" type="button" class="btn btn-primary btn-block" >Despejar Lat/Long</button>
   <li class="title">1. Elija Variable Hidrológica</li>
   <select class="form-select" aria-label="variable selector" id="select-variable">
     <option hidden disabled selected value></option>
@@ -103,13 +104,32 @@
 
   </div>
 </div>
+<div id="errorModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Error</h4>
+      </div>
+      <div class="modal-body">
+        <p>Por favor elimine la entrada anterior.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 <div id="lat-lon-modal" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
     <!-- Modal content-->
     <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Enter Latitude and Longitude </h5>
+          <h5 class="modal-title" id="exampleModalLabel">Poner Latitud y Longitud </h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                <span aria-hidden="true">&times;</span>
             </button>
@@ -117,11 +137,11 @@
               <div class="modal-body">
                 <form>
                   <div class="form-group">
-                    <label for="lat" class="col-form-label">Latitude:</label>
+                    <label for="lat" class="col-form-label">Latitud:</label>
                     <input type="text" class="form-control" id="lat">
                   </div>
                   <div class="form-group">
-                    <label for="lon" class="col-form-label">Longitude:</label>
+                    <label for="lon" class="col-form-label">Longitud:</label>
                     <input type="text" class="form-control" id="lon">
                   </div>
                 </form>

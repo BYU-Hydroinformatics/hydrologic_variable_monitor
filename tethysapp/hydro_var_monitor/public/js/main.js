@@ -20,6 +20,7 @@ const App = (() => {
     const btnLatLong = document.getElementById("lat-lon")
     const usrLat = document.getElementById('lat')
     const usrLon = document.getElementById('lon')
+    const btnClearLatLon = document.getElementById('clear-lat-lon')
 
 
     const download = function (data, file_name) {
@@ -52,6 +53,7 @@ const App = (() => {
     let controlL;
     let input_spatial = "";
     let isPoint = false;
+    let point;
 
     L.Control.Layers.include({
     getOverlays: function() {
@@ -122,18 +124,21 @@ const App = (() => {
 
     btnLatLong.onclick = ()=>{
         //console.log(dataParams)
-        console.log("lat")
-        $('#lat-lon-modal').modal()
-        console.log("lat")
-        const btnSave = document.getElementById('save')
-        btnSave.onclick = () =>{
-            console.log("check")
-            console.log(usrLat.value)
-            console.log(usrLon.value)
-            let marker = L.marker([usrLon.value, usrLat.value]).addTo(map);
-            isPoint = true;
-            //dataParams.region = [usrLat.value, usrLon.value]
-
+        if (isPoint == true){
+            $("#errorModal").modal()
+        }
+        else {
+            console.log("lat")
+            $('#lat-lon-modal').modal()
+            console.log("lat")
+            const btnSave = document.getElementById('save')
+            btnSave.onclick = () =>{
+                console.log("check")
+                console.log(usrLat.value)
+                console.log(usrLon.value)
+                point = L.marker([usrLon.value, usrLat.value]).addTo(map);
+                isPoint = true;
+            }
         }
     }
 
@@ -397,7 +402,13 @@ const App = (() => {
             }})
     }
 
-    map.on(L.Draw.Event.CREATED, function (e) {
+    btnClearLatLon.onclick = () =>{
+        map.removeLayer(point);
+        isPoint = false;
+    }
+
+    map.on(L.Draw.Event.CREATED, e => {
+        drawnItems.clearLayers()
         drawnItems.addLayer(e.layer);
         input_spatial = JSON.stringify(e.layer.toGeoJSON());
       });
