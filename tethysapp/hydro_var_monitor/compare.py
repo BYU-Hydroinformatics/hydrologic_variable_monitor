@@ -20,7 +20,6 @@ def precip_compare(region):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=area,
-            #scale=1e6,
         ))
 
     def avg_in_bounds(img):
@@ -28,8 +27,6 @@ def precip_compare(region):
             reducer=ee.Reducer.mean(),
             geometry=area,
         ))
-
-
     # get gldas data
     gldas_monthly = ee.ImageCollection(
         [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_{i:02}' for i in range(1, 13)])
@@ -167,6 +164,7 @@ def air_temp_compare(region):
     )
 
     era5_avg_df.columns = ["data_values"]
+    era5_avg_df['data_values'] = era5_avg_df['data_values'] - 273.15
     era5_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era5_avg_df.index[i] + 1, day=15) for i in era5_avg_df.index]
     era5_avg_df['date'] = era5_avg_df['datetime'].dt.strftime("%Y-%m-%d")
     era5_avg_df.reset_index(drop=True, inplace=True)
@@ -179,7 +177,7 @@ def air_temp_compare(region):
     gldas_avg_df = pd.DataFrame(
         gldas_monthly.aggregate_array('avg_value').getInfo(),
     )
-    gldas_avg_df["data_values"] = gldas_avg_df["Tair_f_inst"]
+    gldas_avg_df["data_values"] = gldas_avg_df["Tair_f_inst"] - 273.15
     gldas_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=gldas_avg_df.index[i] + 1, day=15)
                                 for i in gldas_avg_df.index]
     gldas_avg_df['date'] = gldas_avg_df['datetime'].dt.strftime("%Y-%m-%d")
@@ -187,7 +185,7 @@ def air_temp_compare(region):
     title = "Air Temperature"
 
     return {'era5': era5_avg_df, 'gldas': gldas_avg_df,
-            'title': title, 'yaxis': "temp in K"}
+            'title': title, 'yaxis': "Temperatura in Celcius"}
 
 
 def surface_temp_compare(region):
@@ -201,7 +199,6 @@ def surface_temp_compare(region):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=area,
-            scale=1e6,
         ))
 
     # get era5 data
@@ -213,6 +210,7 @@ def surface_temp_compare(region):
     )
 
     era5_avg_df.columns = ["data_values"]
+    era5_avg_df['data_values'] = era5_avg_df['data_values'] - 273.15
     era5_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era5_avg_df.index[i] + 1, day=15) for i in
                                era5_avg_df.index]
     era5_avg_df['date'] = era5_avg_df['datetime'].dt.strftime("%Y-%m-%d")
@@ -224,14 +222,13 @@ def surface_temp_compare(region):
 
     gldas_avg_df = pd.DataFrame(
         gldas_monthly.aggregate_array('avg_value').getInfo(),
-        # index=np.array(gldas_avg.aggregate_array('month').getInfo()).astype(int),
     )
-    gldas_avg_df["data_values"] = gldas_avg_df["AvgSurfT_inst"]
+    gldas_avg_df["data_values"] = gldas_avg_df["AvgSurfT_inst"] - 273.15
     gldas_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=gldas_avg_df.index[i] + 1, day=15)
                                 for i in gldas_avg_df.index]
     gldas_avg_df['date'] = gldas_avg_df['datetime'].dt.strftime("%Y-%m-%d")
 
     title = "Surface Temperature"
     return {'era5': era5_avg_df, 'gldas': gldas_avg_df,
-            'title': title, 'yaxis': "temp in K"}
+            'title': title, 'yaxis': "Temperatura in Celcius"}
 

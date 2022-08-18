@@ -35,6 +35,7 @@ def set_ymd_properties(img):
 
 def plot_ERA5(region, band, title, yaxis):
     now, avg_start, y2d_start = get_current_date()
+    print("era5_function")
 
     get_coord = region["geometry"]
     area = ee.Geometry.Polygon(get_coord["coordinates"])
@@ -54,7 +55,7 @@ def plot_ERA5(region, band, title, yaxis):
         # set the result as a metadata property in the image
         return img.set(temp)
 
-    def get_df(band_name, img_col, region):
+    def get_df(band_name, img_col):
         era_df = img_col.select(band_name)
         era_with_property = era_df.map(get_val_at_xypoint)
         # create an array of values that are extracted from image collection
@@ -71,17 +72,17 @@ def plot_ERA5(region, band, title, yaxis):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=area,
-            scale=1e6,
         ))
 
     avg_img = img_col_avg.select(band).map(avg_era)
-    y2d_df = get_df(band, img_col_y2d, area)
+    y2d_df = get_df(band, img_col_y2d)
 
     avg_df = pd.DataFrame(
         avg_img.aggregate_array('avg_value').getInfo(),
     )
     # set date and data values columns that the js code will look for
     avg_df.columns = ["data_values"]
+    avg_df["data_values"] = (avg_df["data_values"] - 273.15)
     avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=avg_df.index[i] + 1, day=15) for i in avg_df.index]
     avg_df['date'] = avg_df['datetime'].dt.strftime("%Y-%m-%d")
     avg_df.reset_index(drop=True, inplace=True)
@@ -110,7 +111,7 @@ def plot_ERA5(region, band, title, yaxis):
     if band == "total_precipitation":
         y2d_df["data_values"] = (y2d_df["data_values"] * 1000).cumsum()
     else:
-        y2d_df["data_values"] = y2d_df["data_values"]
+        y2d_df["data_values"] = (y2d_df["data_values"] - 273.15)
 
     return {'avg': avg_df, 'y2d': y2d_df, 'title': title, 'yaxis': yaxis}
 
@@ -175,6 +176,10 @@ def plot_GLDAS(region, band, title, yaxis):
         gldas_ytd_df = gldas_ytd_df.groupby('date').mean()
         gldas_ytd_df.rename(index={0: 'index'}, inplace=True)
         gldas_ytd_df['date'] = gldas_ytd_df.index
+
+    if band == "Tair_f_inst" or "AvgSurfT_inst":
+        gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
+        gldas_avg_df["data_values"] = gldas_avg_df["data_values"] - 273.15
 
     return {'avg': gldas_avg_df, 'y2d': gldas_ytd_df, 'title': title, 'yaxis': yaxis}
 

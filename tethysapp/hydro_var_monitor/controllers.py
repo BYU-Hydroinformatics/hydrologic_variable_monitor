@@ -139,12 +139,14 @@ def get_plot(request):
         sensor = request.GET.get('source', None)
         var = request.GET.get('variable', None)
         region = request.GET.get('region', None)
+        print("get_plot")
 
         if sensor == "ERA5":
+            print("era5")
             if var == "air_temp":
                 band = "temperature_2m"
                 title = "Temperatura del Aire - ERA5"
-                yaxis = "temperature in K"
+                yaxis = "Temperature in Celcius"
             if var == "precip":
                 band = "total_precipitation"
                 title = "Acumulados de Precipitación - ERA5"
@@ -152,8 +154,9 @@ def get_plot(request):
             if var == "soil_temperature":
                 band = "skin_temperature"
                 title = "Temperatura del Suelo- ERA5"
-                yaxis = "temperatura in K"
+                yaxis = "Temperatura in Celcius"
             plot_data = plot_ERA5(json.loads(region), band, title, yaxis)
+            print(plot_data)
 
         if sensor == "GLDAS":
             if var == "precip":
@@ -163,7 +166,7 @@ def get_plot(request):
             if var == "air_temp":
                 band = "Tair_f_inst"
                 title = "Temperatura del Aire- GLDAS"
-                yaxis = "temperatura in K"
+                yaxis = "Temperatura in Celcius"
             if var == "soil_moisture":
                 band = "RootMoist_inst"
                 title = "Humedad del Suelo - GLDAS"
@@ -171,7 +174,7 @@ def get_plot(request):
             if var == "soil_temperature":
                 band = "AvgSurfT_inst"
                 title = "Temperatura del Suelo - GLDAS"
-                yaxis = "temperatura in K"
+                yaxis = "Temperatura in Celcius"
             plot_data = plot_GLDAS(json.loads(region), band, title, yaxis)
 
         if sensor == "IMERG":
