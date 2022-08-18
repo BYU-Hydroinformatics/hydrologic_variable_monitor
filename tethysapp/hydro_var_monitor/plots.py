@@ -84,7 +84,6 @@ def plot_ERA5(region, band, title, yaxis, isPoint):
     )
     # set date and data values columns that the js code will look for
     avg_df.columns = ["data_values"]
-    avg_df["data_values"] = (avg_df["data_values"] - 273.15)
     avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=avg_df.index[i] + 1, day=15) for i in avg_df.index]
     avg_df['date'] = avg_df['datetime'].dt.strftime("%Y-%m-%d")
     avg_df.reset_index(drop=True, inplace=True)
@@ -181,6 +180,10 @@ def plot_GLDAS(region, band, title, yaxis, isPoint):
         gldas_ytd_df = gldas_ytd_df.groupby('date').mean()
         gldas_ytd_df.rename(index={0: 'index'}, inplace=True)
         gldas_ytd_df['date'] = gldas_ytd_df.index
+
+    if band == "Tair_f_inst" or "AvgSurfT_inst":
+        gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
+        gldas_avg_df["data_values"] = gldas_avg_df["data_values"] - 273.15
 
     if band == "Tair_f_inst" or band == "AvgSurfT_inst":
         gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
