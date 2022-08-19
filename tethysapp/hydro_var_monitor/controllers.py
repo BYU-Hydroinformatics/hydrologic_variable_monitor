@@ -8,7 +8,7 @@ from . import ee_auth
 import logging
 from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, NDVI
 from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS, plot_NDVI
-from .compare import air_temp_compare, precip_compare, surface_temp_compare
+from .compare import air_temp_compare, precip_compare, surface_temp_compare, compare_precip_moist
 
 
 # @controller(name='home', url='/', login_required=
@@ -146,7 +146,7 @@ def get_plot(request):
             if var == "air_temp":
                 band = "temperature_2m"
                 title = "Temperatura del Aire - ERA5"
-                yaxis = "Temperature in Celcius"
+                yaxis = "Temperature en Celsius"
             if var == "precip":
                 band = "total_precipitation"
                 title = "Acumulados de Precipitación - ERA5"
@@ -154,7 +154,7 @@ def get_plot(request):
             if var == "soil_temperature":
                 band = "skin_temperature"
                 title = "Temperatura del Suelo- ERA5"
-                yaxis = "Temperatura in Celcius"
+                yaxis = "Temperatura en Celsius"
             plot_data = plot_ERA5(json.loads(region), band, title, yaxis)
             print(plot_data)
 
@@ -166,7 +166,7 @@ def get_plot(request):
             if var == "air_temp":
                 band = "Tair_f_inst"
                 title = "Temperatura del Aire- GLDAS"
-                yaxis = "Temperatura in Celcius"
+                yaxis = "Temperatura en Celsius"
             if var == "soil_moisture":
                 band = "RootMoist_inst"
                 title = "Humedad del Suelo - GLDAS"
@@ -174,7 +174,7 @@ def get_plot(request):
             if var == "soil_temperature":
                 band = "AvgSurfT_inst"
                 title = "Temperatura del Suelo - GLDAS"
-                yaxis = "Temperatura in Celcius"
+                yaxis = "Temperatura en Celsius"
             plot_data = plot_GLDAS(json.loads(region), band, title, yaxis)
 
         if sensor == "IMERG":
@@ -185,6 +185,23 @@ def get_plot(request):
 
         if sensor == "Landsat":
             plot_data = plot_NDVI(json.loads(region))
+
+        response_data.update({
+            'success': True,
+        })
+
+    except Exception as e:
+        response_data['error'] = f'Error Processing Request: {e}'
+    return JsonResponse(json.loads(json.dumps(plot_data)))
+
+def compare_precip(request):
+    response_data = {'success': False}
+
+    try:
+        region = request.GET.get('region', None)
+        isPoint = request.GET.get('isPoint', None)
+        print("compare_precip")
+        plot_data = compare_precip_moist(json.loads(region), False)
 
         response_data.update({
             'success': True,

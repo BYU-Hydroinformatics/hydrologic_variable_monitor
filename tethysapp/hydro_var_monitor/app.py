@@ -46,6 +46,11 @@ class HydroVarMonitor(TethysAppBase):
                 url=f'{self.root_url}/compare/',
                 controller=f'{self.package}.controllers.compare'
             ),
+            UrlMap(
+                name='compare_precip',
+                url=f'{self.root_url}/compare-precip/',
+                controller=f'{self.package}.controllers.compare_precip'
+            ),
         )
 
         return url_maps

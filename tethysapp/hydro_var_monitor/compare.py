@@ -185,7 +185,7 @@ def air_temp_compare(region):
     title = "Air Temperature"
 
     return {'era5': era5_avg_df, 'gldas': gldas_avg_df,
-            'title': title, 'yaxis': "Temperatura in Celcius"}
+            'title': title, 'yaxis': "Temperatura en Celsius"}
 
 
 def surface_temp_compare(region):
@@ -230,5 +230,67 @@ def surface_temp_compare(region):
 
     title = "Surface Temperature"
     return {'era5': era5_avg_df, 'gldas': gldas_avg_df,
-            'title': title, 'yaxis': "Temperatura in Celcius"}
+            'title': title, 'yaxis': "Temperatura en Celsius"}
+
+def compare_precip_moist(region,isPoint):
+    now, avg_start, y2d_start = get_current_date()
+    print("in compare")
+    print(isPoint)
+
+    if isPoint:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        print("check")
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
+    print("check1")
+
+    # define functions that will be mapped
+    def clip_to_bounds(img):
+        return img.updateMask(ee.Image.constant(1).clip(area).mask())
+    def avg_gldas(img):
+        return img.set('avg_value', img.reduceRegion(
+            reducer=ee.Reducer.mean(),
+            geometry=area,
+        ))
+    # get gldas data
+    gldas_ic = ee.ImageCollection("NASA/GLDAS/V021/NOAH/G025/T3H")
+    gldas_monthly = ee.ImageCollection(
+        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_{i:02}' for i in range(1, 13)])
+    gldas_monthly = gldas_monthly.map(avg_gldas)
+
+    gldas_avg_df = pd.DataFrame(
+        gldas_monthly.aggregate_array('avg_value').getInfo(),
+    )
+    print(gldas_avg_df)
+    gldas_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=gldas_avg_df.index[i] + 1, day=15)
+                                for i in gldas_avg_df.index]
+    gldas_avg_df['date'] = gldas_avg_df['datetime'].dt.strftime("%Y-%m-%d")
+    date_generated_gldas = pd.date_range(y2d_start, periods=365)
+    cum_df_gldas = pd.DataFrame(date_generated_gldas)
+    values_list = []
+    for date in cum_df_gldas[0]:
+        i = 1
+        for val in gldas_avg_df["Rainf_tavg"]:
+            if date.month == i:
+                values_list.append(val * 86400)  # it is a rate per second - 86400 seconds in day convert to per day
+            i = i + 1
+    cum_df_gldas['val_per_day'] = values_list
+    # code will look for columns names 'date' and 'data_values' so rename to those
+    cum_df_gldas['date'] = cum_df_gldas[0].dt.strftime("%Y-%m-%d")
+    cum_df_gldas["data_values"] = cum_df_gldas['val_per_day'].cumsum()
+    print(cum_df_gldas)
+    gldas_ytd = gldas_ic.select(["Rainf_tavg", "RootMoist_inst"]).filterDate(y2d_start, now).map(clip_to_bounds).map(avg_gldas)
+    gldas_ytd_df = pd.DataFrame(
+        gldas_ytd.aggregate_array('avg_value').getInfo(),
+        index=pd.to_datetime(np.array(gldas_ytd.aggregate_array('system:time_start').getInfo()) * 1e6)
+    )
+    gldas_ytd_df['date'] = gldas_ytd_df.index.strftime("%Y-%m-%d")
+
+    gldas_ytd_df['Rainf_tavg'] = (gldas_ytd_df['Rainf_tavg'] * 10800).cumsum()
+    gldas_ytd_df = gldas_ytd_df.groupby('date').mean()
+    gldas_ytd_df.rename(index={0: 'index'}, inplace=True)
+    gldas_ytd_df['date'] = gldas_ytd_df.index
+
+    return { 'average_precip': cum_df_gldas, 'average_moist': gldas_avg_df, 'y2d' :gldas_ytd_df }
 
