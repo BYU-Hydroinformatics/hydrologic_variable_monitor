@@ -180,8 +180,9 @@ def plot_GLDAS(region, band, title, yaxis, isPoint):
         gldas_ytd_df = gldas_ytd_df.groupby('date').mean()
         gldas_ytd_df.rename(index={0: 'index'}, inplace=True)
         gldas_ytd_df['date'] = gldas_ytd_df.index
+    print(band)
 
-    if band == "Tair_f_inst" or "AvgSurfT_inst":
+    if band == "Tair_f_inst" or band == "AvgSurfT_inst":
         gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
         gldas_avg_df["data_values"] = gldas_avg_df["data_values"] - 273.15
 

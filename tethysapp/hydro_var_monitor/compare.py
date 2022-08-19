@@ -168,6 +168,8 @@ def air_temp_compare(region, isPoint):
     )
 
     era5_avg_df.columns = ["data_values"]
+    era5_avg_df['data_values'] = era5_avg_df['data_values'] - 273.15
+    era5_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era5_avg_df.index[i] + 1, day=15) for i in era5_avg_df.index]
     era5_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era5_avg_df.index[i] + 1, day=15) for i in
                                era5_avg_df.index]
     era5_avg_df['data_values'] = era5_avg_df['data_values'] - 273.15
@@ -230,7 +232,6 @@ def surface_temp_compare(region, isPoint):
 
     gldas_avg_df = pd.DataFrame(
         gldas_monthly.aggregate_array('avg_value').getInfo(),
-        # index=np.array(gldas_avg.aggregate_array('month').getInfo()).astype(int),
     )
     gldas_avg_df["data_values"] = gldas_avg_df["AvgSurfT_inst"] - 273.15
     gldas_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=gldas_avg_df.index[i] + 1, day=15)
@@ -302,3 +303,4 @@ def compare_precip_moist(region,isPoint):
     gldas_ytd_df['date'] = gldas_ytd_df.index
 
     return { 'average_precip': cum_df_gldas, 'average_moist': gldas_avg_df, 'y2d' :gldas_ytd_df }
+
