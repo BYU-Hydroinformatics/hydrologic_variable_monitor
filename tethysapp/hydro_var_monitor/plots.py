@@ -35,7 +35,6 @@ def set_ymd_properties(img):
 
 def plot_ERA5(region, band, title, yaxis):
     now, avg_start, y2d_start = get_current_date()
-    print("era5_function")
 
     get_coord = region["geometry"]
     area = ee.Geometry.Polygon(get_coord["coordinates"])
@@ -176,7 +175,6 @@ def plot_GLDAS(region, band, title, yaxis):
         gldas_ytd_df = gldas_ytd_df.groupby('date').mean()
         gldas_ytd_df.rename(index={0: 'index'}, inplace=True)
         gldas_ytd_df['date'] = gldas_ytd_df.index
-    print(band)
 
     if band == "Tair_f_inst" or band == "AvgSurfT_inst":
         gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
@@ -213,8 +211,6 @@ def plot_IMERG(region):
     values_list = []
     for date in cum_df[0]:
         i = 1
-        # print("printing date")
-        # print (date)
         for val in imerg_1m_df["HQprecipitation"]:
             if date.month == i:
                 values_list.append(val * 24)
