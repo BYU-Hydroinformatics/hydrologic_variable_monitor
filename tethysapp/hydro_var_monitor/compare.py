@@ -244,16 +244,12 @@ def surface_temp_compare(region, isPoint):
 
 def compare_precip_moist(region,isPoint):
     now, avg_start, y2d_start = get_current_date()
-    print("in compare")
-    print(isPoint)
 
     if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
-        print("check")
         get_coord = region["geometry"]
         area = ee.Geometry.Polygon(get_coord["coordinates"])
-    print("check1")
 
     # define functions that will be mapped
     def clip_to_bounds(img):
@@ -272,7 +268,6 @@ def compare_precip_moist(region,isPoint):
     gldas_avg_df = pd.DataFrame(
         gldas_monthly.aggregate_array('avg_value').getInfo(),
     )
-    print(gldas_avg_df)
     gldas_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=gldas_avg_df.index[i] + 1, day=15)
                                 for i in gldas_avg_df.index]
     gldas_avg_df['date'] = gldas_avg_df['datetime'].dt.strftime("%Y-%m-%d")
@@ -289,7 +284,6 @@ def compare_precip_moist(region,isPoint):
     # code will look for columns names 'date' and 'data_values' so rename to those
     cum_df_gldas['date'] = cum_df_gldas[0].dt.strftime("%Y-%m-%d")
     cum_df_gldas["data_values"] = cum_df_gldas['val_per_day'].cumsum()
-    print(cum_df_gldas)
     gldas_ytd = gldas_ic.select(["Rainf_tavg", "RootMoist_inst"]).filterDate(y2d_start, now).map(clip_to_bounds).map(avg_gldas)
     gldas_ytd_df = pd.DataFrame(
         gldas_ytd.aggregate_array('avg_value').getInfo(),
