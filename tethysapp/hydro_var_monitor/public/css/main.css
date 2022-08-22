@@ -11,7 +11,16 @@
     margin-block: 3px;
 }
 
-.modal-content{
+#chart_modal .modal-body {
+    height: 700px;
+    width: 1000px;
+}
+
+#chart_modal .modal-content {
+    height: 800px;
+    width: 1000px;
+}
+/*.modal-content{
     height: 800px;
     width: 1000px;
 }
@@ -19,6 +28,12 @@
     height: 700px;
     width: 1000px;
 }
+
+#lat-lon-modal{
+    position: center;
+    height: 200px;
+    width: 400px;
+}*/
 
 .form-select{
     width: 100%

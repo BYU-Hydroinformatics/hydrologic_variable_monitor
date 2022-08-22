@@ -1,11 +1,5 @@
 import ee
 
-'''def get_map_id(ic: ee.ImageCollection, vis_opts: dict = {}) -> str:
-    """
-    Get the map id for a given image collection.
-    """
-    return ic.getMapId(vis_opts)['tile_fetcher'].url_format'''
-
 
 def ERA5(band):
     ic = ee.ImageCollection("ECMWF/ERA5_LAND/MONTHLY").filterDate('1983-01-01', '2023-01-01').select(band).reduce(
@@ -41,8 +35,8 @@ def NDVI(region):
     # geometry and name it "point" or set the point coordinates with the
     # ee.Geometry.Point() function as demonstrated here.
     get_coord = region["geometry"]
-    area= ee.Geometry.Polygon(get_coord["coordinates"])
-    #print(point)
+    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    # print(point)
 
     # Import the Landsat 8 TOA image collection.
     l8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_TOA');

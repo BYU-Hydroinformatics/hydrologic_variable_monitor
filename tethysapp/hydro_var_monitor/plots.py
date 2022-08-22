@@ -33,11 +33,14 @@ def set_ymd_properties(img):
     })
 
 
-def plot_ERA5(region, band, title, yaxis):
+def plot_ERA5(region, band, title, yaxis, isPoint):
     now, avg_start, y2d_start = get_current_date()
 
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
     # read in img col
     img_col_avg = ee.ImageCollection(
         [f'users/rachelshaylahuber55/era5_monthly_avg/era5_monthly_{i:02}' for i in range(1, 13)])
@@ -115,10 +118,13 @@ def plot_ERA5(region, band, title, yaxis):
     return {'avg': avg_df, 'y2d': y2d_df, 'title': title, 'yaxis': yaxis}
 
 
-def plot_GLDAS(region, band, title, yaxis):
+def plot_GLDAS(region, band, title, yaxis, isPoint):
     now, avg_start, y2d_start = get_current_date()
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     gldas_ic = ee.ImageCollection("NASA/GLDAS/V021/NOAH/G025/T3H")
 
@@ -183,11 +189,13 @@ def plot_GLDAS(region, band, title, yaxis):
     return {'avg': gldas_avg_df, 'y2d': gldas_ytd_df, 'title': title, 'yaxis': yaxis}
 
 
-
-def plot_IMERG(region):
+def plot_IMERG(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     def avg_in_bounds(img):
         return img.set('avg_value', img.reduceRegion(
@@ -203,7 +211,6 @@ def plot_IMERG(region):
     imerg_1m_df = pd.DataFrame(
         imerg_1m_values_ic.aggregate_array('avg_value').getInfo(),
     ).dropna()
-
 
     date_generated = pd.date_range(y2d_start, periods=365)
     cum_df = pd.DataFrame(date_generated)
@@ -248,10 +255,13 @@ def plot_IMERG(region):
     return Dict
 
 
-def plot_CHIRPS(region):
+def plot_CHIRPS(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
     chirps_daily_ic = ee.ImageCollection('UCSB-CHG/CHIRPS/DAILY')
     chirps_pentad_ic = ee.ImageCollection(
         [f'users/rachelshaylahuber55/chirps_monthly_avg/chirps_monthly_avg_{i:02}' for i in range(1, 13)])
@@ -274,7 +284,6 @@ def plot_CHIRPS(region):
 
         columns=['depth', ]
     ).dropna()
-
 
     chirps_df['data_values'] = chirps_df['depth'].cumsum() * days_in_month / 5
     chirps_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=chirps_df.index[i] + 1, day=15) for i in
@@ -328,6 +337,7 @@ def plot_NDVI(region):
 
         # apply mask and return orignal image
         return image.updateMask(mask);
+
     def qa_mask_L8(image):
         # Bits 3, 4, and 5 are cloud shadow, snow, and cloud, respectively.
         cloudShadowBitMask = (1 << 3);
@@ -388,7 +398,7 @@ def plot_NDVI(region):
         # filter by sample locations
         .filterBounds(area)
         # apply qa mask
-        #.map(qa_mask_L8)
+        # .map(qa_mask_L8)
         # select the spectral bands and rename
         .select(
             ["SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6", "SR_B7"],
@@ -424,6 +434,6 @@ def plot_NDVI(region):
     avg = pd.DataFrame(info_to_plot)
     avg['data_values'] = avg[0]
 
-    avg['date'] = [datetime.datetime(year = int(now[:4]), month = avg.index[i]+1, day = 15) for i in avg.index]
+    avg['date'] = [datetime.datetime(year=int(now[:4]), month=avg.index[i] + 1, day=15) for i in avg.index]
 
-    return {'avg': avg, 'y2d': y2d, 'title':"NDVI", 'yaxis': ""}
+    return {'avg': avg, 'y2d': y2d, 'title': "NDVI", 'yaxis': ""}
