@@ -21,7 +21,7 @@ const App = (() => {
     const usrLat = document.getElementById('lat')
     const usrLon = document.getElementById('lon')
     const btnClearLatLon = document.getElementById('clear-lat-lon')
-    const btnComparePrecip = document.getElementById("compare-humedad")
+    const btnComparePrecip = document.getElementById('compare-humedad')
 
 
     const download = function (data, file_name) {
@@ -122,21 +122,27 @@ const App = (() => {
         $('#myModal').modal()
     }
 
+    const getVarSourceJSON = () => {
+        return {
+            "variable": selectVariable.value,
+            "source": selectSource.value,
+            "region": input_spatial,
+            "isPoint": isPoint
+        }
+    }
+
     btnComparePrecip.onclick = () => {
         const dataParams = getVarSourceJSON()
         //check that it is a variable that can be compared
-        if ( dataParams.region === "") return
+        if (dataParams.region === "") return
         $("#loading-icon").addClass("appear");
-        console.log(dataParams)
-
-       $.ajax({
+        $.ajax({
             type: "GET",
             url: URL_COMPARE_PRECIP,
             datatype: "JSON",
             data: dataParams,
             success: function (data) {
                 $("#loading-icon").removeClass("appear");
-                console.log(data)
                 $('#chart_modal').modal("show")
 
 
@@ -145,8 +151,8 @@ const App = (() => {
                 const average_moist = JSON.parse(data['average_moist'])
                 const y2d = JSON.parse(data['y2d'])
 
-                const precip_avg_extracted= Object.values(precip_avg.data_values)
-                const average_moist_extracted= Object.values(average_moist.RootMoist_inst)
+                const precip_avg_extracted = Object.values(precip_avg.data_values)
+                const average_moist_extracted = Object.values(average_moist.RootMoist_inst)
                 const y2d_moist_extracted = Object.values(y2d.RootMoist_inst)
                 const y2d_precip_extracted = Object.values(y2d.Rainf_tavg)
 
@@ -181,8 +187,6 @@ const App = (() => {
                 };
 
                 let data_plt = [precip_avg_plt, precip_y2d_plt, moisture_avg_plt, moisture_y2d_plt]
-                console.log(data_plt)
-
 
                 const layout = {
                     legend: {
@@ -190,68 +194,57 @@ const App = (() => {
                         y: 1,
                         traceorder: 'normal',
                         font: {
-                          family: 'sans-serif',
-                          size: 12,
-                          color: '#000'
+                            family: 'sans-serif',
+                            size: 12,
+                            color: '#000'
                         },
                         bgcolor: '#E2E2E2',
                         bordercolor: '#FFFFFF',
                         borderwidth: 2
-                      },
+                    },
                     title: "Comparison of Precipitation and Soil Moisture",
                     xaxis: {
                         title: 'day of year'
-                      },
+                    },
                     yaxis: {
                         title: "mm"
                     }
 
                 };
                 Plotly.newPlot('chart', data_plt, layout);
-                btnDownload.onclick= ()=>{
-                    //console.log(average)
-                    let list_era5 = ['date,value']
-                    era5_plt.x.forEach((num1, index) => {
-                      const num2 = era5_plt.y[index];
-                      list_era5.push((num1+","+num2));
+                btnDownload.onclick = () => {
+                    let list_preip_avg = ['date,value']
+                    precip_avg_plt.x.forEach((num1, index) => {
+                        const num2 = precip_avg_plt.y[index];
+                        list_precip_avg.push((num1 + "," + num2));
                     })
-                    let csvContent_era5 = list_era5.join("\n");
-                    download(csvContent_era5, "era5_averages")
-                    let list_gldas = ['date,value']
-                    gldas_plt.x.forEach((num1, index) => {
-                      const num2 = gldas_plt.y[index];
-                      list_gldas.push((num1+","+num2));
+                    let csvContent_precip_avg = list_precip_avg.join("\n");
+                    download(csvContent_precip_avg, "precip_averages")
+                    let list_precip_y2d = ['date,value']
+                    precip_y2d_plt.x.forEach((num1, index) => {
+                        const num2 = precip_y2d_plt.y[index];
+                        list_precip_y2d.push((num1 + "," + num2));
                     })
-                    let csvContent_gldas = list_gldas.join("\n");
-                    download(csvContent_gldas, "gldas_averages")
-                    if (dataParams.variable == "precip"){
-                        let list_imerg = ['date,value']
-                        imerg_plt.x.forEach((num1, index) => {
-                            const num2 = imerg_plt.y[index];
-                            list_imerg.push((num1+","+num2));
-                        })
-                        let csvContent_imerg = list_imerg.join("\n");
-                        download(csvContent_imerg, "imerg_averages")
-                        let list_chirps = ['date,value']
-                        chirps_plt.x.forEach((num1, index) => {
-                            const num2 = chirps_plt.y[index];
-                            list_chirps.push((num1+","+num2));
-                        })
-                        let csvContent_chirps= list_chirps.join("\n");
-                        download(csvContent_chirps, "chirps_averages")
-                    }
+                    let csvContent_precip_y2d = list_precip_y2d.join("\n");
+                    download(csvContent_precip_y2d, "year_to_date_precip")
+                    let list_moisture_avg = ['date,value']
+                    moisture_avg_plt.x.forEach((num1, index) => {
+                        const num2 = moisture_avg_plt.y[index];
+                        list_moisture_avg.push((num1 + "," + num2));
+                    })
+                    let csvContent_moisture_avg = list_moisture_avg.join("\n");
+                    download(csvContent_moisture_avg, "soil_moisture_averages")
+                    let list_moisture_y2d = ['date,value']
+                    moisture_y2d_plt.x.forEach((num1, index) => {
+                        const num2 = moisture_y2d_plt.y[index];
+                        list_moisture_y2d.push((num1 + "," + num2));
+                    })
+                    let csvContent_moisture_y2d = list_moisture_y2d.join("\n");
+                    download(csvContent_moisture_y2d, "year_to_date_soil_moisture")
+
                 }
             }
         })
-    }
-
-    const getVarSourceJSON = () => {
-        return {
-            "variable": selectVariable.value,
-            "source": selectSource.value,
-            "region": input_spatial,
-            "isPoint": isPoint
-        }
     }
 
 
@@ -272,7 +265,6 @@ const App = (() => {
         const dataParams = getVarSourceJSON()
         if (dataParams.variable === "" || dataParams.source === "") return
         $("#loading-icon").addClass("appear");
-
 
         $.ajax({
             type: "GET",
@@ -344,7 +336,6 @@ const App = (() => {
                 };
 
                 let data_plt = [era5_plt, gldas_plt]
-
                 //add imerg and chirps if it is precipitation
                 if (dataParams.variable == "precip") {
                     const imerg = JSON.parse(data['imerg'])
@@ -407,7 +398,7 @@ const App = (() => {
                     })
                     let csvContent_gldas = list_gldas.join("\n");
                     download(csvContent_gldas, "gldas_averages")
-                    if (dataParams.variable == "precip") {
+                    if (dataParams.variable === "precip") {
                         let list_imerg = ['date,value']
                         imerg_plt.x.forEach((num1, index) => {
                             const num2 = imerg_plt.y[index];
@@ -430,7 +421,7 @@ const App = (() => {
 
     btnPlotSeries.onclick = () => {
         const dataParams = getVarSourceJSON()
-        if (dataParams.isPoint == true) {
+        if (dataParams.isPoint === true) {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }
         if (dataParams.variable === "" || dataParams.source === "" || dataParams.region === "") return

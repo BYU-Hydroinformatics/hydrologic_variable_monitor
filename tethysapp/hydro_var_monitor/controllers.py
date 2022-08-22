@@ -70,6 +70,7 @@ def get_map_id(request):
         region = request.GET.get('region', None)
         sensor = request.GET.get('source', None)
         var = request.GET.get('variable', None)
+        isPoint = request.GET.get('isPoint', None)
 
         if sensor == "ERA5":
             if var == "air_temp":
@@ -115,7 +116,7 @@ def get_map_id(request):
 
         if sensor == "Landsat":
             vis_params = {"min": -1, "max": 1, "palette": ['blue', 'white', 'green']}
-            imgs = NDVI(json.loads(region))
+            imgs = NDVI(json.loads(region), json.loads(isPoint))
             # print ("in landsat")
         # get the url from specified image and then return it in json
         wurl = get_tile_url(imgs, vis_params)
@@ -155,9 +156,6 @@ def get_plot(request):
                 band = "skin_temperature"
                 title = "Temperatura del Suelo- ERA5"
                 yaxis = "Temperatura en Celsius"
-            plot_data = plot_ERA5(json.loads(region), band, title, yaxis)
-            print(plot_data)
-                yaxis = "temperatura in K"
             plot_data = plot_ERA5(json.loads(region), band, title, yaxis, json.loads(isPoint))
 
         if sensor == "GLDAS":
@@ -171,16 +169,13 @@ def get_plot(request):
                 yaxis = "Temperatura en Celsius"
             if var == "soil_moisture":
                 band = "RootMoist_inst"
-                title = "Humedad del Suelo - GLDAS"
+                title = "Humedad del Suelo - GLDAS (root zone)"
                 yaxis = "kg/m^2"
             if var == "soil_temperature":
                 band = "AvgSurfT_inst"
                 title = "Temperatura del Suelo - GLDAS"
-                yaxis = "temperatura in K"
-
-            plot_data = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint))
                 yaxis = "Temperatura en Celsius"
-            plot_data = plot_GLDAS(json.loads(region), band, title, yaxis)
+            plot_data = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint))
 
         if sensor == "IMERG":
             plot_data = plot_IMERG(json.loads(region), json.loads(isPoint))
@@ -205,7 +200,6 @@ def compare_precip(request):
     try:
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
-        print("compare_precip")
         plot_data = compare_precip_moist(json.loads(region), False)
 
         response_data.update({
