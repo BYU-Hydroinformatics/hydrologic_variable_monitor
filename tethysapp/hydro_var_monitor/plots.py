@@ -184,7 +184,6 @@ def plot_GLDAS(region, band, title, yaxis, isPoint):
     return {'avg': gldas_avg_df, 'y2d': gldas_ytd_df, 'title': title, 'yaxis': yaxis}
 
 
-
 def plot_IMERG(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
     if isPoint == True:
@@ -207,7 +206,6 @@ def plot_IMERG(region, isPoint):
     imerg_1m_df = pd.DataFrame(
         imerg_1m_values_ic.aggregate_array('avg_value').getInfo(),
     ).dropna()
-
 
     date_generated = pd.date_range(y2d_start, periods=365)
     cum_df = pd.DataFrame(date_generated)
@@ -284,7 +282,6 @@ def plot_CHIRPS(region, isPoint):
         columns=['depth', ]
     ).dropna()
 
-
     chirps_df['data_values'] = chirps_df['depth'].cumsum() * days_in_month / 5
     chirps_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=chirps_df.index[i] + 1, day=15) for i in
                              chirps_df.index]
@@ -337,6 +334,7 @@ def plot_NDVI(region):
 
         # apply mask and return orignal image
         return image.updateMask(mask);
+
     def qa_mask_L8(image):
         # Bits 3, 4, and 5 are cloud shadow, snow, and cloud, respectively.
         cloudShadowBitMask = (1 << 3);
@@ -397,7 +395,7 @@ def plot_NDVI(region):
         # filter by sample locations
         .filterBounds(area)
         # apply qa mask
-        #.map(qa_mask_L8)
+        # .map(qa_mask_L8)
         # select the spectral bands and rename
         .select(
             ["SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6", "SR_B7"],
@@ -433,6 +431,6 @@ def plot_NDVI(region):
     avg = pd.DataFrame(info_to_plot)
     avg['data_values'] = avg[0]
 
-    avg['date'] = [datetime.datetime(year = int(now[:4]), month = avg.index[i]+1, day = 15) for i in avg.index]
+    avg['date'] = [datetime.datetime(year=int(now[:4]), month=avg.index[i] + 1, day=15) for i in avg.index]
 
-    return {'avg': avg, 'y2d': y2d, 'title':"NDVI", 'yaxis': ""}
+    return {'avg': avg, 'y2d': y2d, 'title': "NDVI", 'yaxis': ""}

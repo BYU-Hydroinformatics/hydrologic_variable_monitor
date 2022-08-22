@@ -39,13 +39,13 @@ def compare(request):
         isPoint = request.GET.get('isPoint', None)
 
         if var == "air_temp":
-            dict = air_temp_compare(json.loads(region),json.loads(isPoint))
+            dict = air_temp_compare(json.loads(region), json.loads(isPoint))
 
         if var == "precip":
-            dict = precip_compare(json.loads(region),json.loads(isPoint))
+            dict = precip_compare(json.loads(region), json.loads(isPoint))
 
         if var == "soil_temperature":
-            dict = surface_temp_compare(json.loads(region),json.loads(isPoint))
+            dict = surface_temp_compare(json.loads(region), json.loads(isPoint))
 
         response_data.update({
             'success': True,

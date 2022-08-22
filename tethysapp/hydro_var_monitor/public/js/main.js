@@ -132,18 +132,12 @@ const App = (() => {
 
 
     btnLatLong.onclick = () => {
-        //console.log(dataParams)
-        if (isPoint == true) {
+        if (isPoint === true) {
             $("#errorModal").modal()
         } else {
-            console.log("lat")
             $('#lat-lon-modal').modal()
-            console.log("lat")
             const btnSave = document.getElementById('save')
             btnSave.onclick = () => {
-                console.log("check")
-                console.log(usrLat.value)
-                console.log(usrLon.value)
                 point = L.marker([usrLon.value, usrLat.value]).addTo(map);
                 isPoint = true;
             }
@@ -152,11 +146,9 @@ const App = (() => {
 
     btnLoadMap.onclick = () => {
         const dataParams = getVarSourceJSON()
-        console.log(dataParams)
         if (dataParams.variable === "" || dataParams.source === "") return
         $("#loading-icon").addClass("appear");
 
-        console.log(dataParams)
 
         $.ajax({
             type: "GET",
@@ -165,7 +157,6 @@ const App = (() => {
             data: dataParams,
             success: function (data) {
                 $("#loading-icon").removeClass("appear");
-                console.log(data)
                 if (data["success"] === true) {
                     //get url and set it then add it to the map
                     image_layer.setUrl(data.water_url)
@@ -184,7 +175,6 @@ const App = (() => {
     }
 
     btnCompare.onclick = () => {
-        //console.log(dataParams)
         const dataParams = getVarSourceJSON()
         if (dataParams.isPoint == true) {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
@@ -192,7 +182,6 @@ const App = (() => {
         //check that it is a variable that can be compared
         if (dataParams.variable === "" || dataParams.variable === "soil_moisture" || dataParams.variable === "ndvi" || dataParams.region === "") return
         $("#loading-icon").addClass("appear");
-        console.log(dataParams)
 
         $.ajax({
             type: "GET",
@@ -201,7 +190,6 @@ const App = (() => {
             data: dataParams,
             success: function (data) {
                 $("#loading-icon").removeClass("appear");
-                console.log(data)
                 $('#chart_modal').modal("show")
 
 
@@ -211,7 +199,6 @@ const App = (() => {
                 const title = data['title']
                 const yaxis = data['yaxis']
 
-                console.log(data['title'])
                 const era5_extracted_val = Object.values(era5.data_values)
                 const gldas_extracted_val = Object.values(gldas.data_values)
 
@@ -233,7 +220,6 @@ const App = (() => {
                 };
 
                 let data_plt = [era5_plt, gldas_plt]
-                console.log(data_plt)
 
                 //add imerg and chirps if it is precipitation
                 if (dataParams.variable == "precip") {
@@ -283,7 +269,6 @@ const App = (() => {
                 };
                 Plotly.newPlot('chart', data_plt, layout);
                 btnDownload.onclick = () => {
-                    //console.log(average)
                     let list_era5 = ['date,value']
                     era5_plt.x.forEach((num1, index) => {
                         const num2 = era5_plt.y[index];
@@ -325,7 +310,6 @@ const App = (() => {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }
         if (dataParams.variable === "" || dataParams.source === "" || dataParams.region === "") return
-        console.log(dataParams)
         //$('#chart_modal').modal("show")
         $("#loading-icon").addClass("appear");
 
@@ -335,15 +319,12 @@ const App = (() => {
             datatype: "JSON",
             data: dataParams,
             success: data => {
-                console.log("success!")
                 $('#chart_modal').modal("show")
                 $("#loading-icon").removeClass("appear");
                 //data = JSON.parse(data)
-                //console.log(data)
                 //get variable for plan from json
                 const averages = JSON.parse(data['avg'])
                 const y2d = JSON.parse(data['y2d'])
-                console.log(y2d)
                 const title = data['title']
                 const yaxis = data['yaxis']
 
@@ -352,7 +333,6 @@ const App = (() => {
 
                 const date_extracted_avg = Object.values(averages.date)
                 const date_extracted_y2d = Object.values(y2d.date)
-                console.log(temp_extracted_avg)
 
                 const year_2_date = {
                     x: date_extracted_y2d,
@@ -368,7 +348,6 @@ const App = (() => {
                     name: "Los promedios de los últimos 30 años"
                 };
 
-                console.log(average)
                 const date_plt = [year_2_date, average];
                 const layout = {
                     legend: {
@@ -394,7 +373,6 @@ const App = (() => {
                 };
                 Plotly.newPlot('chart', date_plt, layout);
                 btnDownload.onclick = () => {
-                    console.log(average)
                     let list_avg = ['date,value']
                     average.x.forEach((num1, index) => {
                         const num2 = average.y[index];
