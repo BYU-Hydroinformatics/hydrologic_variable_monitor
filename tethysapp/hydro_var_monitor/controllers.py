@@ -117,7 +117,6 @@ def get_map_id(request):
         if sensor == "Landsat":
             vis_params = {"min": -1, "max": 1, "palette": ['blue', 'white', 'green']}
             imgs = NDVI(json.loads(region), json.loads(isPoint))
-            # print ("in landsat")
         # get the url from specified image and then return it in json
         wurl = get_tile_url(imgs, vis_params)
         response_data.update({
