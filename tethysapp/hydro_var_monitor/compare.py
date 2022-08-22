@@ -6,12 +6,16 @@ from .plots import get_current_date, get_collection
 import numpy as np
 
 
-def precip_compare(region):
+def precip_compare(region, isPoint):
     # get needed functions
 
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
+
     now, avg_start, y2d_start = get_current_date()
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     def clip_to_bounds(img):
         return img.updateMask(ee.Image.constant(1).clip(area).mask())
@@ -20,7 +24,7 @@ def precip_compare(region):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=area,
-            #scale=1e6,
+            # scale=1e6,
         ))
 
     def avg_in_bounds(img):
@@ -28,7 +32,6 @@ def precip_compare(region):
             reducer=ee.Reducer.mean(),
             geometry=area,
         ))
-
 
     # get gldas data
     gldas_monthly = ee.ImageCollection(
@@ -41,7 +44,6 @@ def precip_compare(region):
     # consider that each day is growing at the average monthly rate
     img_col_avg = ee.ImageCollection(
         [f'users/rachelshaylahuber55/era5_monthly_avg/era5_monthly_{i:02}' for i in range(1, 13)])
-
 
     avg_img = img_col_avg.select("total_precipitation").map(avg_gldas)
 
@@ -99,13 +101,11 @@ def precip_compare(region):
     values_list = []
     for date in imerg_cum_df[0]:
         i = 1
-        # print("printing date")
         # print (date)
         for val in imerg_1m_df["HQprecipitation"]:
             if date.month == i:
                 values_list.append(val * 24)
             i = i + 1
-    # print(values_list)
 
     imerg_cum_df["val_per_day"] = values_list
     imerg_cum_df["data_values"] = imerg_cum_df["val_per_day"].cumsum()
@@ -144,11 +144,14 @@ def precip_compare(region):
             'title': title, 'yaxis': "mm of precipitation"}
 
 
-def air_temp_compare(region):
+def air_temp_compare(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
 
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     def avg_gldas(img):
         return img.set('avg_value', img.reduceRegion(
@@ -167,7 +170,8 @@ def air_temp_compare(region):
     )
 
     era5_avg_df.columns = ["data_values"]
-    era5_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era5_avg_df.index[i] + 1, day=15) for i in era5_avg_df.index]
+    era5_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era5_avg_df.index[i] + 1, day=15) for i in
+                               era5_avg_df.index]
     era5_avg_df['date'] = era5_avg_df['datetime'].dt.strftime("%Y-%m-%d")
     era5_avg_df.reset_index(drop=True, inplace=True)
 
@@ -190,18 +194,19 @@ def air_temp_compare(region):
             'title': title, 'yaxis': "temp in K"}
 
 
-def surface_temp_compare(region):
+def surface_temp_compare(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
-
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     # define functions that will be mapped
     def avg_gldas(img):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=area,
-            scale=1e6,
         ))
 
     # get era5 data
@@ -234,4 +239,3 @@ def surface_temp_compare(region):
     title = "Surface Temperature"
     return {'era5': era5_avg_df, 'gldas': gldas_avg_df,
             'title': title, 'yaxis': "temp in K"}
-

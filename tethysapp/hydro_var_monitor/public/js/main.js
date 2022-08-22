@@ -17,13 +17,17 @@ const App = (() => {
     const btnCompare = document.getElementById("compare")
     const btnInstructions = document.getElementById("instructions")
     const btnDownload = document.getElementById("download")
+    const btnLatLong = document.getElementById("lat-lon")
+    const usrLat = document.getElementById('lat')
+    const usrLon = document.getElementById('lon')
+    const btnClearLatLon = document.getElementById('clear-lat-lon')
 
 
     const download = function (data, file_name) {
 
         // Creating a Blob for having a csv file format
         // and passing the data with type
-        const blob = new Blob([data], { type: 'text/csv' });
+        const blob = new Blob([data], {type: 'text/csv'});
 
         // Creating an object for downloading url
         const url = window.URL.createObjectURL(blob)
@@ -48,71 +52,96 @@ const App = (() => {
     let map;
     let controlL;
     let input_spatial = "";
+    let isPoint = false;
+    let point;
 
     L.Control.Layers.include({
-    getOverlays: function() {
-      // create hash to hold all layers
-      let control, layers;
-      layers = {};
-      control = this;
+        getOverlays: function () {
+            // create hash to hold all layers
+            let control, layers;
+            layers = {};
+            control = this;
 
-      // loop thru all layers in control
-      control._layers.forEach(function(obj) {
-        let layerName;
+            // loop thru all layers in control
+            control._layers.forEach(function (obj) {
+                let layerName;
 
-        // check if layer is an overlay
-        if (obj.overlay) {
-          // get name of overlay
-          layerName = obj.name;
-          // store whether it's present on the map or not
-          return layers[layerName] = control._map.hasLayer(obj.layer);
+                // check if layer is an overlay
+                if (obj.overlay) {
+                    // get name of overlay
+                    layerName = obj.name;
+                    // store whether it's present on the map or not
+                    return layers[layerName] = control._map.hasLayer(obj.layer);
+                }
+            });
+
+            return layers;
         }
-      });
+    });
 
-      return layers;
-    }
-  });
+    map = L.map('map').setView([20, -40], 3);
 
-     map = L.map('map').setView([20, -40], 3);
+    image_layer = L.tileLayer('', {
+        opacity: 0.5, attribution:
+            '<a href="https://earthengine.google.com" target="_">' +
+            'Google Earth Engine</a>;'
+    }).addTo(map);
 
-     image_layer = L.tileLayer('',{opacity: 0.5, attribution:
-          '<a href="https://earthengine.google.com" target="_">' +
-          'Google Earth Engine</a>;'}).addTo(map);
+    const positron = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '©OpenStreetMap, ©CartoDB'
+    }).addTo(map);
 
-     const positron = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '©OpenStreetMap, ©CartoDB'
-        }).addTo(map);
+    let baseMaps = {"Basemap": positron}
+    let varMaps = {"Satellite Observation": image_layer}
 
-    let baseMaps = {"Basemap":positron}
-    let varMaps = {"Satellite Observation":image_layer}
-
-    controlL = L.control.layers(baseMaps,varMaps,{position: 'bottomleft'})
+    controlL = L.control.layers(baseMaps, varMaps, {position: 'bottomleft'})
     controlL.addTo(map);
 
     // FeatureGroup is to store editable layers
-     let drawnItems = new L.FeatureGroup().addTo(map);
+    let drawnItems = new L.FeatureGroup().addTo(map);
     //allow people to enter a region on the map - as for now only a point
-     let drawControl = new L.Control.Draw({
-       edit: {
-         featureGroup: drawnItems,
-         edit: true,
-       },
-       draw: {
-         marker: false,
-         polyline: false,
-         circlemarker: false,
-         circle: false,
-         polygon: true,
-         rectangle: true,
-         trash: true,
-       },
-     });
-     map.addControl(drawControl);
-
-    const getVarSourceJSON = () => {return {"variable": selectVariable.value, "source": selectSource.value, "region" : input_spatial}}
+    let drawControl = new L.Control.Draw({
+        edit: {
+            featureGroup: drawnItems,
+            edit: true,
+        },
+        draw: {
+            marker: false,
+            polyline: false,
+            circlemarker: false,
+            circle: false,
+            polygon: true,
+            rectangle: true,
+            trash: true,
+        },
+    });
+    map.addControl(drawControl);
 
     btnInstructions.onclick = () => {
         $('#myModal').modal()
+    }
+
+    const getVarSourceJSON = () => {
+        return {
+            "variable": selectVariable.value,
+            "source": selectSource.value,
+            "region": input_spatial,
+            "isPoint": isPoint
+        }
+    }
+
+
+    btnLatLong.onclick = () => {
+        if (isPoint === true) {
+            $("#errorModal").modal()
+        } else {
+            $('#lat-lon-modal').modal()
+            const btnSave = document.getElementById('save')
+            btnSave.onclick = () => {
+                point = L.marker([usrLon.value, usrLat.value]).addTo(map);
+                isPoint = true;
+            }
+        }
     }
 
     btnLoadMap.onclick = () => {
@@ -120,21 +149,21 @@ const App = (() => {
         if (dataParams.variable === "" || dataParams.source === "") return
         $("#loading-icon").addClass("appear");
 
-        console.log(dataParams)
 
-         $.ajax({
-             type:"GET",
-             url: URL_GETMAPID,
-             datatype:"JSON",
-             data: dataParams,
-             success: function(data){
+        $.ajax({
+            type: "GET",
+            url: URL_GETMAPID,
+            datatype: "JSON",
+            data: dataParams,
+            success: function (data) {
                 $("#loading-icon").removeClass("appear");
-                console.log(data)
                 if (data["success"] === true) {
                     //get url and set it then add it to the map
                     image_layer.setUrl(data.water_url)
                     map.addLayer(image_layer)
-                }}})
+                }
+            }
+        })
     }
 
     selectVariable.onchange = (e) => selectSource.innerHTML = SOURCES[e.target.value].map(src => `<option value="${src}">${src}</option>`).join("")
@@ -147,19 +176,20 @@ const App = (() => {
 
     btnCompare.onclick = () => {
         const dataParams = getVarSourceJSON()
+        if (dataParams.isPoint == true) {
+            dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
+        }
         //check that it is a variable that can be compared
-        if (dataParams.variable === "" || dataParams.variable === "soil_moisture"|| dataParams.variable === "ndvi"|| dataParams.region === "") return
+        if (dataParams.variable === "" || dataParams.variable === "soil_moisture" || dataParams.variable === "ndvi" || dataParams.region === "") return
         $("#loading-icon").addClass("appear");
-        console.log(dataParams)
 
-       $.ajax({
+        $.ajax({
             type: "GET",
             url: URL_COMPARE,
             datatype: "JSON",
             data: dataParams,
             success: function (data) {
                 $("#loading-icon").removeClass("appear");
-                console.log(data)
                 $('#chart_modal').modal("show")
 
 
@@ -169,8 +199,7 @@ const App = (() => {
                 const title = data['title']
                 const yaxis = data['yaxis']
 
-                console.log(data['title'])
-                const era5_extracted_val= Object.values(era5.data_values)
+                const era5_extracted_val = Object.values(era5.data_values)
                 const gldas_extracted_val = Object.values(gldas.data_values)
 
                 const era5_extracted_date = Object.values(era5.date)
@@ -191,13 +220,12 @@ const App = (() => {
                 };
 
                 let data_plt = [era5_plt, gldas_plt]
-                console.log(data_plt)
 
                 //add imerg and chirps if it is precipitation
                 if (dataParams.variable == "precip") {
                     const imerg = JSON.parse(data['imerg'])
                     const chirps = JSON.parse(data['chirps'])
-                    const imerg_extracted_val= Object.values(imerg.data_values)
+                    const imerg_extracted_val = Object.values(imerg.data_values)
                     const chirps_extracted_val = Object.values(chirps.data_values)
                     const imerg_extracted_date = Object.values(imerg.date)
                     const chirps_extracted_date = Object.values(chirps.date)
@@ -222,54 +250,53 @@ const App = (() => {
                         y: 1,
                         traceorder: 'normal',
                         font: {
-                          family: 'sans-serif',
-                          size: 12,
-                          color: '#000'
+                            family: 'sans-serif',
+                            size: 12,
+                            color: '#000'
                         },
                         bgcolor: '#E2E2E2',
                         bordercolor: '#FFFFFF',
                         borderwidth: 2
-                      },
+                    },
                     title: title,
                     xaxis: {
                         title: 'day of year'
-                      },
+                    },
                     yaxis: {
                         title: yaxis
                     }
 
                 };
                 Plotly.newPlot('chart', data_plt, layout);
-                btnDownload.onclick= ()=>{
-                    //console.log(average)
+                btnDownload.onclick = () => {
                     let list_era5 = ['date,value']
                     era5_plt.x.forEach((num1, index) => {
-                      const num2 = era5_plt.y[index];
-                      list_era5.push((num1+","+num2));
+                        const num2 = era5_plt.y[index];
+                        list_era5.push((num1 + "," + num2));
                     })
                     let csvContent_era5 = list_era5.join("\n");
                     download(csvContent_era5, "era5_averages")
                     let list_gldas = ['date,value']
                     gldas_plt.x.forEach((num1, index) => {
-                      const num2 = gldas_plt.y[index];
-                      list_gldas.push((num1+","+num2));
+                        const num2 = gldas_plt.y[index];
+                        list_gldas.push((num1 + "," + num2));
                     })
                     let csvContent_gldas = list_gldas.join("\n");
                     download(csvContent_gldas, "gldas_averages")
-                    if (dataParams.variable == "precip"){
+                    if (dataParams.variable == "precip") {
                         let list_imerg = ['date,value']
                         imerg_plt.x.forEach((num1, index) => {
                             const num2 = imerg_plt.y[index];
-                            list_imerg.push((num1+","+num2));
+                            list_imerg.push((num1 + "," + num2));
                         })
                         let csvContent_imerg = list_imerg.join("\n");
                         download(csvContent_imerg, "imerg_averages")
                         let list_chirps = ['date,value']
                         chirps_plt.x.forEach((num1, index) => {
                             const num2 = chirps_plt.y[index];
-                            list_chirps.push((num1+","+num2));
+                            list_chirps.push((num1 + "," + num2));
                         })
-                        let csvContent_chirps= list_chirps.join("\n");
+                        let csvContent_chirps = list_chirps.join("\n");
                         download(csvContent_chirps, "chirps_averages")
                     }
                 }
@@ -279,26 +306,25 @@ const App = (() => {
 
     btnPlotSeries.onclick = () => {
         const dataParams = getVarSourceJSON()
+        if (dataParams.isPoint == true) {
+            dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
+        }
         if (dataParams.variable === "" || dataParams.source === "" || dataParams.region === "") return
-        console.log(dataParams)
         //$('#chart_modal').modal("show")
         $("#loading-icon").addClass("appear");
 
         $.ajax({
-            type:"GET",
+            type: "GET",
             url: URL_GETPLOT,
-            datatype:"JSON",
+            datatype: "JSON",
             data: dataParams,
             success: data => {
-                console.log("success!")
                 $('#chart_modal').modal("show")
                 $("#loading-icon").removeClass("appear");
                 //data = JSON.parse(data)
-                //console.log(data)
                 //get variable for plan from json
                 const averages = JSON.parse(data['avg'])
                 const y2d = JSON.parse(data['y2d'])
-                console.log(y2d)
                 const title = data['title']
                 const yaxis = data['yaxis']
 
@@ -307,7 +333,6 @@ const App = (() => {
 
                 const date_extracted_avg = Object.values(averages.date)
                 const date_extracted_y2d = Object.values(y2d.date)
-                console.log(temp_extracted_avg)
 
                 const year_2_date = {
                     x: date_extracted_y2d,
@@ -320,10 +345,9 @@ const App = (() => {
                     x: date_extracted_avg,
                     y: temp_extracted_avg,
                     mode: 'lines',
-                    name:"Los promedios de los últimos 30 años"
+                    name: "Los promedios de los últimos 30 años"
                 };
 
-                console.log(average)
                 const date_plt = [year_2_date, average];
                 const layout = {
                     legend: {
@@ -331,49 +355,54 @@ const App = (() => {
                         y: 1,
                         traceorder: 'normal',
                         font: {
-                          family: 'sans-serif',
-                          size: 12,
-                          color: '#000'
+                            family: 'sans-serif',
+                            size: 12,
+                            color: '#000'
                         },
                         bgcolor: '#E2E2E2',
                         bordercolor: '#FFFFFF',
                         borderwidth: 2
-                      },
+                    },
                     title: title,
                     xaxis: {
                         title: 'día del año'
-                      },
+                    },
                     yaxis: {
                         title: yaxis
                     }
                 };
                 Plotly.newPlot('chart', date_plt, layout);
-                btnDownload.onclick= ()=>{
-                    console.log(average)
+                btnDownload.onclick = () => {
                     let list_avg = ['date,value']
                     average.x.forEach((num1, index) => {
-                      const num2 = average.y[index];
-                      list_avg.push((num1+","+num2));
+                        const num2 = average.y[index];
+                        list_avg.push((num1 + "," + num2));
                     })
                     let csvContent_avg = list_avg.join("\n");
                     download(csvContent_avg, "averages")
                     let list_y2d = ['date,value']
                     year_2_date.x.forEach((num1, index) => {
-                      const num2 = year_2_date.y[index];
-                      list_y2d.push((num1+","+num2));
+                        const num2 = year_2_date.y[index];
+                        list_y2d.push((num1 + "," + num2));
                     })
                     let csvContent_y2d = list_y2d.join("\n");
                     download(csvContent_y2d, "year-to-date")
                 }
 
-            }})
+            }
+        })
     }
-    
+
+    btnClearLatLon.onclick = () => {
+        map.removeLayer(point);
+        isPoint = false;
+    }
+
     map.on(L.Draw.Event.CREATED, e => {
         drawnItems.clearLayers()
         drawnItems.addLayer(e.layer);
         input_spatial = JSON.stringify(e.layer.toGeoJSON());
-      });
+    });
 
     return {}
 })();
