@@ -36,7 +36,7 @@ def set_ymd_properties(img):
 def plot_ERA5(region, band, title, yaxis, isPoint):
     now, avg_start, y2d_start = get_current_date()
 
-    if isPoint == True:
+    if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
         get_coord = region["geometry"]
@@ -57,7 +57,7 @@ def plot_ERA5(region, band, title, yaxis, isPoint):
         # set the result as a metadata property in the image
         return img.set(temp)
 
-    def get_df(band_name, img_col, region):
+    def get_df(band_name, img_col):
         era_df = img_col.select(band_name)
         era_with_property = era_df.map(get_val_at_xypoint)
         # create an array of values that are extracted from image collection
@@ -77,7 +77,7 @@ def plot_ERA5(region, band, title, yaxis, isPoint):
         ))
 
     avg_img = img_col_avg.select(band).map(avg_era)
-    y2d_df = get_df(band, img_col_y2d, area)
+    y2d_df = get_df(band, img_col_y2d)
 
     avg_df = pd.DataFrame(
         avg_img.aggregate_array('avg_value').getInfo(),
@@ -112,7 +112,8 @@ def plot_ERA5(region, band, title, yaxis, isPoint):
     if band == "total_precipitation":
         y2d_df["data_values"] = (y2d_df["data_values"] * 1000).cumsum()
     else:
-        y2d_df["data_values"] = y2d_df["data_values"]
+        y2d_df["data_values"] = (y2d_df["data_values"] - 273.15)
+        avg_df["data_values"] = (avg_df["data_values"] - 273.15)
 
     return {'avg': avg_df, 'y2d': y2d_df, 'title': title, 'yaxis': yaxis}
 
@@ -126,10 +127,6 @@ def plot_GLDAS(region, band, title, yaxis, isPoint):
         area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     gldas_ic = ee.ImageCollection("NASA/GLDAS/V021/NOAH/G025/T3H")
-
-    # define necessary functions
-    def clip_to_bounds(img):
-        return img.updateMask(ee.Image.constant(1).clip(area).mask())
 
     def avg_gldas(img):
         return img.set('avg_value', img.reduceRegion(
@@ -166,7 +163,7 @@ def plot_GLDAS(region, band, title, yaxis, isPoint):
                                     for i in gldas_avg_df.index]
         gldas_avg_df['date'] = gldas_avg_df['datetime'].dt.strftime("%Y-%m-%d")
 
-    gldas_ytd = gldas_ic.select(band).filterDate(y2d_start, now).map(clip_to_bounds).map(avg_gldas)
+    gldas_ytd = gldas_ic.select(band).filterDate(y2d_start, now).map(avg_gldas)
     gldas_ytd_df = pd.DataFrame(
         gldas_ytd.aggregate_array('avg_value').getInfo(),
         index=pd.to_datetime(np.array(gldas_ytd.aggregate_array('system:time_start').getInfo()) * 1e6)
@@ -180,6 +177,14 @@ def plot_GLDAS(region, band, title, yaxis, isPoint):
         gldas_ytd_df = gldas_ytd_df.groupby('date').mean()
         gldas_ytd_df.rename(index={0: 'index'}, inplace=True)
         gldas_ytd_df['date'] = gldas_ytd_df.index
+
+    if band == "Tair_f_inst" or band == "AvgSurfT_inst":
+        gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
+        gldas_avg_df["data_values"] = gldas_avg_df["data_values"] - 273.15
+
+    if band == "Tair_f_inst" or band == "AvgSurfT_inst":
+        gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
+        gldas_avg_df["data_values"] = gldas_avg_df["data_values"] - 273.15
 
     return {'avg': gldas_avg_df, 'y2d': gldas_ytd_df, 'title': title, 'yaxis': yaxis}
 
@@ -213,13 +218,10 @@ def plot_IMERG(region, isPoint):
     values_list = []
     for date in cum_df[0]:
         i = 1
-        # print("printing date")
-        # print (date)
         for val in imerg_1m_df["HQprecipitation"]:
             if date.month == i:
                 values_list.append(val * 24)
             i = i + 1
-    # print(values_list)
 
     cum_df["val_per_day"] = values_list
     cum_df["data_values"] = cum_df["val_per_day"].cumsum()
@@ -255,7 +257,8 @@ def plot_IMERG(region, isPoint):
 def plot_CHIRPS(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
     if isPoint == True:
-        area = ee.Geometry.Point([float(region[0]), float(region[1])])
+        spot = ee.Geometry.Point([float(region[0]), float(region[1])])
+        area = spot.buffer(400)
     else:
         get_coord = region["geometry"]
         area = ee.Geometry.Polygon(get_coord["coordinates"])
@@ -295,6 +298,7 @@ def plot_CHIRPS(region, isPoint):
         index=pd.to_datetime(np.array(chirps_ytd_ic.aggregate_array('system:time_start').getInfo()) * 1e6),
         columns=['depth', ]
     )
+
     chirps_ytd_df.index.name = 'datetime'
     chirps_ytd_df['data_values'] = chirps_ytd_df['depth'].cumsum()
     chirps_ytd_df['date'] = chirps_ytd_df.index.strftime("%Y-%m-%d")
@@ -304,10 +308,14 @@ def plot_CHIRPS(region, isPoint):
     return {'avg': chirps_df, 'y2d': chirps_ytd_df, 'yaxis': yaxis, 'title': title}
 
 
-def plot_NDVI(region):
+def plot_NDVI(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
-    get_coord = region["geometry"]
-    area = ee.Geometry.Polygon(get_coord["coordinates"])
+    if isPoint == True:
+        spot = ee.Geometry.Point([float(region[0]), float(region[1])])
+        area = spot.buffer(400)
+    else:
+        get_coord = region["geometry"]
+        area = ee.Geometry.Polygon(get_coord["coordinates"])
 
     # functions needed to get data
     # adds ndvi as a band
@@ -419,7 +427,8 @@ def plot_NDVI(region):
     y2d["data_values"] = y2d[0]
     y2d["day"] = dates
     y2d["date"] = y2d["day"].dt.strftime("%Y-%m-%d")
-    y2d.sort_values(by="date").reset_index(drop=True)
+    y2d.sort_values(by="date", inplace=True)
+    y2d = y2d.reset_index(drop=True)
 
     def avg_landsat_month(month_str):
         return landsat_ic.filterMetadata('month', 'equals', month_str).mean()

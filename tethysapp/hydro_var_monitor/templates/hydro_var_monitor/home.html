@@ -29,7 +29,8 @@
   <button id="plot-series" class="btn btn-primary btn-block">Mostrar Gráfico</button>
 
   <li class="title">4. Comparar los Promedios</li>
-  <button id="compare" class="btn btn-primary btn-block">Comparar</button>
+  <button id="compare" class="btn btn-primary btn-block">Comparar los Promedios </button>
+  <button id="compare-humedad" class="btn btn-primary btn-block">Comparar Precipitación y Humedad de Suelo</button>
 {% endblock %}
 
 {% block app_content %}
@@ -172,6 +173,7 @@
       const URL_GETMAPID = "{% url 'hydro_var_monitor:get-map-id' %}"
       const URL_GETPLOT = "{% url 'hydro_var_monitor:get-plot' %}"
       const URL_COMPARE = "{% url 'hydro_var_monitor:compare' %}"
+      const URL_COMPARE_PRECIP = "{% url 'hydro_var_monitor:compare_precip' %}"
       const SOURCES = JSON.parse('{{ sources|safe }}')
   </script>
   <script src='https://cdn.plot.ly/plotly-2.12.1.min.js'></script>

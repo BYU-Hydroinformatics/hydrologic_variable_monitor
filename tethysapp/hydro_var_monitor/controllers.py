@@ -8,7 +8,7 @@ from . import ee_auth
 import logging
 from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, NDVI
 from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS, plot_NDVI
-from .compare import air_temp_compare, precip_compare, surface_temp_compare
+from .compare import air_temp_compare, precip_compare, surface_temp_compare, compare_precip_moist
 
 
 # @controller(name='home', url='/', login_required=
@@ -32,20 +32,18 @@ def home(request):
 def compare(request):
     response_data = {'success': False}
     try:
-        # log.debug(f'GET: {request.GET}')
-
         region = request.GET.get('region', None)
         var = request.GET.get('variable', None)
         isPoint = request.GET.get('isPoint', None)
 
         if var == "air_temp":
-            dict = air_temp_compare(json.loads(region), json.loads(isPoint))
+            values = air_temp_compare(json.loads(region), json.loads(isPoint))
 
         if var == "precip":
-            dict = precip_compare(json.loads(region), json.loads(isPoint))
+            values = precip_compare(json.loads(region), json.loads(isPoint))
 
         if var == "soil_temperature":
-            dict = surface_temp_compare(json.loads(region), json.loads(isPoint))
+            values = surface_temp_compare(json.loads(region), json.loads(isPoint))
 
         response_data.update({
             'success': True,
@@ -54,7 +52,7 @@ def compare(request):
     except Exception as e:
         response_data['error'] = f'Error Processing Request: {e}'
 
-    return JsonResponse(json.loads(json.dumps(dict)))
+    return JsonResponse(json.loads(json.dumps(values)))
 
 
 # @controller(name='get-map-id', url='/ee/get-map-id', login_required=True)
@@ -65,11 +63,11 @@ def get_map_id(request):
         return HttpResponseNotAllowed(['GET'])
 
     try:
-        # log.debug(f'GET: {request.GET}')
 
         region = request.GET.get('region', None)
         sensor = request.GET.get('source', None)
         var = request.GET.get('variable', None)
+        isPoint = request.GET.get('isPoint', None)
 
         if sensor == "ERA5":
             if var == "air_temp":
@@ -115,8 +113,7 @@ def get_map_id(request):
 
         if sensor == "Landsat":
             vis_params = {"min": -1, "max": 1, "palette": ['blue', 'white', 'green']}
-            imgs = NDVI(json.loads(region))
-            # print ("in landsat")
+            imgs = NDVI(json.loads(region), json.loads(isPoint))
         # get the url from specified image and then return it in json
         wurl = get_tile_url(imgs, vis_params)
         response_data.update({
@@ -135,8 +132,6 @@ def get_plot(request):
     response_data = {'success': False}
 
     try:
-        # log.debug(f'GET: {request.GET}')
-
         sensor = request.GET.get('source', None)
         var = request.GET.get('variable', None)
         region = request.GET.get('region', None)
@@ -146,7 +141,7 @@ def get_plot(request):
             if var == "air_temp":
                 band = "temperature_2m"
                 title = "Temperatura del Aire - ERA5"
-                yaxis = "temperature in K"
+                yaxis = "Temperature en Celsius"
             if var == "precip":
                 band = "total_precipitation"
                 title = "Acumulados de Precipitación - ERA5"
@@ -154,7 +149,7 @@ def get_plot(request):
             if var == "soil_temperature":
                 band = "skin_temperature"
                 title = "Temperatura del Suelo- ERA5"
-                yaxis = "temperatura in K"
+                yaxis = "Temperatura en Celsius"
             plot_data = plot_ERA5(json.loads(region), band, title, yaxis, json.loads(isPoint))
 
         if sensor == "GLDAS":
@@ -165,16 +160,15 @@ def get_plot(request):
             if var == "air_temp":
                 band = "Tair_f_inst"
                 title = "Temperatura del Aire- GLDAS"
-                yaxis = "temperatura in K"
+                yaxis = "Temperatura en Celsius"
             if var == "soil_moisture":
                 band = "RootMoist_inst"
-                title = "Humedad del Suelo - GLDAS"
+                title = "Humedad del Suelo - GLDAS (root zone)"
                 yaxis = "kg/m^2"
             if var == "soil_temperature":
                 band = "AvgSurfT_inst"
                 title = "Temperatura del Suelo - GLDAS"
-                yaxis = "temperatura in K"
-
+                yaxis = "Temperatura en Celsius"
             plot_data = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint))
 
         if sensor == "IMERG":
@@ -185,6 +179,23 @@ def get_plot(request):
 
         if sensor == "Landsat":
             plot_data = plot_NDVI(json.loads(region), json.loads(isPoint))
+
+        response_data.update({
+            'success': True,
+        })
+
+    except Exception as e:
+        response_data['error'] = f'Error Processing Request: {e}'
+    return JsonResponse(json.loads(json.dumps(plot_data)))
+
+
+def compare_precip(request):
+    response_data = {'success': False}
+
+    try:
+        region = request.GET.get('region', None)
+        isPoint = request.GET.get('isPoint', None)
+        plot_data = compare_precip_moist(json.loads(region), False)
 
         response_data.update({
             'success': True,
