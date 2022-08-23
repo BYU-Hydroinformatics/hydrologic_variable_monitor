@@ -120,9 +120,8 @@ def plot_ERA5(region, band, title, yaxis, isPoint):
 
 def plot_GLDAS(region, band, title, yaxis, isPoint):
     now, avg_start, y2d_start = get_current_date()
-    if isPoint:
+    if isPoint == True:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
-        #area = spot.buffer(400)
     else:
         get_coord = region["geometry"]
         area = ee.Geometry.Polygon(get_coord["coordinates"])

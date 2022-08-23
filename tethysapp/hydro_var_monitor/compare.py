@@ -31,6 +31,7 @@ def precip_compare(region, isPoint):
             reducer=ee.Reducer.mean(),
             geometry=area,
         ))
+
     # get gldas data
     gldas_monthly = ee.ImageCollection(
         [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_{i:02}' for i in range(1, 13)])
@@ -169,11 +170,9 @@ def air_temp_compare(region, isPoint):
 
     era5_avg_df.columns = ["data_values"]
     era5_avg_df['data_values'] = era5_avg_df['data_values'] - 273.15
-    era5_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era5_avg_df.index[i] + 1, day=15) for i in era5_avg_df.index]
     era5_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era5_avg_df.index[i] + 1, day=15) for i in
                                era5_avg_df.index]
-    era5_avg_df['data_values'] = era5_avg_df['data_values'] - 273.15
-    era5_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era5_avg_df.index[i] + 1, day=15) for i in era5_avg_df.index]
+
     era5_avg_df['date'] = era5_avg_df['datetime'].dt.strftime("%Y-%m-%d")
     era5_avg_df.reset_index(drop=True, inplace=True)
 
@@ -297,4 +296,5 @@ def compare_precip_moist(region,isPoint):
     gldas_ytd_df['date'] = gldas_ytd_df.index
 
     return { 'average_precip': cum_df_gldas, 'average_moist': gldas_avg_df, 'y2d' :gldas_ytd_df }
+
 

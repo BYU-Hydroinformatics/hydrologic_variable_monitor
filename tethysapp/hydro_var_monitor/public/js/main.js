@@ -24,6 +24,7 @@ const App = (() => {
     const btnComparePrecip = document.getElementById('compare-humedad')
 
 
+
     const download = function (data, file_name) {
 
         // Creating a Blob for having a csv file format
@@ -265,7 +266,7 @@ const App = (() => {
         const dataParams = getVarSourceJSON()
         if (dataParams.variable === "" || dataParams.source === "") return
         $("#loading-icon").addClass("appear");
-
+        
         $.ajax({
             type: "GET",
             url: URL_GETMAPID,
@@ -336,6 +337,7 @@ const App = (() => {
                 };
 
                 let data_plt = [era5_plt, gldas_plt]
+                
                 //add imerg and chirps if it is precipitation
                 if (dataParams.variable == "precip") {
                     const imerg = JSON.parse(data['imerg'])
@@ -399,6 +401,7 @@ const App = (() => {
                     let csvContent_gldas = list_gldas.join("\n");
                     download(csvContent_gldas, "gldas_averages")
                     if (dataParams.variable === "precip") {
+
                         let list_imerg = ['date,value']
                         imerg_plt.x.forEach((num1, index) => {
                             const num2 = imerg_plt.y[index];
