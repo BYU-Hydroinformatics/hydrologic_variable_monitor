@@ -9,7 +9,7 @@ import numpy as np
 def precip_compare(region, isPoint):
     # get needed functions
 
-    if isPoint == True:
+    if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
         get_coord = region["geometry"]
@@ -146,7 +146,7 @@ def precip_compare(region, isPoint):
 def air_temp_compare(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
 
-    if isPoint == True:
+    if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
         get_coord = region["geometry"]
@@ -191,13 +191,12 @@ def air_temp_compare(region, isPoint):
 
     title = "Air Temperature"
 
-    return {'era5': era5_avg_df, 'gldas': gldas_avg_df,
-            'title': title, 'yaxis': "Temperatura en Celsius"}
+    return {'era5': era5_avg_df, 'gldas': gldas_avg_df, 'title': title, 'yaxis': "Temperatura en Celsius"}
 
 
 def surface_temp_compare(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
-    if isPoint == True:
+    if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
         get_coord = region["geometry"]
@@ -238,10 +237,10 @@ def surface_temp_compare(region, isPoint):
     gldas_avg_df['date'] = gldas_avg_df['datetime'].dt.strftime("%Y-%m-%d")
 
     title = "Surface Temperature"
-    return {'era5': era5_avg_df, 'gldas': gldas_avg_df,
-            'title': title, 'yaxis': "Temperatura en Celsius"}
+    return {'era5': era5_avg_df, 'gldas': gldas_avg_df, 'title': title, 'yaxis': "Temperatura en Celsius"}
 
-def compare_precip_moist(region,isPoint):
+
+def compare_precip_moist(region, isPoint):
     now, avg_start, y2d_start = get_current_date()
 
     if isPoint:
@@ -253,11 +252,13 @@ def compare_precip_moist(region,isPoint):
     # define functions that will be mapped
     def clip_to_bounds(img):
         return img.updateMask(ee.Image.constant(1).clip(area).mask())
+
     def avg_gldas(img):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=area,
         ))
+
     # get gldas data
     gldas_ic = ee.ImageCollection("NASA/GLDAS/V021/NOAH/G025/T3H")
     gldas_monthly = ee.ImageCollection(
@@ -283,7 +284,8 @@ def compare_precip_moist(region,isPoint):
     # code will look for columns names 'date' and 'data_values' so rename to those
     cum_df_gldas['date'] = cum_df_gldas[0].dt.strftime("%Y-%m-%d")
     cum_df_gldas["data_values"] = cum_df_gldas['val_per_day'].cumsum()
-    gldas_ytd = gldas_ic.select(["Rainf_tavg", "RootMoist_inst"]).filterDate(y2d_start, now).map(clip_to_bounds).map(avg_gldas)
+    gldas_ytd = gldas_ic.select(["Rainf_tavg", "RootMoist_inst"]).filterDate(y2d_start, now).map(clip_to_bounds).map(
+        avg_gldas)
     gldas_ytd_df = pd.DataFrame(
         gldas_ytd.aggregate_array('avg_value').getInfo(),
         index=pd.to_datetime(np.array(gldas_ytd.aggregate_array('system:time_start').getInfo()) * 1e6)
@@ -295,6 +297,4 @@ def compare_precip_moist(region,isPoint):
     gldas_ytd_df.rename(index={0: 'index'}, inplace=True)
     gldas_ytd_df['date'] = gldas_ytd_df.index
 
-    return { 'average_precip': cum_df_gldas, 'average_moist': gldas_avg_df, 'y2d' :gldas_ytd_df }
-
-
+    return {'average_precip': cum_df_gldas, 'average_moist': gldas_avg_df, 'y2d': gldas_ytd_df}

@@ -41,7 +41,6 @@ def NDVI(region, isPoint):
         get_coord = region["geometry"]
         area = ee.Geometry.Polygon(get_coord["coordinates"])
 
-
     # Import the Landsat 8 TOA image collection.
     l8 = ee.ImageCollection('LANDSAT/LC08/C01/T1_TOA');
 

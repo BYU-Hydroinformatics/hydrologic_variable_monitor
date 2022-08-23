@@ -293,7 +293,6 @@ def plot_CHIRPS(region, isPoint):
     chirps_ytd_ic = chirps_daily_ic.filterDate(y2d_start, now).select('precipitation').map(clip_to_bounds).map(
         chirps_avg)
 
-
     chirps_ytd_df = pd.DataFrame(
         chirps_ytd_ic.aggregate_array('avg_value').getInfo(),
         index=pd.to_datetime(np.array(chirps_ytd_ic.aggregate_array('system:time_start').getInfo()) * 1e6),

@@ -32,20 +32,18 @@ def home(request):
 def compare(request):
     response_data = {'success': False}
     try:
-        # log.debug(f'GET: {request.GET}')
-
         region = request.GET.get('region', None)
         var = request.GET.get('variable', None)
         isPoint = request.GET.get('isPoint', None)
 
         if var == "air_temp":
-            dict = air_temp_compare(json.loads(region), json.loads(isPoint))
+            values = air_temp_compare(json.loads(region), json.loads(isPoint))
 
         if var == "precip":
-            dict = precip_compare(json.loads(region), json.loads(isPoint))
+            values = precip_compare(json.loads(region), json.loads(isPoint))
 
         if var == "soil_temperature":
-            dict = surface_temp_compare(json.loads(region), json.loads(isPoint))
+            values = surface_temp_compare(json.loads(region), json.loads(isPoint))
 
         response_data.update({
             'success': True,
@@ -54,7 +52,7 @@ def compare(request):
     except Exception as e:
         response_data['error'] = f'Error Processing Request: {e}'
 
-    return JsonResponse(json.loads(json.dumps(dict)))
+    return JsonResponse(json.loads(json.dumps(values)))
 
 
 # @controller(name='get-map-id', url='/ee/get-map-id', login_required=True)
@@ -65,7 +63,6 @@ def get_map_id(request):
         return HttpResponseNotAllowed(['GET'])
 
     try:
-        # log.debug(f'GET: {request.GET}')
 
         region = request.GET.get('region', None)
         sensor = request.GET.get('source', None)
@@ -135,8 +132,6 @@ def get_plot(request):
     response_data = {'success': False}
 
     try:
-        # log.debug(f'GET: {request.GET}')
-
         sensor = request.GET.get('source', None)
         var = request.GET.get('variable', None)
         region = request.GET.get('region', None)
@@ -192,6 +187,7 @@ def get_plot(request):
     except Exception as e:
         response_data['error'] = f'Error Processing Request: {e}'
     return JsonResponse(json.loads(json.dumps(plot_data)))
+
 
 def compare_precip(request):
     response_data = {'success': False}
