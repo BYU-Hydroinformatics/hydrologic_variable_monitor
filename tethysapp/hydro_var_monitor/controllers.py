@@ -143,15 +143,15 @@ def get_plot(request):
         var = request.GET.get('variable', None)
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
-        startDate = request.GET.get('startDate', None)
-        endDate = request.GET.get('endDate', None)
+        year = request.GET.get('year', None)
         #print(startDate)
 
-        if startDate == "" or endDate == "":
-            startDate, endDate  = get_date()
+        if year== "" or year == "2022" or year == "y2d":
+            endDate, startDate  = get_date()
         else:
-            startDate = datetime.strptime(startDate, "%m/%d/%Y").strftime("%Y-%m-%d")
-            endDate = datetime.strptime(endDate, "%m/%d/%Y").strftime("%Y-%m-%d")
+            startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
+            endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")
+            print(year)
         print(startDate)
         print(endDate)
 

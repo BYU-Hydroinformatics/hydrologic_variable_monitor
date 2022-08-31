@@ -22,9 +22,7 @@ const App = (() => {
     const usrLon = document.getElementById('lon')
     const btnClearLatLon = document.getElementById('clear-lat-lon')
     const btnComparePrecip = document.getElementById('compare-humedad')
-    const btnSubmitDate = document.getElementById('date-submit')
-    const startDate = document.getElementById("start-date")
-    const endDate = document.getElementById("end-date")
+    const year = document.getElementById("select-year")
 
 
     const download = function (data, file_name) {
@@ -131,8 +129,7 @@ const App = (() => {
             "source": selectSource.value,
             "region": input_spatial,
             "isPoint": isPoint,
-            "startDate": startDate.value,
-            "endDate": endDate.value
+            "year": year.value
         }
     }
 
@@ -427,7 +424,9 @@ const App = (() => {
     }
 
     btnPlotSeries.onclick = () => {
+        console.log("here")
         const dataParams = getVarSourceJSON()
+        console.log(dataParams)
         if (dataParams.isPoint === true) {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }
