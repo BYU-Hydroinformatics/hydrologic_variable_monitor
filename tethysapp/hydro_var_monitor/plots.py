@@ -7,11 +7,8 @@ import calendar
 
 
 # define functions
-def get_current_date():
-    now = date.today().strftime("%Y-%m-%d")
-    avg_start = date.today().replace(year=date.today().year - 30).strftime("%Y-%m-%d")
-    y2d_start = date(date.today().year, 1, 1).strftime("%Y-%m-%d")
-    return now, avg_start, y2d_start
+def get_avg_date():
+    return date.today().replace(year=date.today().year - 30).strftime("%Y-%m-%d")
 
 
 def get_collection(collection_name, xy_point, start_date='1992-01-01', end_date='2023-01-01'):
@@ -33,8 +30,9 @@ def set_ymd_properties(img):
     })
 
 
-def plot_ERA5(region, band, title, yaxis, isPoint):
-    now, avg_start, y2d_start = get_current_date()
+def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
+    now = endDate
+    y2d_start = startDate
 
     if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
@@ -118,8 +116,9 @@ def plot_ERA5(region, band, title, yaxis, isPoint):
     return {'avg': avg_df, 'y2d': y2d_df, 'title': title, 'yaxis': yaxis}
 
 
-def plot_GLDAS(region, band, title, yaxis, isPoint):
-    now, avg_start, y2d_start = get_current_date()
+def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
+    now = endDate
+    y2d_start = startDate
     if isPoint == True:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
@@ -189,8 +188,9 @@ def plot_GLDAS(region, band, title, yaxis, isPoint):
     return {'avg': gldas_avg_df, 'y2d': gldas_ytd_df, 'title': title, 'yaxis': yaxis}
 
 
-def plot_IMERG(region, isPoint):
-    now, avg_start, y2d_start = get_current_date()
+def plot_IMERG(region, isPoint, startDate, endDate):
+    now = endDate
+    y2d_start = startDate
     if isPoint == True:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
@@ -254,8 +254,11 @@ def plot_IMERG(region, isPoint):
     return Dict
 
 
-def plot_CHIRPS(region, isPoint):
-    now, avg_start, y2d_start = get_current_date()
+def plot_CHIRPS(region, isPoint, startDate, endDate):
+    now = endDate
+    y2d_start = startDate
+    print(now)
+
     if isPoint == True:
         spot = ee.Geometry.Point([float(region[0]), float(region[1])])
         area = spot.buffer(400)
@@ -289,27 +292,32 @@ def plot_CHIRPS(region, isPoint):
     chirps_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=chirps_df.index[i] + 1, day=15) for i in
                              chirps_df.index]
     chirps_df['date'] = chirps_df['datetime'].dt.strftime("%Y-%m-%d")
+    print("finished avg")
 
     chirps_ytd_ic = chirps_daily_ic.filterDate(y2d_start, now).select('precipitation').map(clip_to_bounds).map(
         chirps_avg)
+    print(chirps_ytd_ic)
 
     chirps_ytd_df = pd.DataFrame(
         chirps_ytd_ic.aggregate_array('avg_value').getInfo(),
         index=pd.to_datetime(np.array(chirps_ytd_ic.aggregate_array('system:time_start').getInfo()) * 1e6),
         columns=['depth', ]
     )
+    print("check")
 
     chirps_ytd_df.index.name = 'datetime'
     chirps_ytd_df['data_values'] = chirps_ytd_df['depth'].cumsum()
     chirps_ytd_df['date'] = chirps_ytd_df.index.strftime("%Y-%m-%d")
     yaxis = "mm of precipitación"
     title = "Acumulados de Precipitación - CHIRPS"
+    print("finished plot chirps")
 
     return {'avg': chirps_df, 'y2d': chirps_ytd_df, 'yaxis': yaxis, 'title': title}
 
 
-def plot_NDVI(region, isPoint):
-    now, avg_start, y2d_start = get_current_date()
+def plot_NDVI(region, isPoint, startDate, endDate):
+    now = endDate
+    y2d_start = startDate
     if isPoint == True:
         spot = ee.Geometry.Point([float(region[0]), float(region[1])])
         area = spot.buffer(400)
@@ -413,7 +421,7 @@ def plot_NDVI(region, isPoint):
 
     # merge all of the collections together for long time series
     landsat_ic = l5_collection.merge(l7_collection).merge(l8_collection).filterBounds(area).map(add_ndvi).select(
-        'ndvi').filterDate(avg_start, now).map(landsat_avg).map(set_ymd_properties)
+        'ndvi').filterDate("1998-01-01", now).map(landsat_avg).map(set_ymd_properties)
     month_list = ee.List(['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'])
 
     landsat_ic_y2d = l5_collection.merge(l7_collection).merge(l8_collection).filterBounds(area).map(add_ndvi).select(

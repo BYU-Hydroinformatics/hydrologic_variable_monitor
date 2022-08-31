@@ -30,7 +30,31 @@
 
   <li class="title">4. Comparar los Promedios</li>
   <button id="compare" class="btn btn-primary btn-block">Comparar los Promedios </button>
-  <button id="compare-humedad" class="btn btn-primary btn-block">Comparar Precipitación y Humedad de Suelo</button>
+  <button id="compare-humedad" class="btn btn-primary btn-block">Comparar Precip y Humedad de Suelo</button>
+    <li class="title">Choose specific date for graph</li>
+    <div class="bootstrap-iso">
+ <div class="container-fluid">
+  <div class="row">
+   <div class="col-md-6 col-sm-6 col-xs-12">
+
+    <!-- Form code begins -->
+    <form method="post">
+      <div class="form-group"> <!-- Date input -->
+        <label class="control-label" for="date">Start Date</label>
+        <input class="form-control" id="start-date" name="date" placeholder="MM/DD/YYY" type="text"/>
+          <label class="control-label" for="date">End Date</label>
+          <input class="form-control" id="end-date" name="date" placeholder="MM/DD/YYY" type="text"/>
+      </div>
+      <div class="form-group"> <!-- Submit button -->
+      </div>
+     </form>
+     <!-- Form code ends -->
+
+    </div>
+  </div>
+ </div>
+</div>
+    <button id = "date-submit" type="button" class="btn btn-primary btn-block">Data in Specific Date Range</button>
 {% endblock %}
 
 {% block app_content %}
@@ -154,27 +178,6 @@
     </div>
 
   </div>
-</div>
-    <div class="bootstrap-iso">
- <div class="container-fluid">
-  <div class="row">
-   <div class="col-md-6 col-sm-6 col-xs-12">
-
-    <!-- Form code begins -->
-    <form method="post">
-      <div class="form-group"> <!-- Date input -->
-        <label class="control-label" for="date">Date</label>
-        <input class="form-control" id="date" name="date" placeholder="MM/DD/YYY" type="text"/>
-      </div>
-      <div class="form-group"> <!-- Submit button -->
-        <button class="btn btn-primary " name="submit" type="submit">Submit</button>
-      </div>
-     </form>
-     <!-- Form code ends -->
-
-    </div>
-  </div>
- </div>
 </div>
 {% endblock %}
 

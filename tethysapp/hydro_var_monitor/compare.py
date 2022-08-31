@@ -2,9 +2,14 @@ import datetime
 import ee
 import pandas as pd
 import calendar
-from .plots import get_current_date, get_collection
+from .plots import get_collection
 import numpy as np
 
+
+def get_current_date():
+    now = date.today().strftime("%Y-%m-%d")
+    y2d_start = date(date.today().year, 1, 1).strftime("%Y-%m-%d")
+    return now, y2d_start
 
 def precip_compare(region, isPoint):
     # get needed functions
@@ -15,7 +20,7 @@ def precip_compare(region, isPoint):
         get_coord = region["geometry"]
         area = ee.Geometry.Polygon(get_coord["coordinates"])
 
-    now, avg_start, y2d_start = get_current_date()
+    now, y2d_start = get_current_date()
 
     def clip_to_bounds(img):
         return img.updateMask(ee.Image.constant(1).clip(area).mask())
@@ -144,7 +149,7 @@ def precip_compare(region, isPoint):
 
 
 def air_temp_compare(region, isPoint):
-    now, avg_start, y2d_start = get_current_date()
+    now, y2d_start = get_current_date()
 
     if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
@@ -195,7 +200,7 @@ def air_temp_compare(region, isPoint):
 
 
 def surface_temp_compare(region, isPoint):
-    now, avg_start, y2d_start = get_current_date()
+    now, y2d_start = get_current_date()
     if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
@@ -241,7 +246,7 @@ def surface_temp_compare(region, isPoint):
 
 
 def compare_precip_moist(region, isPoint):
-    now, avg_start, y2d_start = get_current_date()
+    now, y2d_start = get_current_date()
 
     if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])

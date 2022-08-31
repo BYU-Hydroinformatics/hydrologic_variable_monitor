@@ -1,4 +1,6 @@
 from django.http.response import JsonResponse
+from datetime import date
+from datetime import datetime
 from django.shortcuts import render
 from tethys_sdk.permissions import login_required
 from .ee_auth import *
@@ -126,16 +128,32 @@ def get_map_id(request):
 
     return JsonResponse(response_data)
 
+def get_date():
+    now = date.today().strftime("%Y-%m-%d")
+    y2d_start = date(date.today().year, 1, 1).strftime("%Y-%m-%d")
+    return now, y2d_start
 
 # @controller(name='get-plot', url='/ee/get-plot', login_required=True)
 def get_plot(request):
     response_data = {'success': False}
+    print("get_plot")
 
     try:
         sensor = request.GET.get('source', None)
         var = request.GET.get('variable', None)
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
+        startDate = request.GET.get('startDate', None)
+        endDate = request.GET.get('endDate', None)
+        #print(startDate)
+
+        if startDate == "" or endDate == "":
+            startDate, endDate  = get_date()
+        else:
+            startDate = datetime.strptime(startDate, "%m/%d/%Y").strftime("%Y-%m-%d")
+            endDate = datetime.strptime(endDate, "%m/%d/%Y").strftime("%Y-%m-%d")
+        print(startDate)
+        print(endDate)
 
         if sensor == "ERA5":
             if var == "air_temp":
@@ -150,7 +168,7 @@ def get_plot(request):
                 band = "skin_temperature"
                 title = "Temperatura del Suelo- ERA5"
                 yaxis = "Temperatura en Celsius"
-            plot_data = plot_ERA5(json.loads(region), band, title, yaxis, json.loads(isPoint))
+            plot_data = plot_ERA5(json.loads(region), band, title, yaxis, json.loads(isPoint), startDate, endDate)
 
         if sensor == "GLDAS":
             if var == "precip":
@@ -169,16 +187,17 @@ def get_plot(request):
                 band = "AvgSurfT_inst"
                 title = "Temperatura del Suelo - GLDAS"
                 yaxis = "Temperatura en Celsius"
-            plot_data = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint))
+            plot_data = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint), startDate, endDate)
 
         if sensor == "IMERG":
-            plot_data = plot_IMERG(json.loads(region), json.loads(isPoint))
+            plot_data = plot_IMERG(json.loads(region), json.loads(isPoint), startDate, endDate)
 
         if sensor == "CHIRPS":
-            plot_data = plot_CHIRPS(json.loads(region), json.loads(isPoint))
+            print("chirps")
+            plot_data = plot_CHIRPS(json.loads(region), json.loads(isPoint), startDate, endDate)
 
         if sensor == "Landsat":
-            plot_data = plot_NDVI(json.loads(region), json.loads(isPoint))
+            plot_data = plot_NDVI(json.loads(region), json.loads(isPoint), startDate, endDate)
 
         response_data.update({
             'success': True,
@@ -195,7 +214,7 @@ def compare_precip(request):
     try:
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
-        plot_data = compare_precip_moist(json.loads(region), False)
+        plot_data = compare_precip_moist(json.loads(region), isPoint)
 
         response_data.update({
             'success': True,
@@ -204,3 +223,4 @@ def compare_precip(request):
     except Exception as e:
         response_data['error'] = f'Error Processing Request: {e}'
     return JsonResponse(json.loads(json.dumps(plot_data)))
+

@@ -22,7 +22,9 @@ const App = (() => {
     const usrLon = document.getElementById('lon')
     const btnClearLatLon = document.getElementById('clear-lat-lon')
     const btnComparePrecip = document.getElementById('compare-humedad')
-
+    const btnSubmitDate = document.getElementById('date-submit')
+    const startDate = document.getElementById("start-date")
+    const endDate = document.getElementById("end-date")
 
 
     const download = function (data, file_name) {
@@ -128,7 +130,9 @@ const App = (() => {
             "variable": selectVariable.value,
             "source": selectSource.value,
             "region": input_spatial,
-            "isPoint": isPoint
+            "isPoint": isPoint,
+            "startDate": startDate.value,
+            "endDate": endDate.value
         }
     }
 
@@ -266,7 +270,7 @@ const App = (() => {
         const dataParams = getVarSourceJSON()
         if (dataParams.variable === "" || dataParams.source === "") return
         $("#loading-icon").addClass("appear");
-        
+
         $.ajax({
             type: "GET",
             url: URL_GETMAPID,
@@ -337,7 +341,7 @@ const App = (() => {
                 };
 
                 let data_plt = [era5_plt, gldas_plt]
-                
+
                 //add imerg and chirps if it is precipitation
                 if (dataParams.variable == "precip") {
                     const imerg = JSON.parse(data['imerg'])
