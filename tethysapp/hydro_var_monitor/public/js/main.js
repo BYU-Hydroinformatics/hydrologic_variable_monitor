@@ -427,9 +427,9 @@ const App = (() => {
     }
 
     btnPlotSeries.onclick = () => {
-        console.log("here")
+        //console.log("here")
         const dataParams = getVarSourceJSON()
-        console.log(dataParams)
+        //console.log(dataParams)
         if (dataParams.isPoint === true) {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }

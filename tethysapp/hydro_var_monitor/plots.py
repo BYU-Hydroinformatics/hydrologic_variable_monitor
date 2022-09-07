@@ -33,8 +33,8 @@ def set_ymd_properties(img):
 def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
     now = endDate
     y2d_start = startDate
-    print("ERA5")
-    print(now)
+    #("ERA5")
+    #print(now)
 
     if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
@@ -77,20 +77,19 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
         ))
 
     avg_img = img_col_avg.select(band).map(avg_era)
-    print(avg_img)
     y2d_df = get_df(band, img_col_y2d)
-    print(y2d_df)
+    #print(y2d_df)
 
     avg_df = pd.DataFrame(
         avg_img.aggregate_array('avg_value').getInfo(),
     )
-    print(avg_df)
+   # print(avg_df)
     # set date and data values columns that the js code will look for
     avg_df.columns = ["data_values"]
     avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=avg_df.index[i] + 1, day=15) for i in avg_df.index]
     avg_df['date'] = avg_df['datetime'].dt.strftime("%Y-%m-%d")
     avg_df.reset_index(drop=True, inplace=True)
-    print(avg_df)
+    #print(avg_df)
     # set year to date values
     y2d_df.columns = ["data_values"]
     y2d_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=int(i[:2]), day=int(i[3:5])) for i in y2d_df.index]
@@ -263,7 +262,7 @@ def plot_IMERG(region, isPoint, startDate, endDate):
 def plot_CHIRPS(region, isPoint, startDate, endDate):
     now = endDate
     y2d_start = startDate
-    print(now)
+    #print(now)
 
     if isPoint == True:
         spot = ee.Geometry.Point([float(region[0]), float(region[1])])
@@ -298,8 +297,8 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
     chirps_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=chirps_df.index[i] + 1, day=15) for i in
                              chirps_df.index]
     chirps_df['date'] = chirps_df['datetime'].dt.strftime("%Y-%m-%d")
-    print("finished avg")
-    print(chirps_df)
+    #print("finished avg")
+    #print(chirps_df)
 
     chirps_ytd_ic = chirps_daily_ic.filterDate(y2d_start, now).select('precipitation').map(clip_to_bounds).map(
         chirps_avg)
@@ -310,14 +309,14 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
         index=pd.to_datetime(np.array(chirps_ytd_ic.aggregate_array('system:time_start').getInfo()) * 1e6),
         columns=['depth', ]
     )
-    print("check")
+    #print("check")
 
     chirps_ytd_df.index.name = 'datetime'
     chirps_ytd_df['data_values'] = chirps_ytd_df['depth'].cumsum()
     chirps_ytd_df['date'] = chirps_ytd_df.index.strftime("%Y-%m-%d")
     yaxis = "mm of precipitación"
     title = "Acumulados de Precipitación - CHIRPS"
-    print("finished plot chirps")
+    #print("finished plot chirps")
 
     return {'avg': chirps_df, 'y2d': chirps_ytd_df, 'yaxis': yaxis, 'title': title}
 

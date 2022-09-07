@@ -136,7 +136,6 @@ def get_date():
 # @controller(name='get-plot', url='/ee/get-plot', login_required=True)
 def get_plot(request):
     response_data = {'success': False}
-    print("get_plot")
 
     try:
         sensor = request.GET.get('source', None)
@@ -151,9 +150,6 @@ def get_plot(request):
         else:
             startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
             endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")
-            print(year)
-        print(startDate)
-        print(endDate)
 
         if sensor == "ERA5":
             if var == "air_temp":
@@ -193,7 +189,6 @@ def get_plot(request):
             plot_data = plot_IMERG(json.loads(region), json.loads(isPoint), startDate, endDate)
 
         if sensor == "CHIRPS":
-            print("chirps")
             plot_data = plot_CHIRPS(json.loads(region), json.loads(isPoint), startDate, endDate)
 
         if sensor == "Landsat":
