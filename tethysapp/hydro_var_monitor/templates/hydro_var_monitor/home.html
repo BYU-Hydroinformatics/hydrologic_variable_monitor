@@ -58,7 +58,6 @@
     <option value="2021">2021</option>
     <option value="2022">2022</option>
     <option value="y2d">Year to Date</option>
-    <option value="past12">last 12 months</option>
   </select>
 
 {% endblock %}
@@ -168,11 +167,11 @@
               <div class="modal-body">
                 <form>
                   <div class="form-group">
-                    <label for="lat" class="col-form-label">Latitud:</label>
+                    <label for="lat" class="col-form-label">Longitud:</label>
                     <input type="text" class="form-control" id="lat">
                   </div>
                   <div class="form-group">
-                    <label for="lon" class="col-form-label">Longitud:</label>
+                    <label for="lon" class="col-form-label">Latitud:</label>
                     <input type="text" class="form-control" id="lon">
                   </div>
                 </form>
@@ -210,6 +209,8 @@
   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
           integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
           crossorigin=""></script>
+    <script src="{% static 'hydro_var_monitor/geojson/*' %}" type="text/javascript" defer></script>
+    <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript" defer></script>
   <script src="{% static 'hydro_var_monitor/js/main.js' %}" type="text/javascript" defer></script>
 
         <!-- Load Esri Leaflet from CDN -->

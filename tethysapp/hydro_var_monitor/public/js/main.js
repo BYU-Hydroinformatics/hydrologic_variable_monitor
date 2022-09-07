@@ -118,6 +118,9 @@ const App = (() => {
         },
     });
     map.addControl(drawControl);
+    //console.log(JSON.parse(region_index))
+   //var myLayer = L.geoJSON().addTo(map)
+    //myLayer.addData(region_index)
 
     btnInstructions.onclick = () => {
         $('#myModal').modal()
