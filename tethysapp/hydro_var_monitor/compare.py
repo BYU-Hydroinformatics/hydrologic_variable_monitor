@@ -1,4 +1,5 @@
 import datetime
+from datetime import date
 import ee
 import pandas as pd
 import calendar

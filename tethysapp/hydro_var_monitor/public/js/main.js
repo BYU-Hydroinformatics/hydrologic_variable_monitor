@@ -118,9 +118,26 @@ const App = (() => {
         },
     });
     map.addControl(drawControl);
-    //console.log(JSON.parse(region_index))
-   //var myLayer = L.geoJSON().addTo(map)
-    //myLayer.addData(region_index)
+    //let geojsons = region_index[$("#regions").val()]['geojsons'];
+    //console.log(geojsons)
+    //console.log((typeof region_index))
+    let check = {
+    "type": "Feature",
+    "properties": {
+        "name": "Coors Field",
+        "amenity": "Baseball Stadium",
+        "popupContent": "This is where the Rockies play!"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinates": [-104.99404, 39.75621]
+    }
+}
+//var geojsonLayer = new L.GeoJson.AJAX('hydro_var_monitor/public/geojson/check.json')
+    //geojsonLayer.addTo(map)
+    // myLayer = L.geoJSON(check.json).addTo(map)
+    //myLayer.addData(geojsons)
+   // console.log('tethysapp/hydro_var_monitor/public/geojson/check.json')
 
     btnInstructions.onclick = () => {
         $('#myModal').modal()

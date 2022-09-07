@@ -59,6 +59,35 @@
     <option value="2022">2022</option>
     <option value="y2d">Year to Date</option>
   </select>
+   <li class="title">Zoom to Region </li>
+    <select id="regions" class="form-select" name = "regions">
+        <option value = "ecuador">Ecuador</option>
+        <option value = "azuay">Azuay</option>
+        <option value = "bolivar">Bolivar</option>
+        <option value = "canar">Canar</option>
+        <option value = "carchi">Carchi</option>
+        <option value = "chimborazo">Chimborazo</option>
+        <option value = "cotopaxi">Cotopaxi</option>
+        <option value = "el_oro">El Oro</option>
+        <option value = "esmeraldas">Esmeraldas</option>
+        <option value = "galapagos">Galapagos</option>
+        <option value = "guayas">Guayas</option>
+        <option value = "imbabura">Imbabura</option>
+        <option value = "loja">Loja</option>
+        <option value = "los_rios">Los Rios</option>
+        <option value = "manabi">Manabi</option>
+        <option value = "morona_santiago">Morona Santiago</option>
+        <option value = "napo">Napo</option>
+        <option value = "orellana">Orellana</option>
+        <option value = "pastaza">Pastaza</option>
+        <option value = "pichincha">Pichincha</option>
+        <option value = "santa_elena">Santa Elena</option>
+        <option value = "santo_domingo_de_los_tsachilas">Santo Domingo de los Tsachilas</option>
+        <option value = "sucumbios">Sucumbios</option>
+        <option value = "tungurahua">Tungurahua</option>
+        <option value = "zamora_chinchipe">Zamora Chinchipe</option>
+    </select>
+
 
 {% endblock %}
 
@@ -205,11 +234,14 @@
       const URL_COMPARE_PRECIP = "{% url 'hydro_var_monitor:compare_precip' %}"
       const SOURCES = JSON.parse('{{ sources|safe }}')
   </script>
+    <script>
+    var staticGeoJSON = "{% static base_name|add:'/geojson/' %}";
+</script>
   <script src='https://cdn.plot.ly/plotly-2.12.1.min.js'></script>
+    <script src="/js/leaflet-0.7.2/leaflet.ajax.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
           integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
           crossorigin=""></script>
-    <script src="{% static 'hydro_var_monitor/geojson/*' %}" type="text/javascript" defer></script>
     <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript" defer></script>
   <script src="{% static 'hydro_var_monitor/js/main.js' %}" type="text/javascript" defer></script>
 
