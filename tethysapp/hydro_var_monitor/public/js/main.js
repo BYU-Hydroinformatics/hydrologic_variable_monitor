@@ -22,6 +22,8 @@ const App = (() => {
     const usrLon = document.getElementById('lon')
     const btnClearLatLon = document.getElementById('clear-lat-lon')
     const btnComparePrecip = document.getElementById('compare-humedad')
+    const btnRegion = document.getElementById('region')
+    const selectRegion = document.getElementById('regions')
     const year = document.getElementById("select-year")
 
 
@@ -119,25 +121,11 @@ const App = (() => {
     });
     map.addControl(drawControl);
     //let geojsons = region_index[$("#regions").val()]['geojsons'];
-    //console.log(geojsons)
-    //console.log((typeof region_index))
-    let check = {
-    "type": "Feature",
-    "properties": {
-        "name": "Coors Field",
-        "amenity": "Baseball Stadium",
-        "popupContent": "This is where the Rockies play!"
-    },
-    "geometry": {
-        "type": "Point",
-        "coordinates": [-104.99404, 39.75621]
-    }
-}
-//var geojsonLayer = new L.GeoJson.AJAX('hydro_var_monitor/public/geojson/check.json')
-    //geojsonLayer.addTo(map)
-    // myLayer = L.geoJSON(check.json).addTo(map)
-    //myLayer.addData(geojsons)
-   // console.log('tethysapp/hydro_var_monitor/public/geojson/check.json')
+    //let url = staticGeoJSON+geojsons
+    //const mygeojsonlayer = L.geoJSON().addTo(map)
+    //fetch('/static/hydro_var_monitor/geojson/Guayas.json')
+        //.then(response => response.json())
+        //.then(json => mygeojsonlayer.addData(json));
 
     btnInstructions.onclick = () => {
         $('#myModal').modal()
@@ -151,6 +139,18 @@ const App = (() => {
             "isPoint": isPoint,
             "year": year.value
         }
+    }
+    let province_json = L.geoJSON(false)
+
+    btnRegion.onclick = () =>{
+        const dataParams = getVarSourceJSON()
+        province_json.clearLayers();
+        dataParams.region = selectRegion
+        let geojsons = selectRegion.value
+        let url = staticGeoJSON + geojsons + ".json"
+        fetch(url)
+            .then(response => response.json())
+            .then(json => province_json.addData(json).addTo(map))
     }
 
     btnComparePrecip.onclick = () => {

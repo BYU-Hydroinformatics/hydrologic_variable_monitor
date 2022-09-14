@@ -219,3 +219,12 @@ def compare_precip(request):
         response_data['error'] = f'Error Processing Request: {e}'
     return JsonResponse(json.loads(json.dumps(plot_data)))
 
+
+#@controller()
+#def get_predefined_boundary_jsons(request):
+    #name_of_area = request.GET.get("nameOfArea")
+    # get path to workspace
+    #json.loads(os.path.join(workspace_path, path, to , json))
+   # return JsonResponse()
+
+
