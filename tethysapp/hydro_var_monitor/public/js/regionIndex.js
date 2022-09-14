@@ -41,7 +41,7 @@ let region_index = {
 	  },
 	  "guayas": {
 		"name": "Guayas",
-		"geojsons": ["GUAYAS_2.json"]
+		"geojsons": ["Guayas.json"]
 	  },
 	  "imbabura": {
 		"name": "Imbabura",

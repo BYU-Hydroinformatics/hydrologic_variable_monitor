@@ -145,18 +145,101 @@ const App = (() => {
     btnRegion.onclick = () =>{
         const dataParams = getVarSourceJSON()
         province_json.clearLayers();
-        dataParams.region = selectRegion
+        dataParams.region = selectRegion.value
         let geojsons = selectRegion.value
         let url = staticGeoJSON + geojsons + ".json"
+        console.log(dataParams.region)
         fetch(url)
             .then(response => response.json())
             .then(json => province_json.addData(json).addTo(map))
+        //check that it is a variable that can be compared
+        //if (dataParams.region === "") return
+        $("#loading-icon").addClass("appear");
+        $.ajax({
+            type: "GET",
+            url: URL_GETPREDEFINED,
+            datatype: "JSON",
+            data: dataParams,
+            success: function (data) {
+                $("#loading-icon").removeClass("appear");
+                $('#chart_modal').modal("show")
+                console.log("SUCCESS!")
+                console.log(data)
+                const averages = JSON.parse(data['avg'])
+                const y2d = JSON.parse(data['y2d'])
+                const title = data['title']
+                const yaxis = data['yaxis']
+
+                const temp_extracted_avg = Object.values(averages.data_values)
+                const temp_extracted_y2d = Object.values(y2d.data_values)
+
+                const date_extracted_avg = Object.values(averages.date)
+                const date_extracted_y2d = Object.values(y2d.date)
+
+                const year_2_date = {
+                    x: date_extracted_y2d,
+                    y: temp_extracted_y2d,
+                    mode: 'lines',
+                    name: "El año hasta la fecha"
+                };
+
+                const average = {
+                    x: date_extracted_avg,
+                    y: temp_extracted_avg,
+                    mode: 'lines',
+                    name: "Los promedios de los últimos 30 años"
+                };
+
+                const date_plt = [year_2_date, average];
+                const layout = {
+                    legend: {
+                        x: 0,
+                        y: 1,
+                        traceorder: 'normal',
+                        font: {
+                            family: 'sans-serif',
+                            size: 12,
+                            color: '#000'
+                        },
+                        bgcolor: '#E2E2E2',
+                        bordercolor: '#FFFFFF',
+                        borderwidth: 2
+                    },
+                    title: title,
+                    xaxis: {
+                        title: 'día del año'
+                    },
+                    yaxis: {
+                        title: yaxis
+                    }
+                };
+                Plotly.newPlot('chart', date_plt, layout);
+                btnDownload.onclick = () => {
+                    let list_avg = ['date,value']
+                    average.x.forEach((num1, index) => {
+                        const num2 = average.y[index];
+                        list_avg.push((num1 + "," + num2));
+                    })
+                    let csvContent_avg = list_avg.join("\n");
+                    download(csvContent_avg, "averages")
+                    let list_y2d = ['date,value']
+                    year_2_date.x.forEach((num1, index) => {
+                        const num2 = year_2_date.y[index];
+                        list_y2d.push((num1 + "," + num2));
+                    })
+                    let csvContent_y2d = list_y2d.join("\n");
+                    download(csvContent_y2d, "year-to-date")
+                }
+
+            }
+        })
     }
 
     btnComparePrecip.onclick = () => {
         const dataParams = getVarSourceJSON()
         //check that it is a variable that can be compared
         if (dataParams.region === "") return
+        dataParams.isPoint = false
         $("#loading-icon").addClass("appear");
         $.ajax({
             type: "GET",

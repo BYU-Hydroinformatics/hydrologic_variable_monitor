@@ -256,6 +256,7 @@ def plot_IMERG(region, isPoint, startDate, endDate):
 
 
 def plot_CHIRPS(region, isPoint, startDate, endDate):
+    print("in chirps")
     now = endDate
     y2d_start = startDate
     #print(now)
@@ -265,6 +266,10 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
         area = spot.buffer(400)
     else:
         get_coord = region["geometry"]
+        print(get_coord)
+        #region_json= region["features"]
+        #get_coord = region_json["geometry"]
+        #print(get_coord)
         area = ee.Geometry.Polygon(get_coord["coordinates"])
     chirps_daily_ic = ee.ImageCollection('UCSB-CHG/CHIRPS/DAILY')
     chirps_pentad_ic = ee.ImageCollection(

@@ -6,8 +6,10 @@ from tethys_sdk.permissions import login_required
 from .ee_auth import *
 import json
 from django.http import JsonResponse, HttpResponseNotAllowed
+from tethys_sdk.workspaces import app_workspace
 from . import ee_auth
 import logging
+import os
 from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, NDVI
 from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS, plot_NDVI
 from .compare import air_temp_compare, precip_compare, surface_temp_compare, compare_precip_moist
@@ -143,7 +145,7 @@ def get_plot(request):
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
         year = request.GET.get('year', None)
-        #print(startDate)
+        print(region)
 
         if year== "" or year == "2022" or year == "y2d":
             endDate, startDate  = get_date()
@@ -220,11 +222,35 @@ def compare_precip(request):
     return JsonResponse(json.loads(json.dumps(plot_data)))
 
 
-#@controller()
-#def get_predefined_boundary_jsons(request):
-    #name_of_area = request.GET.get("nameOfArea")
-    # get path to workspace
+def get_predefined(request):
+    print("in predefined")
+    name_of_area = request.GET.get("region", None)
+    isPoint = request.GET.get('isPoint', None)
+    sensor = request.GET.get('source', None)
+    var = request.GET.get('variable', None)
+    year = request.GET.get('year', None)
+    if year == "" or year == "2022" or year == "y2d":
+        endDate, startDate = get_date()
+    #print(json.loads(name_of_area))
+    ROOT_DIR = os.path.abspath(os.curdir)
+    json_url = os.path.join(ROOT_DIR,"hydrologic_variable_monitor","tethysapp", "hydro_var_monitor","workspaces","app_workspace", "preconfigured_geojsons", "ecuador", 'Azuay.json')
+    print(json_url)
+    f = open(json_url)
+    region = json.load(f)
+    #region = json.dumps(region_data['features'])
+    print(region)
+
+    if year == "" or year == "2022" or year == "y2d":
+        endDate, startDate = get_date()
+    else:
+        startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
+        endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")
+    plot_data = plot_CHIRPS(region, isPoint, startDate, endDate)
+
+
+
+    print(json_url)
     #json.loads(os.path.join(workspace_path, path, to , json))
-   # return JsonResponse()
+    return JsonResponse(json.loads(json.dumps(plot_data)))
 
 

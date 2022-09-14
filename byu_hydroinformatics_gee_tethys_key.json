@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "byu-hydroinformatics-gee",
+  "private_key_id": "867389397b4bddd204a224f2ba7903415bdcd5b6",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC3+dcT1XAW0fyS\nccRgKtfm8uGTyUVW+r7yw1tuAsqzjHBLeGlQ0sP0alrSLCVKv/5h+bH2q8uW/Aqt\n/UeSCJaBpqAnAa88feYic1Ch7nW59wpIc5GSIaQPaIac2h23XvBr3wrg0EVB7EOt\nNK5joE4+0XAgKpxO6CAvf6y7LX5Z8dMWvMN18yvyqpsg9TmOTTVSzlY5A1yRjrf7\njdnzkHEbAzVSPY94MFnJvimknls5EtwriGB6iG+dlkOCI5yl8fGgt5lilq6P6tb0\nEG25nIsSNpkdZarjupy12RxvdkZYTcepaHmCy99KaMlbCyv0LzgOKLJi6l5U3hde\nImvDdOFFAgMBAAECggEAFjTXc6LrLS36fRizWeJB/jPp64M7VeTdQIM5GX3HxsVY\nVpu5ppJSKcHepYjDlZK4G05e30XcRKS2i0rLpUJZHFwm755h7vzJVvYxUOJuHlzF\nxnoAo7Fg0qVMvkkLljMk9PhOoVUyTuM8Rf9aX1cdqrJwBMnv5QxaujEAgfVbT3LO\nsKW61AkQ2RXAtrmZLiSvxeh5LSGOuT7BZoGHxd9MzU6PhamnfMtB4zR2INqiaALg\nOb1emSs5mR48dc23rzrl0tAqjnNsiVK9lGyh4c9l0f457A74iyLOUV6EpJTMNSLR\nBcF/dhg6CUT2z9cX38z+S96yi9xQleIECSpLzrYTPwKBgQD3L0Qdf++UL7bwoQcw\nCCnIi1LLf5v1QgTDHg4j9uGgpMP1qRgguIqnRdOs7f8yxVAUAnQi4RkvpDPsiaKh\nivcHhJGQBX75hBeA0cTzx2qOwiW5n6jhsP8lATZB6k7f9yKAfI2/96TpRn3oIgRI\nrHqpUTspyncF3JvBEbLhnVffMwKBgQC+iX6WZwaXD5T3CWTK9dceL1cyUuwDAsr/\n4ESf++dgpcZyWUE6DHeCxCz6+tk9Tgik1WNB/9V08JIizUMrdLvOh9mNl1hNYe6W\npHK4uvXaSZ/Vyh2Hazmh7rLv6IHf90eW9iVLzQThKHhtwuRudN7uum+qAegkWCLy\n0/UM18CdpwKBgHlalDdjawy2jDsA45V6PIE/nWtZAAld2xar98dCWq1Slv5RgQ33\na+MJjg2VXrffVRwtxDSnjITuOavEOrrSjcr8E7bAbAE2D4/n7Ki+W5swx/Kk5vW+\nvtS9DpU34ndkTmUEQVdgzm7Uc9X2dWH0g9gCkGhJBTw0fadA+DB53f0vAoGAcTSL\n65yGw9XUMfp40kXCbALAkfvGkftk1SZQX6VxUXDtOR9iq7SghSc9elj0HYJxjE3k\nTWBNWM9eZCMEl5shwpHgZknXgxJ+iS5nou4iCHHZ71HIvZ6tfVKvKe9AyurGtCDH\nBARps8Ux2DUFN8NkeP54PdAoNv/Os+vPGrRNkt0CgYA0uxoruplo2vyWwSr5ftp1\ncj+uFXN8BE33GZqJY71pdanhiVJnDcxplQh5CCQuQAVohN6h4VulURXuDVjjOIuv\nJPOcuZvsv0EwOUw1vAbWbd8jGQIi2USlx5SYr6a+2/gp6/tYullXulSmp7JQvtai\nVXpMJtSzYGLeJnux/rdG+Q==\n-----END PRIVATE KEY-----\n",
+  "client_email": "gee-tethys@byu-hydroinformatics-gee.iam.gserviceaccount.com",
+  "client_id": "117971470310235882336",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gee-tethys%40byu-hydroinformatics-gee.iam.gserviceaccount.com"
+}
