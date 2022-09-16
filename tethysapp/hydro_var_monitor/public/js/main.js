@@ -144,6 +144,7 @@ const App = (() => {
 
     btnRegion.onclick = () =>{
         const dataParams = getVarSourceJSON()
+        if (dataParams.variable === "" || dataParams.source === "") return
         province_json.clearLayers();
         dataParams.region = selectRegion.value
         let geojsons = selectRegion.value

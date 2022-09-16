@@ -145,10 +145,13 @@ def get_plot(request):
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
         year = request.GET.get('year', None)
-        print(region)
+        #print(region)
 
         if year== "" or year == "2022" or year == "y2d":
             endDate, startDate  = get_date()
+        elif year == "last12":
+            endDate = date.today().strftime("%Y-%m-%d")
+            startDate = date(date.today().year-1, date.today().month, date.today().day).strftime("%Y-%m-%d")
         else:
             startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
             endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")
@@ -223,33 +226,76 @@ def compare_precip(request):
 
 
 def get_predefined(request):
-    print("in predefined")
+    #print("in predefined")
     name_of_area = request.GET.get("region", None)
     isPoint = request.GET.get('isPoint', None)
     sensor = request.GET.get('source', None)
     var = request.GET.get('variable', None)
     year = request.GET.get('year', None)
-    if year == "" or year == "2022" or year == "y2d":
-        endDate, startDate = get_date()
-    #print(json.loads(name_of_area))
+    #print(name_of_area)
+    province = name_of_area+".json"
     ROOT_DIR = os.path.abspath(os.curdir)
-    json_url = os.path.join(ROOT_DIR,"hydrologic_variable_monitor","tethysapp", "hydro_var_monitor","workspaces","app_workspace", "preconfigured_geojsons", "ecuador", 'Azuay.json')
-    print(json_url)
+    json_url = os.path.join(ROOT_DIR,"hydrologic_variable_monitor","tethysapp", "hydro_var_monitor","workspaces","app_workspace", "preconfigured_geojsons", "ecuador", province)
+    #print(json_url)
     f = open(json_url)
     region = json.load(f)
+    #if name_of_area == "Galapagos":
+
     #region = json.dumps(region_data['features'])
-    print(region)
+    #print(region)
 
     if year == "" or year == "2022" or year == "y2d":
         endDate, startDate = get_date()
+    elif year == "last12":
+        endDate = date.today().strftime("%Y-%m-%d")
+        startDate = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
     else:
         startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
         endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")
-    plot_data = plot_CHIRPS(region, isPoint, startDate, endDate)
+
+    if sensor == "ERA5":
+        if var == "air_temp":
+            band = "temperature_2m"
+            title = "Temperatura del Aire - ERA5"
+            yaxis = "Temperature en Celsius"
+        if var == "precip":
+            band = "total_precipitation"
+            title = "Acumulados de Precipitación - ERA5"
+            yaxis = "mm of precipitación"
+        if var == "soil_temperature":
+            band = "skin_temperature"
+            title = "Temperatura del Suelo- ERA5"
+            yaxis = "Temperatura en Celsius"
+        plot_data = plot_ERA5(region, band, title, yaxis, json.loads(isPoint), startDate, endDate)
+
+    if sensor == "GLDAS":
+        if var == "precip":
+            band = "Rainf_tavg"
+            title = "Acumulados de Precipitación- GLDAS"
+            yaxis = "mm of precipitación"
+        if var == "air_temp":
+            band = "Tair_f_inst"
+            title = "Temperatura del Aire- GLDAS"
+            yaxis = "Temperatura en Celsius"
+        if var == "soil_moisture":
+            band = "RootMoist_inst"
+            title = "Humedad del Suelo - GLDAS (root zone)"
+            yaxis = "kg/m^2"
+        if var == "soil_temperature":
+            band = "AvgSurfT_inst"
+            title = "Temperatura del Suelo - GLDAS"
+            yaxis = "Temperatura en Celsius"
+        plot_data = plot_GLDAS(region, band, title, yaxis, json.loads(isPoint), startDate, endDate)
+
+    if sensor == "IMERG":
+        plot_data = plot_IMERG(region, json.loads(isPoint), startDate, endDate)
+
+    if sensor == "CHIRPS":
+        plot_data = plot_CHIRPS(region, json.loads(isPoint), startDate, endDate)
 
 
 
-    print(json_url)
+    #print(json_url)
     #json.loads(os.path.join(workspace_path, path, to , json))
     return JsonResponse(json.loads(json.dumps(plot_data)))
 

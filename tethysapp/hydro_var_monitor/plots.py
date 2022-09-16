@@ -256,7 +256,7 @@ def plot_IMERG(region, isPoint, startDate, endDate):
 
 
 def plot_CHIRPS(region, isPoint, startDate, endDate):
-    print("in chirps")
+    #print("in chirps")
     now = endDate
     y2d_start = startDate
     #print(now)
@@ -266,7 +266,7 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
         area = spot.buffer(400)
     else:
         get_coord = region["geometry"]
-        print(get_coord)
+        #print(get_coord)
         #region_json= region["features"]
         #get_coord = region_json["geometry"]
         #print(get_coord)
