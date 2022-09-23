@@ -138,6 +138,7 @@ def get_date():
 # @controller(name='get-plot', url='/ee/get-plot', login_required=True)
 def get_plot(request):
     response_data = {'success': False}
+    print("GET PLOT")
 
     try:
         sensor = request.GET.get('source', None)
@@ -145,13 +146,15 @@ def get_plot(request):
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
         year = request.GET.get('year', None)
-        #print(region)
+        print(year)
 
         if year== "" or year == "2022" or year == "y2d":
             endDate, startDate  = get_date()
         elif year == "last12":
             endDate = date.today().strftime("%Y-%m-%d")
-            startDate = date(date.today().year-1, date.today().month, date.today().day).strftime("%Y-%m-%d")
+            #startDate = date(date.today().year-1, date.today().month, date.today().day).strftime("%Y-%m-%d")
+            startDate = "last12"
+            print(startDate)
         else:
             startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
             endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")
@@ -248,7 +251,8 @@ def get_predefined(request):
         endDate, startDate = get_date()
     elif year == "last12":
         endDate = date.today().strftime("%Y-%m-%d")
-        startDate = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
+        #startDate = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
+        startDate = "last12"
     else:
         startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
         endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")

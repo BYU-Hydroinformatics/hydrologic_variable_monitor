@@ -192,6 +192,9 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
 def plot_IMERG(region, isPoint, startDate, endDate):
     now = endDate
     y2d_start = startDate
+    if startDate == "last12":
+        print("check")
+        y2d_start = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
     if isPoint == True:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
@@ -209,25 +212,55 @@ def plot_IMERG(region, isPoint, startDate, endDate):
 
     imerg_1m_values_ic = imerg_1m_ic.select('HQprecipitation').map(avg_in_bounds)
 
-    imerg_1m_df = pd.DataFrame(
+    imerg_df = pd.DataFrame(
         imerg_1m_values_ic.aggregate_array('avg_value').getInfo(),
     ).dropna()
+    days_in_month = np.array([calendar.monthrange(int(now[:4]), i)[1] for i in range(1, 13)])
+    print(days_in_month)
 
-    date_generated = pd.date_range(y2d_start, periods=365)
-    cum_df = pd.DataFrame(date_generated)
+    print(imerg_df)
 
-    values_list = []
-    for date in cum_df[0]:
+    imerg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=imerg_df.index[i] + 1, day=15) for i in
+                             imerg_df.index]
+    if startDate == "last12":
+        vals_array = imerg_df['HQprecipitation'].to_numpy()
+        print(vals_array)
+        curr_month = int(endDate[5:7])
+        dates = imerg_df['datetime'].to_numpy()
+        # print(12-curr_month)
+        for i in range(12 - curr_month):
+            extra_val = days_in_month[11]
+            days_in_month = np.delete(days_in_month, 11, 0)
+            days_in_month = np.insert(days_in_month, 0, extra_val)
+            imerg_df['datetime'][11 - i] = imerg_df['datetime'][11 - i].replace(year=2021)
+        print(imerg_df)
+        y2d_start = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
+        imerg_df.sort_values(by='datetime', inplace=True)
+        imerg_df.reset_index(inplace=True)
+        print(startDate)
+    imerg_df['HQprecipitation'] = imerg_df['HQprecipitation']*24
+    imerg_df['data_values'] = imerg_df['HQprecipitation'].cumsum() * days_in_month
+    imerg_df['date'] = imerg_df['datetime'].dt.strftime("%Y-%m-%d")
+    print("finished avg")
+    print(imerg_df)
+
+    #date_generated = pd.date_range(y2d_start, periods=365)
+    #cum_df = pd.DataFrame(date_generated)
+
+    """values_list = []
+    for day in cum_df[0]:
         i = 1
         for val in imerg_1m_df["HQprecipitation"]:
-            if date.month == i:
+            if day.month == i:
                 values_list.append(val * 24)
             i = i + 1
 
     cum_df["val_per_day"] = values_list
     cum_df["data_values"] = cum_df["val_per_day"].cumsum()
+    print(cum_df)
 
     cum_df['date'] = cum_df[0].dt.strftime("%Y-%m-%d")
+    print(cum_df)"""
 
     imerg_30min_ic = ee.ImageCollection("NASA/GPM_L3/IMERG_V06")
 
@@ -250,7 +283,7 @@ def plot_IMERG(region, isPoint, startDate, endDate):
     yaxis = "mm of precipitación"
     title = "Acumulados de Precipitación - IMERG"
 
-    Dict = {'avg': cum_df, 'y2d': imerg_ytd_df, 'yaxis': yaxis, 'title': title}
+    Dict = {'avg': imerg_df, 'y2d': imerg_ytd_df, 'yaxis': yaxis, 'title': title}
 
     return Dict
 
@@ -259,6 +292,7 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
     #print("in chirps")
     now = endDate
     y2d_start = startDate
+    print(startDate)
     #print(now)
 
     if isPoint == True:
@@ -266,10 +300,6 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
         area = spot.buffer(400)
     else:
         get_coord = region["geometry"]
-        #print(get_coord)
-        #region_json= region["features"]
-        #get_coord = region_json["geometry"]
-        #print(get_coord)
         area = ee.Geometry.Polygon(get_coord["coordinates"])
     chirps_daily_ic = ee.ImageCollection('UCSB-CHG/CHIRPS/DAILY')
     chirps_pentad_ic = ee.ImageCollection(
@@ -285,6 +315,7 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
         ).get('precipitation'))
 
     days_in_month = np.array([calendar.monthrange(int(now[:4]), i)[1] for i in range(1, 13)])
+    #print(days_in_month)
 
     chirps_avg_ic = chirps_pentad_ic.select('precipitation').map(clip_to_bounds).map(
         chirps_avg)
@@ -293,10 +324,26 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
 
         columns=['depth', ]
     ).dropna()
-
-    chirps_df['data_values'] = chirps_df['depth'].cumsum() * days_in_month / 5
+    #print(chirps_df)
     chirps_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=chirps_df.index[i] + 1, day=15) for i in
                              chirps_df.index]
+    if startDate == "last12":
+      vals_array = chirps_df['depth'].to_numpy()
+      #print(vals_array)
+      curr_month = int(endDate[5:7])
+      #print(12-curr_month)
+      for i in range(12-curr_month):
+        extra_val = days_in_month[11]
+        days_in_month = np.delete(days_in_month, 11, 0)
+        days_in_month = np.insert(days_in_month, 0, extra_val)
+        chirps_df['datetime'][11-i]=chirps_df['datetime'][11-i].replace(year=2021)
+      #print(chirps_df)
+      y2d_start = date(date.today().year-1, date.today().month, date.today().day).strftime("%Y-%m-%d")
+      chirps_df.sort_values(by='datetime',inplace=True)
+      chirps_df.reset_index(inplace=True)
+      #print(startDate)
+
+    chirps_df['data_values'] = chirps_df['depth'].cumsum() * days_in_month / 5
     chirps_df['date'] = chirps_df['datetime'].dt.strftime("%Y-%m-%d")
     #print("finished avg")
     #print(chirps_df)
@@ -304,6 +351,7 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
     chirps_ytd_ic = chirps_daily_ic.filterDate(y2d_start, now).select('precipitation').map(clip_to_bounds).map(
         chirps_avg)
     #print(chirps_ytd_ic)
+    #print("checkpoint")
 
     chirps_ytd_df = pd.DataFrame(
         chirps_ytd_ic.aggregate_array('avg_value').getInfo(),
