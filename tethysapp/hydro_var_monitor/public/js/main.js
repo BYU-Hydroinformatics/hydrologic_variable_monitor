@@ -86,9 +86,7 @@ const App = (() => {
     map = L.map('map').setView([20, -40], 3);
 
     image_layer = L.tileLayer('', {
-        opacity: 0.5, attribution:
-            '<a href="https://earthengine.google.com" target="_">' +
-            'Google Earth Engine</a>;'
+        opacity: 0.5, attribution: '<a href="https://earthengine.google.com" target="_">' + 'Google Earth Engine</a>;'
     }).addTo(map);
 
     const positron = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -106,10 +104,8 @@ const App = (() => {
     //allow people to enter a region on the map - as for now only a point
     let drawControl = new L.Control.Draw({
         edit: {
-            featureGroup: drawnItems,
-            edit: true,
-        },
-        draw: {
+            featureGroup: drawnItems, edit: true,
+        }, draw: {
             marker: false,
             polyline: false,
             circlemarker: false,
@@ -120,12 +116,6 @@ const App = (() => {
         },
     });
     map.addControl(drawControl);
-    //let geojsons = region_index[$("#regions").val()]['geojsons'];
-    //let url = staticGeoJSON+geojsons
-    //const mygeojsonlayer = L.geoJSON().addTo(map)
-    //fetch('/static/hydro_var_monitor/geojson/Guayas.json')
-        //.then(response => response.json())
-        //.then(json => mygeojsonlayer.addData(json));
 
     btnInstructions.onclick = () => {
         $('#myModal').modal()
@@ -142,7 +132,7 @@ const App = (() => {
     }
     let province_json = L.geoJSON(false)
 
-    btnRegion.onclick = () =>{
+    btnRegion.onclick = () => {
         const dataParams = getVarSourceJSON()
         if (dataParams.variable === "" || dataParams.source === "") return
         province_json.clearLayers();
@@ -154,14 +144,9 @@ const App = (() => {
             .then(response => response.json())
             .then(json => province_json.addData(json).addTo(map))
         //check that it is a variable that can be compared
-        //if (dataParams.region === "") return
         $("#loading-icon").addClass("appear");
         $.ajax({
-            type: "GET",
-            url: URL_GETPREDEFINED,
-            datatype: "JSON",
-            data: dataParams,
-            success: function (data) {
+            type: "GET", url: URL_GETPREDEFINED, datatype: "JSON", data: dataParams, success: function (data) {
                 $("#loading-icon").removeClass("appear");
                 $('#chart_modal').modal("show")
                 console.log("SUCCESS!")
@@ -178,10 +163,7 @@ const App = (() => {
                 const date_extracted_y2d = Object.values(y2d.date)
 
                 const year_2_date = {
-                    x: date_extracted_y2d,
-                    y: temp_extracted_y2d,
-                    mode: 'lines',
-                    name: "El año hasta la fecha"
+                    x: date_extracted_y2d, y: temp_extracted_y2d, mode: 'lines', name: "El año hasta la fecha"
                 };
 
                 const average = {
@@ -194,23 +176,12 @@ const App = (() => {
                 const date_plt = [year_2_date, average];
                 const layout = {
                     legend: {
-                        x: 0,
-                        y: 1,
-                        traceorder: 'normal',
-                        font: {
-                            family: 'sans-serif',
-                            size: 12,
-                            color: '#000'
-                        },
-                        bgcolor: '#E2E2E2',
-                        bordercolor: '#FFFFFF',
-                        borderwidth: 2
-                    },
-                    title: title,
-                    xaxis: {
+                        x: 0, y: 1, traceorder: 'normal', font: {
+                            family: 'sans-serif', size: 12, color: '#000'
+                        }, bgcolor: '#E2E2E2', bordercolor: '#FFFFFF', borderwidth: 2
+                    }, title: title, xaxis: {
                         title: 'día del año'
-                    },
-                    yaxis: {
+                    }, yaxis: {
                         title: yaxis
                     }
                 };
@@ -243,11 +214,7 @@ const App = (() => {
         dataParams.isPoint = false
         $("#loading-icon").addClass("appear");
         $.ajax({
-            type: "GET",
-            url: URL_COMPARE_PRECIP,
-            datatype: "JSON",
-            data: dataParams,
-            success: function (data) {
+            type: "GET", url: URL_COMPARE_PRECIP, datatype: "JSON", data: dataParams, success: function (data) {
                 $("#loading-icon").removeClass("appear");
                 $('#chart_modal').modal("show")
 
@@ -267,59 +234,36 @@ const App = (() => {
                 const y2d_extracted_date = Object.values(y2d.date)
 
                 const precip_avg_plt = {
-                    x: precip_avg_extracted_date,
-                    y: precip_avg_extracted,
-                    mode: 'lines',
-                    name: "average precipitation"
+                    x: precip_avg_extracted_date, y: precip_avg_extracted, mode: 'lines', name: "average precipitation"
                 };
                 const precip_y2d_plt = {
-                    x: y2d_extracted_date,
-                    y: y2d_precip_extracted,
-                    mode: 'lines',
-                    name: "y2d precipitation"
+                    x: y2d_extracted_date, y: y2d_precip_extracted, mode: 'lines', name: "y2d precipitation"
                 };
 
                 const moisture_avg_plt = {
-                    x: average_moist_extracted_date,
-                    y: average_moist_extracted,
-                    mode: 'lines',
-                    name: "average moisture"
+                    x: average_moist_extracted_date, y: average_moist_extracted, mode: 'lines', name: "average moisture"
                 };
                 const moisture_y2d_plt = {
-                    x: y2d_extracted_date,
-                    y: y2d_moist_extracted,
-                    mode: 'lines',
-                    name: "y2d moisture",
+                    x: y2d_extracted_date, y: y2d_moist_extracted, mode: 'lines', name: "y2d moisture",
                 };
 
                 let data_plt = [precip_avg_plt, precip_y2d_plt, moisture_avg_plt, moisture_y2d_plt]
 
                 const layout = {
                     legend: {
-                        x: 0,
-                        y: 1,
-                        traceorder: 'normal',
-                        font: {
-                            family: 'sans-serif',
-                            size: 12,
-                            color: '#000'
-                        },
-                        bgcolor: '#E2E2E2',
-                        bordercolor: '#FFFFFF',
-                        borderwidth: 2
-                    },
-                    title: "Comparison of Precipitation and Soil Moisture",
-                    xaxis: {
+                        x: 0, y: 1, traceorder: 'normal', font: {
+                            family: 'sans-serif', size: 12, color: '#000'
+                        }, bgcolor: '#E2E2E2', bordercolor: '#FFFFFF', borderwidth: 2
+                    }, title: "Comparison of Precipitation and Soil Moisture", xaxis: {
                         title: 'day of year'
-                    },
-                    yaxis: {
+                    }, yaxis: {
                         title: "mm"
                     }
 
                 };
                 Plotly.newPlot('chart', data_plt, layout);
                 btnDownload.onclick = () => {
-                    let list_preip_avg = ['date,value']
+                    let list_precip_avg = ['date,value']
                     precip_avg_plt.x.forEach((num1, index) => {
                         const num2 = precip_avg_plt.y[index];
                         list_precip_avg.push((num1 + "," + num2));
@@ -373,11 +317,7 @@ const App = (() => {
         $("#loading-icon").addClass("appear");
 
         $.ajax({
-            type: "GET",
-            url: URL_GETMAPID,
-            datatype: "JSON",
-            data: dataParams,
-            success: function (data) {
+            type: "GET", url: URL_GETMAPID, datatype: "JSON", data: dataParams, success: function (data) {
                 $("#loading-icon").removeClass("appear");
                 if (data["success"] === true) {
                     //get url and set it then add it to the map
@@ -406,11 +346,7 @@ const App = (() => {
         $("#loading-icon").addClass("appear");
 
         $.ajax({
-            type: "GET",
-            url: URL_COMPARE,
-            datatype: "JSON",
-            data: dataParams,
-            success: function (data) {
+            type: "GET", url: URL_COMPARE, datatype: "JSON", data: dataParams, success: function (data) {
                 $("#loading-icon").removeClass("appear");
                 $('#chart_modal').modal("show")
 
@@ -428,17 +364,11 @@ const App = (() => {
                 const gldas_extracted_date = Object.values(gldas.date)
 
                 const era5_plt = {
-                    x: era5_extracted_date,
-                    y: era5_extracted_val,
-                    mode: 'lines',
-                    name: "era5"
+                    x: era5_extracted_date, y: era5_extracted_val, mode: 'lines', name: "era5"
                 };
 
                 const gldas_plt = {
-                    x: gldas_extracted_date,
-                    y: gldas_extracted_val,
-                    mode: 'lines',
-                    name: "gldas"
+                    x: gldas_extracted_date, y: gldas_extracted_val, mode: 'lines', name: "gldas"
                 };
 
                 let data_plt = [era5_plt, gldas_plt]
@@ -452,39 +382,22 @@ const App = (() => {
                     const imerg_extracted_date = Object.values(imerg.date)
                     const chirps_extracted_date = Object.values(chirps.date)
                     const chirps_plt = {
-                        x: chirps_extracted_date,
-                        y: chirps_extracted_val,
-                        mode: 'lines',
-                        name: "chirps"
+                        x: chirps_extracted_date, y: chirps_extracted_val, mode: 'lines', name: "chirps"
                     };
                     const imerg_plt = {
-                        x: imerg_extracted_date,
-                        y: imerg_extracted_val,
-                        mode: 'lines',
-                        name: "imerg"
+                        x: imerg_extracted_date, y: imerg_extracted_val, mode: 'lines', name: "imerg"
                     };
                     data_plt = [era5_plt, gldas_plt, chirps_plt, imerg_plt];
                 }
 
                 const layout = {
                     legend: {
-                        x: 0,
-                        y: 1,
-                        traceorder: 'normal',
-                        font: {
-                            family: 'sans-serif',
-                            size: 12,
-                            color: '#000'
-                        },
-                        bgcolor: '#E2E2E2',
-                        bordercolor: '#FFFFFF',
-                        borderwidth: 2
-                    },
-                    title: title,
-                    xaxis: {
+                        x: 0, y: 1, traceorder: 'normal', font: {
+                            family: 'sans-serif', size: 12, color: '#000'
+                        }, bgcolor: '#E2E2E2', bordercolor: '#FFFFFF', borderwidth: 2
+                    }, title: title, xaxis: {
                         title: 'day of year'
-                    },
-                    yaxis: {
+                    }, yaxis: {
                         title: yaxis
                     }
 
@@ -535,15 +448,10 @@ const App = (() => {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }
         if (dataParams.variable === "" || dataParams.source === "" || dataParams.region === "") return
-        //$('#chart_modal').modal("show")
         $("#loading-icon").addClass("appear");
 
         $.ajax({
-            type: "GET",
-            url: URL_GETPLOT,
-            datatype: "JSON",
-            data: dataParams,
-            success: data => {
+            type: "GET", url: URL_GETPLOT, datatype: "JSON", data: dataParams, success: data => {
                 $('#chart_modal').modal("show")
                 $("#loading-icon").removeClass("appear");
                 //data = JSON.parse(data)
@@ -560,10 +468,7 @@ const App = (() => {
                 const date_extracted_y2d = Object.values(y2d.date)
 
                 const year_2_date = {
-                    x: date_extracted_y2d,
-                    y: temp_extracted_y2d,
-                    mode: 'lines',
-                    name: "El año hasta la fecha"
+                    x: date_extracted_y2d, y: temp_extracted_y2d, mode: 'lines', name: "El año hasta la fecha"
                 };
 
                 const average = {
@@ -576,23 +481,12 @@ const App = (() => {
                 const date_plt = [year_2_date, average];
                 const layout = {
                     legend: {
-                        x: 0,
-                        y: 1,
-                        traceorder: 'normal',
-                        font: {
-                            family: 'sans-serif',
-                            size: 12,
-                            color: '#000'
-                        },
-                        bgcolor: '#E2E2E2',
-                        bordercolor: '#FFFFFF',
-                        borderwidth: 2
-                    },
-                    title: title,
-                    xaxis: {
+                        x: 0, y: 1, traceorder: 'normal', font: {
+                            family: 'sans-serif', size: 12, color: '#000'
+                        }, bgcolor: '#E2E2E2', bordercolor: '#FFFFFF', borderwidth: 2
+                    }, title: title, xaxis: {
                         title: 'día del año'
-                    },
-                    yaxis: {
+                    }, yaxis: {
                         title: yaxis
                     }
                 };

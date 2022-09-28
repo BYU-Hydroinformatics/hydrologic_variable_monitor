@@ -106,7 +106,6 @@ def precip_compare(region, isPoint):
     values_list = []
     for date in imerg_cum_df[0]:
         i = 1
-        # print (date)
         for val in imerg_1m_df["HQprecipitation"]:
             if date.month == i:
                 values_list.append(val * 24)

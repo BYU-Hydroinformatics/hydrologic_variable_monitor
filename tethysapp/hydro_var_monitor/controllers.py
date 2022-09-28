@@ -10,8 +10,8 @@ from tethys_sdk.workspaces import app_workspace
 from . import ee_auth
 import logging
 import os
-from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, NDVI
-from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS, plot_NDVI
+from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG
+from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS
 from .compare import air_temp_compare, precip_compare, surface_temp_compare, compare_precip_moist
 
 
@@ -67,11 +67,8 @@ def get_map_id(request):
         return HttpResponseNotAllowed(['GET'])
 
     try:
-
-        region = request.GET.get('region', None)
         sensor = request.GET.get('source', None)
         var = request.GET.get('variable', None)
-        isPoint = request.GET.get('isPoint', None)
 
         if sensor == "ERA5":
             if var == "air_temp":
@@ -115,9 +112,6 @@ def get_map_id(request):
             vis_params = {"min": 0, "max": 150, "palette": ['00FFFF', '0000FF']}
             imgs = CHIRPS(band)
 
-        if sensor == "Landsat":
-            vis_params = {"min": -1, "max": 1, "palette": ['blue', 'white', 'green']}
-            imgs = NDVI(json.loads(region), json.loads(isPoint))
         # get the url from specified image and then return it in json
         wurl = get_tile_url(imgs, vis_params)
         response_data.update({
@@ -130,15 +124,16 @@ def get_map_id(request):
 
     return JsonResponse(response_data)
 
+
 def get_date():
     now = date.today().strftime("%Y-%m-%d")
     y2d_start = date(date.today().year, 1, 1).strftime("%Y-%m-%d")
     return now, y2d_start
 
+
 # @controller(name='get-plot', url='/ee/get-plot', login_required=True)
 def get_plot(request):
     response_data = {'success': False}
-    print("GET PLOT")
 
     try:
         sensor = request.GET.get('source', None)
@@ -146,15 +141,12 @@ def get_plot(request):
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
         year = request.GET.get('year', None)
-        print(year)
 
-        if year== "" or year == "2022" or year == "y2d":
-            endDate, startDate  = get_date()
+        if year == "" or year == "2022" or year == "y2d":
+            endDate, startDate = get_date()
         elif year == "last12":
             endDate = date.today().strftime("%Y-%m-%d")
-            #startDate = date(date.today().year-1, date.today().month, date.today().day).strftime("%Y-%m-%d")
             startDate = "last12"
-            print(startDate)
         else:
             startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
             endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")
@@ -229,29 +221,22 @@ def compare_precip(request):
 
 
 def get_predefined(request):
-    #print("in predefined")
     name_of_area = request.GET.get("region", None)
     isPoint = request.GET.get('isPoint', None)
     sensor = request.GET.get('source', None)
     var = request.GET.get('variable', None)
     year = request.GET.get('year', None)
-    #print(name_of_area)
-    province = name_of_area+".json"
+    province = name_of_area + ".json"
     ROOT_DIR = os.path.abspath(os.curdir)
-    json_url = os.path.join(ROOT_DIR,"hydrologic_variable_monitor","tethysapp", "hydro_var_monitor","workspaces","app_workspace", "preconfigured_geojsons", "ecuador", province)
-    #print(json_url)
+    json_url = os.path.join(ROOT_DIR, "hydrologic_variable_monitor", "tethysapp", "hydro_var_monitor", "workspaces",
+                            "app_workspace", "preconfigured_geojsons", "ecuador", province)
     f = open(json_url)
     region = json.load(f)
-    #if name_of_area == "Galapagos":
-
-    #region = json.dumps(region_data['features'])
-    #print(region)
 
     if year == "" or year == "2022" or year == "y2d":
         endDate, startDate = get_date()
     elif year == "last12":
         endDate = date.today().strftime("%Y-%m-%d")
-        #startDate = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
         startDate = "last12"
     else:
         startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
@@ -297,10 +282,4 @@ def get_predefined(request):
     if sensor == "CHIRPS":
         plot_data = plot_CHIRPS(region, json.loads(isPoint), startDate, endDate)
 
-
-
-    #print(json_url)
-    #json.loads(os.path.join(workspace_path, path, to , json))
     return JsonResponse(json.loads(json.dumps(plot_data)))
-
-
