@@ -133,13 +133,13 @@ const App = (() => {
     let province_json = L.geoJSON(false)
 
     btnRegion.onclick = () => {
+        isPoint = false;
         const dataParams = getVarSourceJSON()
         if (dataParams.variable === "" || dataParams.source === "") return
         province_json.clearLayers();
         dataParams.region = selectRegion.value
         let geojsons = selectRegion.value
         let url = staticGeoJSON + geojsons + ".json"
-        console.log(dataParams.region)
         fetch(url)
             .then(response => response.json())
             .then(json => province_json.addData(json).addTo(map))
@@ -149,8 +149,7 @@ const App = (() => {
             type: "GET", url: URL_GETPREDEFINED, datatype: "JSON", data: dataParams, success: function (data) {
                 $("#loading-icon").removeClass("appear");
                 $('#chart_modal').modal("show")
-                console.log("SUCCESS!")
-                console.log(data)
+
                 const averages = JSON.parse(data['avg'])
                 const y2d = JSON.parse(data['y2d'])
                 const title = data['title']

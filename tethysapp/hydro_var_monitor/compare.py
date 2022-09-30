@@ -3,7 +3,7 @@ from datetime import date
 import ee
 import pandas as pd
 import calendar
-from .plots import get_collection
+#from .plots import get_collection
 import numpy as np
 
 
