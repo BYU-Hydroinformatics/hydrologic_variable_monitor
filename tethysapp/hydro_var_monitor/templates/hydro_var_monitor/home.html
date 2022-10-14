@@ -8,7 +8,6 @@
 {% block app_navigation_items %}
     <button  id="instructions" type="button" class="btn btn-primary btn-block" >Instrucciones</button>
     <button  id="lat-lon" type="button" class="btn btn-primary btn-block" >Entrar Lat/Lon</button>
-    <button  id="clear-lat-lon" type="button" class="btn btn-primary btn-block" >Despejar Lat/Long</button>
   <li class="title">1. Elija Variable Hidrológica</li>
   <select class="form-select" aria-label="variable selector" id="select-variable">
     <option hidden disabled selected value></option>
@@ -28,7 +27,6 @@
 
   <li class="title">4. Comparar los Promedios</li>
   <button id="compare" class="btn btn-primary btn-block">Comparar los Promedios </button>
-  <button id="compare-humedad" class="btn btn-primary btn-block">Comparar Precip y Humedad de Suelo</button>
     <li class="title">Choose specific date for graph</li>
  <select class="form-select" aria-label="variable selector" id="select-year">
     <option hidden disabled selected value></option>
@@ -60,6 +58,7 @@
   </select>
    <li class="title">Zoom to Region </li>
     <select id="regions" class="form-select" name = "regions">
+        <option value = ""> </option>
         <option value = "Ecuador">Ecuador</option>
         <option value = "Azuay">Azuay</option>
         <option value = "Bolivar">Bolivar</option>

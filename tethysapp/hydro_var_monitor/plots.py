@@ -46,7 +46,7 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
 
     # read in img col of averages
     img_col_avg = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/era5_monthly_avg/era5_monthly_{i:02}' for i in range(1, 13)])
+        [f'users/rachelshaylahuber55/era5_monthly_avg/era5_monthly_updated_{i:02}' for i in range(1, 13)])
 
     def avg_era(img):
         return img.set('avg_value', img.reduceRegion(

@@ -20,8 +20,7 @@ const App = (() => {
     const btnLatLong = document.getElementById("lat-lon")
     const usrLat = document.getElementById('lat')
     const usrLon = document.getElementById('lon')
-    const btnClearLatLon = document.getElementById('clear-lat-lon')
-    const btnComparePrecip = document.getElementById('compare-humedad')
+    //const btnComparePrecip = document.getElementById('compare-humedad')
     const btnRegion = document.getElementById('region')
     const selectRegion = document.getElementById('regions')
     const year = document.getElementById("select-year")
@@ -58,6 +57,7 @@ const App = (() => {
     let input_spatial = "";
     let isPoint = false;
     let point;
+    let definedRegion = false;
 
     L.Control.Layers.include({
         getOverlays: function () {
@@ -127,17 +127,23 @@ const App = (() => {
             "source": selectSource.value,
             "region": input_spatial,
             "isPoint": isPoint,
-            "year": year.value
+            "year": year.value,
+            "definedRegion": false
         }
     }
     let province_json = L.geoJSON(false)
 
     btnRegion.onclick = () => {
-        isPoint = false;
+        if (isPoint === true) {
+            map.removeLayer(point);
+            isPoint = false;
+        }
+        drawnItems.clearLayers()
         const dataParams = getVarSourceJSON()
         if (dataParams.variable === "" || dataParams.source === "") return
         province_json.clearLayers();
         dataParams.region = selectRegion.value
+        //get geojson url and add it to my map using fetch
         let geojsons = selectRegion.value
         let url = staticGeoJSON + geojsons + ".json"
         fetch(url)
@@ -205,7 +211,7 @@ const App = (() => {
             }
         })
     }
-
+/*
     btnComparePrecip.onclick = () => {
         const dataParams = getVarSourceJSON()
         //check that it is a variable that can be compared
@@ -294,19 +300,22 @@ const App = (() => {
                 }
             }
         })
-    }
+        isPoint = false;
+    }*/
 
 
     btnLatLong.onclick = () => {
+        drawnItems.clearLayers()
         if (isPoint === true) {
-            $("#errorModal").modal()
-        } else {
-            $('#lat-lon-modal').modal()
-            const btnSave = document.getElementById('save')
-            btnSave.onclick = () => {
-                point = L.marker([usrLon.value, usrLat.value]).addTo(map);
-                isPoint = true;
-            }
+            map.removeLayer(point);
+            isPoint = false;
+        }
+        $('#lat-lon-modal').modal()
+        const btnSave = document.getElementById('save')
+        btnSave.onclick = () => {
+            point = L.marker([usrLon.value, usrLat.value]).addTo(map);
+            isPoint = true;
+
         }
     }
 
@@ -337,11 +346,22 @@ const App = (() => {
 
     btnCompare.onclick = () => {
         const dataParams = getVarSourceJSON()
+        province_json.clearLayers();
+        if (selectRegion.value !="") {
+            dataParams.definedRegion = true
+            dataParams.region = selectRegion.value
+            //get geojson url and add it to my map using fetch
+            let geojsons = selectRegion.value
+            let url = staticGeoJSON + geojsons + ".json"
+            fetch(url)
+                .then(response => response.json())
+                .then(json => province_json.addData(json).addTo(map))
+        }
         if (dataParams.isPoint == true) {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }
         //check that it is a variable that can be compared
-        if (dataParams.variable === "" || dataParams.variable === "soil_moisture" || dataParams.variable === "ndvi" || dataParams.region === "") return
+        if (dataParams.variable === "" || dataParams.variable === "soil_moisture" || dataParams.region === "") return
         $("#loading-icon").addClass("appear");
 
         $.ajax({
@@ -437,6 +457,7 @@ const App = (() => {
                 }
             }
         })
+        isPoint = false;
     }
 
     btnPlotSeries.onclick = () => {
@@ -509,14 +530,14 @@ const App = (() => {
 
             }
         })
-    }
-
-    btnClearLatLon.onclick = () => {
-        map.removeLayer(point);
         isPoint = false;
     }
 
     map.on(L.Draw.Event.CREATED, e => {
+        if (isPoint === true) {
+            map.removeLayer(point);
+            isPoint = false;
+        }
         drawnItems.clearLayers()
         drawnItems.addLayer(e.layer);
         input_spatial = JSON.stringify(e.layer.toGeoJSON());

@@ -12,7 +12,7 @@ import logging
 import os
 from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG
 from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS
-from .compare import air_temp_compare, precip_compare, surface_temp_compare, compare_precip_moist
+from .compare import air_temp_compare, precip_compare
 
 
 # @controller(name='home', url='/', login_required=
@@ -37,17 +37,34 @@ def compare(request):
     response_data = {'success': False}
     try:
         region = request.GET.get('region', None)
+        definedRegion = request.GET.get('definedRegion', None)
+        print(definedRegion)
+        if definedRegion=="true":
+            province = region + ".json"
+            ROOT_DIR = os.path.abspath(os.curdir)
+            json_url = os.path.join(ROOT_DIR, "hydrologic_variable_monitor", "tethysapp", "hydro_var_monitor",
+                                    "workspaces",
+                                    "app_workspace", "preconfigured_geojsons", "ecuador", province)
+            f = open(json_url)
+            region = json.load(f)
+        print(region)
+
+        #print(type(region))
         var = request.GET.get('variable', None)
         isPoint = request.GET.get('isPoint', None)
 
         if var == "air_temp":
-            values = air_temp_compare(json.loads(region), json.loads(isPoint))
+            if definedRegion == "true":
+                values = air_temp_compare(region, json.loads(isPoint))
+            else:
+                values = air_temp_compare(json.loads(region), json.loads(isPoint))
 
         if var == "precip":
-            values = precip_compare(json.loads(region), json.loads(isPoint))
-
-        if var == "soil_temperature":
-            values = surface_temp_compare(json.loads(region), json.loads(isPoint))
+            if definedRegion == "true":
+                values = precip_compare(region, json.loads(isPoint))
+                print("finished")
+            else:
+                values = precip_compare(json.loads(region), json.loads(isPoint))
 
         response_data.update({
             'success': True,
@@ -191,9 +208,6 @@ def get_plot(request):
         if sensor == "CHIRPS":
             plot_data = plot_CHIRPS(json.loads(region), json.loads(isPoint), startDate, endDate)
 
-        if sensor == "Landsat":
-            plot_data = plot_NDVI(json.loads(region), json.loads(isPoint), startDate, endDate)
-
         response_data.update({
             'success': True,
         })
@@ -221,11 +235,13 @@ def compare_precip(request):
 
 
 def get_predefined(request):
+    #read in values to variables
     name_of_area = request.GET.get("region", None)
     isPoint = request.GET.get('isPoint', None)
     sensor = request.GET.get('source', None)
     var = request.GET.get('variable', None)
     year = request.GET.get('year', None)
+    #get json simplified version from app workspace for earth engine
     province = name_of_area + ".json"
     ROOT_DIR = os.path.abspath(os.curdir)
     json_url = os.path.join(ROOT_DIR, "hydrologic_variable_monitor", "tethysapp", "hydro_var_monitor", "workspaces",
@@ -233,7 +249,7 @@ def get_predefined(request):
     f = open(json_url)
     region = json.load(f)
 
-    if year == "" or year == "2022" or year == "y2d":
+    if year == "" or year == "y2d":
         endDate, startDate = get_date()
     elif year == "last12":
         endDate = date.today().strftime("%Y-%m-%d")
