@@ -108,7 +108,6 @@ const App = (() => {
         }, draw: {
             marker: false,
             polyline: false,
-            circlemarker: false,
             circle: false,
             polygon: true,
             rectangle: true,
@@ -133,22 +132,32 @@ const App = (() => {
     }
     let province_json = L.geoJSON(false)
 
-    btnRegion.onclick = () => {
+    selectRegion.onchange = () =>{
         if (isPoint === true) {
             map.removeLayer(point);
             isPoint = false;
         }
         drawnItems.clearLayers()
+        //get geojson url and add it to my map using fetch
+        province_json.clearLayers();
+        let geojsons = selectRegion.value
+        if (geojsons != "") {
+            let url = staticGeoJSON + geojsons + ".json"
+            fetch(url)
+                .then(response => response.json())
+                .then(json => province_json.addData(json).addTo(map))
+            map.flyTo([-0.987891, -80.834077],6)
+        }
+        if (geojsons == ""){
+            map.flyTo([20, -40], 3)
+        }
+    }
+
+
+    btnRegion.onclick = () => {
         const dataParams = getVarSourceJSON()
         if (dataParams.variable === "" || dataParams.source === "") return
-        province_json.clearLayers();
         dataParams.region = selectRegion.value
-        //get geojson url and add it to my map using fetch
-        let geojsons = selectRegion.value
-        let url = staticGeoJSON + geojsons + ".json"
-        fetch(url)
-            .then(response => response.json())
-            .then(json => province_json.addData(json).addTo(map))
         //check that it is a variable that can be compared
         $("#loading-icon").addClass("appear");
         $.ajax({
@@ -314,7 +323,10 @@ const App = (() => {
         const btnSave = document.getElementById('save')
         btnSave.onclick = () => {
             point = L.marker([usrLon.value, usrLat.value]).addTo(map);
+            map.flyTo([usrLon.value, usrLat.value], 5)
             isPoint = true;
+            $('#lat-lon-modal').modal("hide");
+
 
         }
     }
@@ -393,6 +405,8 @@ const App = (() => {
                 let data_plt = [era5_plt, gldas_plt]
 
                 //add imerg and chirps if it is precipitation
+                console.log("##################################################################")
+                console.log(dataParams.variable)
                 if (dataParams.variable == "precip") {
                     const imerg = JSON.parse(data['imerg'])
                     const chirps = JSON.parse(data['chirps'])
@@ -534,6 +548,7 @@ const App = (() => {
     }
 
     map.on(L.Draw.Event.CREATED, e => {
+        province_json.clearLayers()
         if (isPoint === true) {
             map.removeLayer(point);
             isPoint = false;
