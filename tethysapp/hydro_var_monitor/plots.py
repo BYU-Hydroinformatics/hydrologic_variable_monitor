@@ -6,38 +6,13 @@ import numpy as np
 import calendar
 
 
-# define functions
-"""
-def get_avg_date():
-    return date.today().replace(year=date.today().year - 30).strftime("%Y-%m-%d")
-
-
-def get_collection(collection_name, xy_point, start_date='1992-01-01', end_date='2023-01-01'):
-    return (
-        ee.ImageCollection(collection_name)
-        .filterBounds(xy_point)
-        .filterDate(start_date, end_date)
-    )
-
-
-def set_ymd_properties(img):
-    dates = ee.Date(img.get('system:time_start'))
-    return img.set({
-        'date': dates.format('YYYY-MM-DD'),
-        'month_day': dates.format('MM-DD'),
-        'year': dates.format('YYYY'),
-        'month': dates.format('MM'),
-        'day': dates.format('DD')
-    })
-"""
-
-#ERA5 plot
+# ERA5 plot
 def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
     now = endDate
     y2d_start = startDate
     if startDate == "last12":
         y2d_start = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
-    #check if using latitude and longitude or region
+    # check if using latitude and longitude or region
     if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
@@ -53,11 +28,12 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
             reducer=ee.Reducer.mean(),
             geometry=area,
         ))
-    #get year-to-date averages
+
+    # get year-to-date averages
     era_ic = ee.ImageCollection("ECMWF/ERA5_LAND/HOURLY")
     era_ytd_values_ic = era_ic.select(band).filterDate(y2d_start, now).map(avg_era)
 
-    #create dataframe from image collection
+    # create dataframe from image collection
     era_ytd_df = pd.DataFrame(
         era_ytd_values_ic.aggregate_array('avg_value').getInfo(),
         index=pd.to_datetime(np.array(era_ytd_values_ic.aggregate_array('system:time_start').getInfo()) * 1e6),
@@ -75,25 +51,25 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
     avg_df.reset_index(drop=True, inplace=True)
     # set year to date values
     era_ytd_df.columns = ["data_values"]
-    #loop through the dataframe and move necessary dates for averages in new order if doing last 12 months.
-    #Current month is assumed 12 (meaning it will not be moved), but is reset to be the current month if the last 12 months were selected.
+    # loop through the dataframe and move necessary dates for averages in new order if doing last 12 months.
+    # Current month is assumed 12 (meaning it will not be moved), but is reset to be the current month if the last 12 months were selected.
     curr_month = 12
-    #change date to be a string value that can be easily graphed.
+    # change date to be a string value that can be easily graphed.
     era_ytd_df['date'] = era_ytd_df.index
-    era_ytd_df['date']=pd.to_datetime(era_ytd_df["date"])
+    era_ytd_df['date'] = pd.to_datetime(era_ytd_df["date"])
     era_ytd_df['date'] = era_ytd_df['date'].dt.strftime("%Y-%m-%d")
 
     if startDate == "last12":
         curr_month = int(endDate[5:7])
         for i in range(12 - curr_month):
-            avg_df['datetime'][11 - i] = avg_df['datetime'][11 - i].replace(year=date.today().year -1)
+            avg_df['datetime'][11 - i] = avg_df['datetime'][11 - i].replace(year=date.today().year - 1)
 
     avg_df.sort_values(by='datetime', inplace=True)
     avg_df.reset_index(inplace=True)
     avg_df['date'] = avg_df['datetime'].dt.strftime("%Y-%m-%d")
 
-    #rearrance dataframe to account for last 12 months if necessary
-    #Then sum the values for precipitation
+    # rearrance dataframe to account for last 12 months if necessary
+    # Then sum the values for precipitation
     if band == "total_precipitation":
         days_in_month = np.array([calendar.monthrange(int(now[:4]), i)[1] for i in range(1, 13)])
         for i in range(12 - curr_month):
@@ -102,7 +78,6 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
             days_in_month = np.insert(days_in_month, 0, extra_val)
         avg_df['data_values'] = avg_df['data_values'] * days_in_month * 1000
         avg_df['data_values'] = avg_df['data_values'].cumsum()
-
 
     if band == "total_precipitation":
         era_ytd_df["data_values"] = (era_ytd_df["data_values"] * 1000).cumsum()
@@ -149,7 +124,7 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
     if startDate == "last12":
         curr_month = int(endDate[5:7])
         for i in range(12 - curr_month):
-            gldas_avg_df['datetime'][11 - i] = gldas_avg_df['datetime'][11 - i].replace(year=date.today().year -1)
+            gldas_avg_df['datetime'][11 - i] = gldas_avg_df['datetime'][11 - i].replace(year=date.today().year - 1)
 
     gldas_avg_df.sort_values(by='datetime', inplace=True)
     gldas_avg_df.reset_index(inplace=True)
@@ -167,7 +142,7 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
         gldas_avg_df["data_values"] = gldas_avg_df[band]
         gldas_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=gldas_avg_df.index[i] + 1, day=15)
                                     for i in gldas_avg_df.index]
-    #get the image collection then call aggregate array to turn it into a dataframe
+    # get the image collection then call aggregate array to turn it into a dataframe
     gldas_ytd = gldas_ic.select(band).filterDate(y2d_start, now).map(avg_gldas)
     gldas_ytd_df = pd.DataFrame(
         gldas_ytd.aggregate_array('avg_value').getInfo(),
@@ -207,7 +182,7 @@ def plot_IMERG(region, isPoint, startDate, endDate):
             geometry=area,
         ))
 
-    #get IMERG image collection from assets and then turn it into a dataframe
+    # get IMERG image collection from assets and then turn it into a dataframe
     imerg_1m_ic = ee.ImageCollection(
         [f'users/rachelshaylahuber55/imerg_monthly_avg/imerg_monthly_avg_{i:02}' for i in range(1, 13)])
 
@@ -220,22 +195,22 @@ def plot_IMERG(region, isPoint, startDate, endDate):
 
     imerg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=imerg_df.index[i] + 1, day=15) for i in
                             imerg_df.index]
-    #sort the dataframe to match the last 12 years
+    # sort the dataframe to match the last 12 years
     if startDate == "last12":
         curr_month = int(endDate[5:7])
         for i in range(12 - curr_month):
             extra_val = days_in_month[11]
             days_in_month = np.delete(days_in_month, 11, 0)
             days_in_month = np.insert(days_in_month, 0, extra_val)
-            imerg_df['datetime'][11 - i] = imerg_df['datetime'][11 - i].replace(year=date.today().year -1)
+            imerg_df['datetime'][11 - i] = imerg_df['datetime'][11 - i].replace(year=date.today().year - 1)
         y2d_start = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
         imerg_df.sort_values(by='datetime', inplace=True)
         imerg_df.reset_index(inplace=True)
-    #convert values to be cumulatively summer and also to account for all the days of the month
+    # convert values to be cumulatively summer and also to account for all the days of the month
     imerg_df['HQprecipitation'] = imerg_df['HQprecipitation'] * 24
     imerg_df['data_values'] = imerg_df['HQprecipitation'].cumsum() * days_in_month
     imerg_df['date'] = imerg_df['datetime'].dt.strftime("%Y-%m-%d")
-    #get IMERG values - they are grouped in 30 minute intervals
+    # get IMERG values - they are grouped in 30 minute intervals
     imerg_30min_ic = ee.ImageCollection("NASA/GPM_L3/IMERG_V06")
 
     imerg_ytd_values_ic = imerg_30min_ic.select('HQprecipitation').filterDate(y2d_start, now).map(avg_in_bounds)
@@ -274,7 +249,7 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
     else:
         get_coord = region["geometry"]
         area = ee.Geometry.Polygon(get_coord["coordinates"])
-    #read in daily image collection from earth engine and the averages and then the averages from assets
+    # read in daily image collection from earth engine and the averages and then the averages from assets
     chirps_daily_ic = ee.ImageCollection('UCSB-CHG/CHIRPS/DAILY')
     chirps_pentad_ic = ee.ImageCollection(
         [f'users/rachelshaylahuber55/chirps_monthly_avg/chirps_monthly_avg_{i:02}' for i in range(1, 13)])
@@ -287,7 +262,8 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
             reducer=ee.Reducer.mean(),
             geometry=area,
         ).get('precipitation'))
-    #days in month will allow the average to by applied to every day of the year when cumulatively summing values
+
+    # days in month will allow the average to by applied to every day of the year when cumulatively summing values
     days_in_month = np.array([calendar.monthrange(int(now[:4]), i)[1] for i in range(1, 13)])
 
     chirps_avg_ic = chirps_pentad_ic.select('precipitation').map(clip_to_bounds).map(
@@ -305,14 +281,14 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
             extra_val = days_in_month[11]
             days_in_month = np.delete(days_in_month, 11, 0)
             days_in_month = np.insert(days_in_month, 0, extra_val)
-            chirps_df['datetime'][11 - i] = chirps_df['datetime'][11 - i].replace(year=date.today().year -1)
+            chirps_df['datetime'][11 - i] = chirps_df['datetime'][11 - i].replace(year=date.today().year - 1)
         y2d_start = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
         chirps_df.sort_values(by='datetime', inplace=True)
         chirps_df.reset_index(inplace=True)
-    #sum rates a
+    # sum rates a
     chirps_df['data_values'] = chirps_df['depth'].cumsum() * days_in_month / 5
     chirps_df['date'] = chirps_df['datetime'].dt.strftime("%Y-%m-%d")
-    #get year to date dataframe
+    # get year to date dataframe
     chirps_ytd_ic = chirps_daily_ic.filterDate(y2d_start, now).select('precipitation').map(clip_to_bounds).map(
         chirps_avg)
 

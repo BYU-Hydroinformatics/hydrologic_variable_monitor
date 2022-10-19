@@ -38,7 +38,7 @@ def compare(request):
     try:
         region = request.GET.get('region', None)
         definedRegion = request.GET.get('definedRegion', None)
-        if definedRegion=="true":
+        if definedRegion == "true":
             province = region + ".json"
             ROOT_DIR = os.path.abspath(os.curdir)
             json_url = os.path.join(ROOT_DIR, "hydrologic_variable_monitor", "tethysapp", "hydro_var_monitor",
@@ -231,13 +231,13 @@ def compare_precip(request):
 
 
 def get_predefined(request):
-    #read in values to variables
+    # read in values to variables
     name_of_area = request.GET.get("region", None)
     isPoint = request.GET.get('isPoint', None)
     sensor = request.GET.get('source', None)
     var = request.GET.get('variable', None)
     year = request.GET.get('year', None)
-    #get json simplified version from app workspace for earth engine
+    # get json simplified version from app workspace for earth engine
     province = name_of_area + ".json"
     ROOT_DIR = os.path.abspath(os.curdir)
     json_url = os.path.join(ROOT_DIR, "hydrologic_variable_monitor", "tethysapp", "hydro_var_monitor", "workspaces",

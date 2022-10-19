@@ -3,7 +3,6 @@ from datetime import date
 import ee
 import pandas as pd
 import calendar
-#from .plots import get_collection
 import numpy as np
 
 
@@ -11,6 +10,7 @@ def get_current_date():
     now = date.today().strftime("%Y-%m-%d")
     y2d_start = date(date.today().year, 1, 1).strftime("%Y-%m-%d")
     return now, y2d_start
+
 
 def precip_compare(region, isPoint):
     # get needed functions
@@ -72,7 +72,8 @@ def precip_compare(region, isPoint):
     gldas_avg_df = cum_df_gldas
     # set date and data values columns that the js code will look for
     era_avg_df.columns = ["data_values"]
-    era_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era_avg_df.index[i] + 1, day=15) for i in era_avg_df.index]
+    era_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=era_avg_df.index[i] + 1, day=15) for i in
+                              era_avg_df.index]
     era_avg_df['date'] = era_avg_df['datetime'].dt.strftime("%Y-%m-%d")
     era_avg_df.reset_index(drop=True, inplace=True)
     days_in_month = np.array([calendar.monthrange(int(now[:4]), i)[1] for i in range(1, 13)])
