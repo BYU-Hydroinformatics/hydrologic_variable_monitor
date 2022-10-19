@@ -1,14 +1,18 @@
 from django.http.response import JsonResponse
+from datetime import date
+from datetime import datetime
 from django.shortcuts import render
 from tethys_sdk.permissions import login_required
 from .ee_auth import *
 import json
 from django.http import JsonResponse, HttpResponseNotAllowed
+from tethys_sdk.workspaces import app_workspace
 from . import ee_auth
 import logging
-from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, NDVI
-from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS, plot_NDVI
-from .compare import air_temp_compare, precip_compare, surface_temp_compare, compare_precip_moist
+import os
+from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG
+from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS
+from .compare import air_temp_compare, precip_compare
 
 
 # @controller(name='home', url='/', login_required=
@@ -33,17 +37,30 @@ def compare(request):
     response_data = {'success': False}
     try:
         region = request.GET.get('region', None)
+        definedRegion = request.GET.get('definedRegion', None)
+        if definedRegion == "true":
+            province = region + ".json"
+            ROOT_DIR = os.path.abspath(os.curdir)
+            json_url = os.path.join(ROOT_DIR, "hydrologic_variable_monitor", "tethysapp", "hydro_var_monitor",
+                                    "workspaces",
+                                    "app_workspace", "preconfigured_geojsons", "ecuador", province)
+            f = open(json_url)
+            region = json.load(f)
+
         var = request.GET.get('variable', None)
         isPoint = request.GET.get('isPoint', None)
 
         if var == "air_temp":
-            values = air_temp_compare(json.loads(region), json.loads(isPoint))
+            if definedRegion == "true":
+                values = air_temp_compare(region, json.loads(isPoint))
+            else:
+                values = air_temp_compare(json.loads(region), json.loads(isPoint))
 
         if var == "precip":
-            values = precip_compare(json.loads(region), json.loads(isPoint))
-
-        if var == "soil_temperature":
-            values = surface_temp_compare(json.loads(region), json.loads(isPoint))
+            if definedRegion == "true":
+                values = precip_compare(region, json.loads(isPoint))
+            else:
+                values = precip_compare(json.loads(region), json.loads(isPoint))
 
         response_data.update({
             'success': True,
@@ -63,11 +80,8 @@ def get_map_id(request):
         return HttpResponseNotAllowed(['GET'])
 
     try:
-
-        region = request.GET.get('region', None)
         sensor = request.GET.get('source', None)
         var = request.GET.get('variable', None)
-        isPoint = request.GET.get('isPoint', None)
 
         if sensor == "ERA5":
             if var == "air_temp":
@@ -111,9 +125,6 @@ def get_map_id(request):
             vis_params = {"min": 0, "max": 150, "palette": ['00FFFF', '0000FF']}
             imgs = CHIRPS(band)
 
-        if sensor == "Landsat":
-            vis_params = {"min": -1, "max": 1, "palette": ['blue', 'white', 'green']}
-            imgs = NDVI(json.loads(region), json.loads(isPoint))
         # get the url from specified image and then return it in json
         wurl = get_tile_url(imgs, vis_params)
         response_data.update({
@@ -127,6 +138,12 @@ def get_map_id(request):
     return JsonResponse(response_data)
 
 
+def get_date():
+    now = date.today().strftime("%Y-%m-%d")
+    y2d_start = date(date.today().year, 1, 1).strftime("%Y-%m-%d")
+    return now, y2d_start
+
+
 # @controller(name='get-plot', url='/ee/get-plot', login_required=True)
 def get_plot(request):
     response_data = {'success': False}
@@ -136,6 +153,16 @@ def get_plot(request):
         var = request.GET.get('variable', None)
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
+        year = request.GET.get('year', None)
+
+        if year == "" or year == "2022" or year == "y2d":
+            endDate, startDate = get_date()
+        elif year == "last12":
+            endDate = date.today().strftime("%Y-%m-%d")
+            startDate = "last12"
+        else:
+            startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
+            endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")
 
         if sensor == "ERA5":
             if var == "air_temp":
@@ -150,7 +177,7 @@ def get_plot(request):
                 band = "skin_temperature"
                 title = "Temperatura del Suelo- ERA5"
                 yaxis = "Temperatura en Celsius"
-            plot_data = plot_ERA5(json.loads(region), band, title, yaxis, json.loads(isPoint))
+            plot_data = plot_ERA5(json.loads(region), band, title, yaxis, json.loads(isPoint), startDate, endDate)
 
         if sensor == "GLDAS":
             if var == "precip":
@@ -169,16 +196,13 @@ def get_plot(request):
                 band = "AvgSurfT_inst"
                 title = "Temperatura del Suelo - GLDAS"
                 yaxis = "Temperatura en Celsius"
-            plot_data = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint))
+            plot_data = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint), startDate, endDate)
 
         if sensor == "IMERG":
-            plot_data = plot_IMERG(json.loads(region), json.loads(isPoint))
+            plot_data = plot_IMERG(json.loads(region), json.loads(isPoint), startDate, endDate)
 
         if sensor == "CHIRPS":
-            plot_data = plot_CHIRPS(json.loads(region), json.loads(isPoint))
-
-        if sensor == "Landsat":
-            plot_data = plot_NDVI(json.loads(region), json.loads(isPoint))
+            plot_data = plot_CHIRPS(json.loads(region), json.loads(isPoint), startDate, endDate)
 
         response_data.update({
             'success': True,
@@ -195,7 +219,7 @@ def compare_precip(request):
     try:
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
-        plot_data = compare_precip_moist(json.loads(region), False)
+        plot_data = compare_precip_moist(json.loads(region), isPoint)
 
         response_data.update({
             'success': True,
@@ -203,4 +227,71 @@ def compare_precip(request):
 
     except Exception as e:
         response_data['error'] = f'Error Processing Request: {e}'
+    return JsonResponse(json.loads(json.dumps(plot_data)))
+
+
+def get_predefined(request):
+    # read in values to variables
+    name_of_area = request.GET.get("region", None)
+    isPoint = request.GET.get('isPoint', None)
+    sensor = request.GET.get('source', None)
+    var = request.GET.get('variable', None)
+    year = request.GET.get('year', None)
+    # get json simplified version from app workspace for earth engine
+    province = name_of_area + ".json"
+    ROOT_DIR = os.path.abspath(os.curdir)
+    json_url = os.path.join(ROOT_DIR, "hydrologic_variable_monitor", "tethysapp", "hydro_var_monitor", "workspaces",
+                            "app_workspace", "preconfigured_geojsons", "ecuador", province)
+    f = open(json_url)
+    region = json.load(f)
+
+    if year == "" or year == "y2d":
+        endDate, startDate = get_date()
+    elif year == "last12":
+        endDate = date.today().strftime("%Y-%m-%d")
+        startDate = "last12"
+    else:
+        startDate = datetime(int(year), 1, 1).strftime("%Y-%m-%d")
+        endDate = datetime(int(year), 12, 31).strftime("%Y-%m-%d")
+
+    if sensor == "ERA5":
+        if var == "air_temp":
+            band = "temperature_2m"
+            title = "Temperatura del Aire - ERA5"
+            yaxis = "Temperature en Celsius"
+        if var == "precip":
+            band = "total_precipitation"
+            title = "Acumulados de Precipitación - ERA5"
+            yaxis = "mm of precipitación"
+        if var == "soil_temperature":
+            band = "skin_temperature"
+            title = "Temperatura del Suelo- ERA5"
+            yaxis = "Temperatura en Celsius"
+        plot_data = plot_ERA5(region, band, title, yaxis, json.loads(isPoint), startDate, endDate)
+
+    if sensor == "GLDAS":
+        if var == "precip":
+            band = "Rainf_tavg"
+            title = "Acumulados de Precipitación- GLDAS"
+            yaxis = "mm of precipitación"
+        if var == "air_temp":
+            band = "Tair_f_inst"
+            title = "Temperatura del Aire- GLDAS"
+            yaxis = "Temperatura en Celsius"
+        if var == "soil_moisture":
+            band = "RootMoist_inst"
+            title = "Humedad del Suelo - GLDAS (root zone)"
+            yaxis = "kg/m^2"
+        if var == "soil_temperature":
+            band = "AvgSurfT_inst"
+            title = "Temperatura del Suelo - GLDAS"
+            yaxis = "Temperatura en Celsius"
+        plot_data = plot_GLDAS(region, band, title, yaxis, json.loads(isPoint), startDate, endDate)
+
+    if sensor == "IMERG":
+        plot_data = plot_IMERG(region, json.loads(isPoint), startDate, endDate)
+
+    if sensor == "CHIRPS":
+        plot_data = plot_CHIRPS(region, json.loads(isPoint), startDate, endDate)
+
     return JsonResponse(json.loads(json.dumps(plot_data)))
