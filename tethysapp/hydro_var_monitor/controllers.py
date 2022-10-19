@@ -38,7 +38,6 @@ def compare(request):
     try:
         region = request.GET.get('region', None)
         definedRegion = request.GET.get('definedRegion', None)
-        print(definedRegion)
         if definedRegion=="true":
             province = region + ".json"
             ROOT_DIR = os.path.abspath(os.curdir)
@@ -47,9 +46,7 @@ def compare(request):
                                     "app_workspace", "preconfigured_geojsons", "ecuador", province)
             f = open(json_url)
             region = json.load(f)
-        print(region)
 
-        #print(type(region))
         var = request.GET.get('variable', None)
         isPoint = request.GET.get('isPoint', None)
 
@@ -62,7 +59,6 @@ def compare(request):
         if var == "precip":
             if definedRegion == "true":
                 values = precip_compare(region, json.loads(isPoint))
-                print("finished")
             else:
                 values = precip_compare(json.loads(region), json.loads(isPoint))
 

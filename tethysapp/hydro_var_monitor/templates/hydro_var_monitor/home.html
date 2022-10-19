@@ -27,7 +27,7 @@
 
   <li class="title">4. Comparar los Promedios</li>
   <button id="compare" class="btn btn-primary btn-block">Comparar los Promedios </button>
-    <li class="title">Choose specific date for graph</li>
+    <li class="title">Usar una Fecha Especifica (opcional)</li>
  <select class="form-select" aria-label="variable selector" id="select-year">
     <option hidden disabled selected value></option>
     <option value="2000">2000</option>
@@ -53,12 +53,12 @@
     <option value="2020">2020</option>
     <option value="2021">2021</option>
     <option value="2022">2022</option>
-     <option value="last12">Most Recent 12 months</option>
-    <option value="y2d">Year to Date</option>
+     <option value="last12">últimos 12 meses</option>
+    <option value="y2d">El año hasta la fecha</option>
   </select>
-   <li class="title">Zoom to Region </li>
+   <li class="title">Usar una Provincia Especifica (opcional) </li>
     <select id="regions" class="form-select" name = "regions">
-        <option value = "">None</option>
+        <option value = "">Ninguna</option>
         <option value = "Ecuador">Ecuador</option>
         <option value = "Azuay">Azuay</option>
         <option value = "Bolivar">Bolivar</option>
@@ -85,7 +85,7 @@
         <option value = "Tungurahua">Tungurahua</option>
         <option value = "Zamora_Chinchipe">Zamora Chinchipe</option>
     </select>
-    <button  id="region" type="button" class="btn btn-primary btn-block" >Load Region Data</button>
+    <button  id="region" type="button" class="btn btn-primary btn-block" >Cargar Datos para la Región </button>
 
 
 {% endblock %}

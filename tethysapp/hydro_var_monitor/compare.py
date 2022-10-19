@@ -55,7 +55,6 @@ def precip_compare(region, isPoint):
     era_avg_df = pd.DataFrame(
         era_avg_img.aggregate_array('avg_value').getInfo(),
     )
-    print(era_avg_df)
     # consider that each day is growing at the average monthly rate
     date_generated_gldas = pd.date_range(y2d_start, periods=365)
     cum_df_gldas = pd.DataFrame(date_generated_gldas)
@@ -79,10 +78,8 @@ def precip_compare(region, isPoint):
     days_in_month = np.array([calendar.monthrange(int(now[:4]), i)[1] for i in range(1, 13)])
     era_avg_df['data_values'] = era_avg_df['data_values'] * days_in_month * 1000
     era_avg_df['data_values'] = era_avg_df['data_values'].cumsum()
-    print(era_avg_df)
     # multiply by 1000 to convert into mm from meters
     era5_df = era_avg_df
-    print(era5_df)
     # get Imerg data
     imerg_1m_ic = ee.ImageCollection(
         [f'users/rachelshaylahuber55/imerg_monthly_avg/imerg_monthly_avg_{i:02}' for i in range(1, 13)])

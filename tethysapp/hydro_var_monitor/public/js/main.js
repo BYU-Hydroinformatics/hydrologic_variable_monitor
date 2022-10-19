@@ -405,20 +405,18 @@ const App = (() => {
                 let data_plt = [era5_plt, gldas_plt]
 
                 //add imerg and chirps if it is precipitation
-                console.log("##################################################################")
-                console.log(dataParams.variable)
                 if (dataParams.variable == "precip") {
                     const imerg = JSON.parse(data['imerg'])
                     const chirps = JSON.parse(data['chirps'])
                     const imerg_extracted_val = Object.values(imerg.data_values)
-                    const chirps_extracted_val = Object.values(chirps.data_values)
                     const imerg_extracted_date = Object.values(imerg.date)
+                    const imerg_plt = {
+                        x: imerg_extracted_date, y: imerg_extracted_val, mode: 'lines', name: "imerg"
+                    };
+                    const chirps_extracted_val = Object.values(chirps.data_values)
                     const chirps_extracted_date = Object.values(chirps.date)
                     const chirps_plt = {
                         x: chirps_extracted_date, y: chirps_extracted_val, mode: 'lines', name: "chirps"
-                    };
-                    const imerg_plt = {
-                        x: imerg_extracted_date, y: imerg_extracted_val, mode: 'lines', name: "imerg"
                     };
                     data_plt = [era5_plt, gldas_plt, chirps_plt, imerg_plt];
                 }
@@ -452,7 +450,18 @@ const App = (() => {
                     let csvContent_gldas = list_gldas.join("\n");
                     download(csvContent_gldas, "gldas_averages")
                     if (dataParams.variable === "precip") {
-
+                        const imerg = JSON.parse(data['imerg'])
+                        const chirps = JSON.parse(data['chirps'])
+                        const imerg_extracted_val = Object.values(imerg.data_values)
+                        const imerg_extracted_date = Object.values(imerg.date)
+                        const imerg_plt = {
+                            x: imerg_extracted_date, y: imerg_extracted_val, mode: 'lines', name: "imerg"
+                        };
+                        const chirps_extracted_val = Object.values(chirps.data_values)
+                        const chirps_extracted_date = Object.values(chirps.date)
+                        const chirps_plt = {
+                            x: chirps_extracted_date, y: chirps_extracted_val, mode: 'lines', name: "chirps"
+                        };
                         let list_imerg = ['date,value']
                         imerg_plt.x.forEach((num1, index) => {
                             const num2 = imerg_plt.y[index];
@@ -475,9 +484,7 @@ const App = (() => {
     }
 
     btnPlotSeries.onclick = () => {
-        //console.log("here")
         const dataParams = getVarSourceJSON()
-        //console.log(dataParams)
         if (dataParams.isPoint === true) {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }
