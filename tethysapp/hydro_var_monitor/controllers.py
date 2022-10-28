@@ -22,10 +22,9 @@ def home(request):
         return render(request, 'hydro_var_monitor/no_auth_error.html')
     ee_sources = {
         'air_temp': ['GLDAS', 'ERA5'],
-        'ndvi': ['Landsat', ],
         'precip': ['GLDAS', 'CHIRPS', 'IMERG', 'ERA5'],
         'soil_moisture': ['GLDAS', ],
-        'soil_temperature': ['ERA5', 'GLDAS']
+        'evapo': ['GLDAS']
     }
     context = {
         'sources': json.dumps(ee_sources)
@@ -90,7 +89,7 @@ def get_map_id(request):
                               "palette": ['009392', '72aaa1', 'b1c7b3', 'f1eac8', 'e5b9ad', 'd98994', 'd0587e']}
             if var == "precip":
                 band = "total_precipitation"
-                vis_params = {"min": 0, "max": 0.03, "palette": ['00FFFF', '0000FF']}
+                vis_params = {"min": 0, "max": 0.008, "palette": ['00FFFF', '0000FF']}
             if var == "soil_temperature":
                 band = "skin_temperature"
                 vis_params = {"min": 250, "max": 300,
@@ -101,14 +100,14 @@ def get_map_id(request):
         if sensor == "GLDAS":
             if var == "precip":
                 band = "Rainf_tavg"
-                vis_params = {"min": 0, "max": 0.0002, "palette": ['00FFFF', '0000FF']}
+                vis_params = {"min": 0, "max": 0.00006, "palette": ['00FFFF', '0000FF']}
             if var == "air_temp":
                 band = "Tair_f_inst"
-                vis_params = {"min": 206, "max": 328,
+                vis_params = {"min": 235, "max": 320,
                               "palette": ['009392', '72aaa1', 'b1c7b3', 'f1eac8', 'e5b9ad', 'd98994', 'd0587e']}
             if var == "soil_moisture":
                 band = "RootMoist_inst"
-                vis_params = {"min": 1.99, "max": 48, "palette": ['00FFFF', '0000FF']}
+                vis_params = {"min": 100, "max": 400}
             if var == "soil_temperature":
                 band = "AvgSurfT_inst"
                 vis_params = {"min": 222, "max": 378,
@@ -117,12 +116,12 @@ def get_map_id(request):
 
         if sensor == "IMERG":
             band = "HQprecipitation"
-            vis_params = {"min": 0, "max": 5, "palette": ['00FFFF', '0000FF']}
+            vis_params = {"min": 0, "max": 0.4, "palette": ['00FFFF', '0000FF']}
             imgs = IMERG(band)
 
         if sensor == "CHIRPS":
             band = "precipitation"
-            vis_params = {"min": 0, "max": 150, "palette": ['00FFFF', '0000FF']}
+            vis_params = {"min": 0, "max": 40, "palette": ['00FFFF', '0000FF']}
             imgs = CHIRPS(band)
 
         # get the url from specified image and then return it in json
