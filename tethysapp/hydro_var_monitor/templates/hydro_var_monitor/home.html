@@ -8,7 +8,7 @@
 {% block app_navigation_items %}
     <button  id="instructions" type="button" class="btn btn-primary btn-block" >Instrucciones</button>
     <button  id="lat-lon" type="button" class="btn btn-primary btn-block" >Entrar Lat/Lon</button>
-  <li class="title">1. Elija Variable Hidrológica</li>
+  <li class="title">1. Elija Variable</li>
   <select class="form-select" aria-label="variable selector" id="select-variable">
     <option hidden disabled selected value></option>
     <option value="air_temp">Temperatura del Aire</option>
@@ -149,11 +149,41 @@
         <h4 class="modal-title">Instrucciones</h4>
       </div>
       <div class="modal-body">
-        <p>Elija una variable, un satélite correspondiente y un punto en el mapa.  Posteriormente,
-            escoja “cargar mapa” para visualizar una imagen del conjunto de datos o  escoger
-            “mostrar gráfico” para observar un gráfico de la variable con el paso del tiempo. Por favor
-            tenga paciencia!, puede tardar hasta cinco minutos o más para cargar los gráficos. Finalmente,
-            para visualizar los promedios de algunos conjuntos de datos hacer clic en “comparar promedios".</p>
+        <p>Bienvenido a la aplicación Tendencia de Clima!</p>
+
+        <p>La aplicación tendencia de clima permite visualizar  información satelital de los últimos 30 años y
+          comparar la misma para una variable de interés.</p>
+        <p>Para empezar, selecciona una variable de interés: la precipitación, la temperatura, y la humedad del
+          suelo. Después, escoja el satélite de interés para la variable seleccionada.</p>
+          <p><span class="bolded">Selección de un punto o región de interés:</span></p>
+        <p>1. Al hacer clic en la opción “Cargar Mapa” podrá visualizar un mapa de la variable y satélite de interés seleccionada.</p>
+        <p>2.Posteriormente, seleccione el lugar ubicando una región de interés, provincia de Ecuador o coordenadas.</p>
+
+          <p><span class="bolded">Coordenadas:</span> Hacer clic en el botón “Entrar Lat/Lon”, se desplegará una pantalla para colocar la latitud y longitud.
+            Haga clic en “Guardar”, seguidamente en “Mostrar Gráfico” para ver los resultados.</p>
+          <p><span class="bolded">Región de Interés</span></p>
+        <p>En la esquina izquierda de la aplicación, hay una opción con dos botones para dibujar en el mapa. Seleccionar cualquiera
+            de los dos botones para crear un área de interés Hacer clic en el botón “Mostrar Gráfico” para visualizar los resultados.</p>
+          <p><span class="bolded">Provincia en Ecuador</span></p>
+        <p>Al final del menú, encuentre el botón ¨Cargar datos para la región¨ y seleccione la provincia de interés en el menú
+            desplegable. Finalmente haga clic en el botón“Cargar Datos para la Región” para visualizar los resultados.</p>
+
+
+          <p><span class="bolded">Visualización de resultados</span></p>
+        <p>Una vez seleccionada la variable, satélite y área de interés podrá visualizar el gráfico. Los resultados los puedes
+            descargar en formato csv haciendo clic en el botón descargar. También puede descargar el gráfico en formato png al
+            hacer clic en el botón de cámara, localizado en la esquina derecha de la gráfica.</p>
+        <p>En el gráfico puede seleccionar una fecha de interés  haciendo clic y seleccionando un rango de fechas directamente en
+            el gráfico. Para visualizar el gráfico nuevamente con el periodo total de tiempo haga clic en Autoscale.</p>
+        <p>En la leyenda del gráfico puede prender y apagar las líneas de los gráficos según necesite. Por default todas las líneas
+            están encendidas.</p>
+
+          <p><span class="bolded">Comparar los promedios por una variable</span></p>
+        <p>Seleccione la región y variable según lo descrito anteriormente,,, seleccione comparar promedios y observará un gráfico
+            con la información sobre los promedios comparando los datos obtenidos de una variable con diferentes satélites.</p>
+          <p><span class="bolded">Selección de una fecha determinada</span></p>
+          <p> Podrá visualizar los resultados por un año específico en el pasado. Puede seleccionar un año donde dice “Usar una
+              Fecha Específica”. Y después cuando cargue el gráfico observará la información de este año.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
