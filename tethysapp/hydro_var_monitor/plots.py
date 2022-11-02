@@ -109,8 +109,12 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
         ))
 
     # read in assets from the gldas_monthly folder
-    gldas_monthly = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_{i:02}' for i in range(1, 13)])
+    if band == "Evap_tavg":
+        gldas_monthly = ee.ImageCollection(
+            [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_evapo_{i:02}' for i in range(1, 13)])
+    else:
+        gldas_monthly = ee.ImageCollection(
+            [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_{i:02}' for i in range(1, 13)])
     gldas_monthly = gldas_monthly.map(avg_gldas)
     gldas_avg_df = pd.DataFrame(
         gldas_monthly.aggregate_array('avg_value').getInfo(),

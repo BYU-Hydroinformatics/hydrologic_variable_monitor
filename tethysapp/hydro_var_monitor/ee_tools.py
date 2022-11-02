@@ -14,6 +14,12 @@ def GLDAS(band):
         ee.Reducer.mean())
     return ic
 
+def GLDAS_evapo(band):
+    ic = ee.ImageCollection(
+        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_evapo_{i:02}' for i in range(1, 13)]).select(band).reduce(
+        ee.Reducer.mean())
+    return ic
+
 
 def IMERG(band):
     ic = ee.ImageCollection(
