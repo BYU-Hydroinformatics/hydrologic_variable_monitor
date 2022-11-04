@@ -38,7 +38,7 @@ def compare(request):
         if definedRegion == "true":
             province = region + ".json"
             ROOT_DIR = os.path.abspath(os.curdir)
-            json_url = os.path.join(ROOT_DIR, "hydrologic_variable_monitor", "tethysapp", "hydro_var_monitor",
+            json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor",
                                     "workspaces",
                                     "app_workspace", "preconfigured_geojsons", "ecuador", province)
             f = open(json_url)
@@ -223,7 +223,7 @@ def get_predefined(request):
     # get json simplified version from app workspace for earth engine
     province = name_of_area + ".json"
     ROOT_DIR = os.path.abspath(os.curdir)
-    json_url = os.path.join(ROOT_DIR, "hydrologic_variable_monitor", "tethysapp", "hydro_var_monitor", "workspaces",
+    json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor", "workspaces",
                             "app_workspace", "preconfigured_geojsons", "ecuador", province)
     f = open(json_url)
     region = json.load(f)
