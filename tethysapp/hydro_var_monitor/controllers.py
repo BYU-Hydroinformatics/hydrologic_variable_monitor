@@ -7,6 +7,7 @@ from .ee_auth import *
 import json
 from django.http import JsonResponse, HttpResponseNotAllowed
 from tethys_sdk.workspaces import app_workspace
+from tethys_sdk.routing import controller
 from . import ee_auth
 import logging
 import os
@@ -15,8 +16,7 @@ from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS
 from .compare import air_temp_compare, precip_compare
 
 
-# @controller(name='home', url='/', login_required=
-# @login_required()
+@controller(name='home', url='hydro-var-monitor')
 def home(request):
     if not EE_IS_AUTHORIZED:
         return render(request, 'hydro_var_monitor/no_auth_error.html')
@@ -31,7 +31,7 @@ def home(request):
     }
     return render(request, 'hydro_var_monitor/home.html', context)
 
-
+@controller(name='compare', url='hydro-var-monitor/compare')
 def compare(request):
     response_data = {'success': False}
     try:
@@ -71,7 +71,7 @@ def compare(request):
     return JsonResponse(json.loads(json.dumps(values)))
 
 
-# @controller(name='get-map-id', url='/ee/get-map-id', login_required=True)
+@controller(name='get-map-id', url='hydro-var-monitor/get-map-id')
 def get_map_id(request):
     response_data = {'success': False}
 
@@ -145,7 +145,7 @@ def get_date():
     return now, y2d_start
 
 
-# @controller(name='get-plot', url='/ee/get-plot', login_required=True)
+@controller(name='get-plot', url='hydro-var-monitor/get-plot')
 def get_plot(request):
     response_data = {'success': False}
 
@@ -214,23 +214,7 @@ def get_plot(request):
     return JsonResponse(json.loads(json.dumps(plot_data)))
 
 
-def compare_precip(request):
-    response_data = {'success': False}
-
-    try:
-        region = request.GET.get('region', None)
-        isPoint = request.GET.get('isPoint', None)
-        plot_data = compare_precip_moist(json.loads(region), isPoint)
-
-        response_data.update({
-            'success': True,
-        })
-
-    except Exception as e:
-        response_data['error'] = f'Error Processing Request: {e}'
-    return JsonResponse(json.loads(json.dumps(plot_data)))
-
-
+@controller(name='get_predefined', url='hydro-var-monitor/get-predefined')
 def get_predefined(request):
     # read in values to variables
     name_of_area = request.GET.get("region", None)

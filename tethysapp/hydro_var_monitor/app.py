@@ -17,48 +17,48 @@ class HydroVarMonitor(TethysAppBase):
     tags = ['remote sensing', 'earth engine', 'hydrological cycle', 'essential water variables', 'geoglows toolbox']
     enable_feedback = False
     feedback_emails = []
+    controller_modules = ['controllers']
+    # def url_maps(self):
+    #     """
+    #     Add controllers
+    #     """
+    #     UrlMap = url_map_maker(self.root_url)
 
-    def url_maps(self):
-        """
-        Add controllers
-        """
-        UrlMap = url_map_maker(self.root_url)
+    #     url_maps = (
+    #         UrlMap(
+    #             name='home',
+    #             url=f'{self.root_url}',
+    #             controller=f'{self.package}.controllers.home'
+    #         ),
 
-        url_maps = (
-            UrlMap(
-                name='home',
-                url=f'{self.root_url}',
-                controller=f'{self.package}.controllers.home'
-            ),
+    #         UrlMap(
+    #             name='get-map-id',
+    #             url=f'{self.root_url}/get-map-id/',
+    #             controller=f'{self.package}.controllers.get_map_id'
+    #         ),
+    #         UrlMap(
+    #             name='get-plot',
+    #             url=f'{self.root_url}/get-plot/',
+    #             controller=f'{self.package}.controllers.get_plot'
+    #         ),
+    #         UrlMap(
+    #             name='compare',
+    #             url=f'{self.root_url}/compare/',
+    #             controller=f'{self.package}.controllers.compare'
+    #         ),
+    #         UrlMap(
+    #             name='compare_precip',
+    #             url=f'{self.root_url}/compare-precip/',
+    #             controller=f'{self.package}.controllers.compare_precip'
+    #         ),
+    #         UrlMap(
+    #             name='get_predefined',
+    #             url=f'{self.root_url}/get-predefined/',
+    #             controller=f'{self.package}.controllers.get_predefined'
+    #         ),
+    #     )
 
-            UrlMap(
-                name='get-map-id',
-                url=f'{self.root_url}/get-map-id/',
-                controller=f'{self.package}.controllers.get_map_id'
-            ),
-            UrlMap(
-                name='get-plot',
-                url=f'{self.root_url}/get-plot/',
-                controller=f'{self.package}.controllers.get_plot'
-            ),
-            UrlMap(
-                name='compare',
-                url=f'{self.root_url}/compare/',
-                controller=f'{self.package}.controllers.compare'
-            ),
-            UrlMap(
-                name='compare_precip',
-                url=f'{self.root_url}/compare-precip/',
-                controller=f'{self.package}.controllers.compare_precip'
-            ),
-            UrlMap(
-                name='get_predefined',
-                url=f'{self.root_url}/get-predefined/',
-                controller=f'{self.package}.controllers.get_predefined'
-            ),
-        )
-
-        return url_maps
+    #     return url_maps
 
     def custom_settings(self):
         return (
