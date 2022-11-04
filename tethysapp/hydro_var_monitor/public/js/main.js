@@ -15,7 +15,7 @@ const App = (() => {
     const btnClearMap = document.getElementById("clear-map")
     const btnPlotSeries = document.getElementById("plot-series")
     const btnCompare = document.getElementById("compare")
-    const btnInstructions = document.getElementById("instructions")
+    // const btnInstructions = document.getElementById("instructions")
     const btnDownload = document.getElementById("download")
     const btnLatLong = document.getElementById("lat-lon")
     const usrLat = document.getElementById('lat')
@@ -116,9 +116,9 @@ const App = (() => {
     });
     map.addControl(drawControl);
 
-    btnInstructions.onclick = () => {
-        $('#myModal').modal()
-    }
+    // btnInstructions.onclick = () => {
+    //     $('#myModal').modal()
+    // }
 
     const getVarSourceJSON = () => {
         return {
