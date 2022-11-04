@@ -29,18 +29,21 @@ def home(request):
     }
     return render(request, 'hydro_var_monitor/home.html', context)
 
-@controller(name='compare', url='hydro-var-monitor/compare')
-def compare(request):
+@controller(name='compare', url='hydro-var-monitor/compare', app_workspace=True)
+def compare(request,app_workspace):
     response_data = {'success': False}
     try:
         region = request.GET.get('region', None)
         definedRegion = request.GET.get('definedRegion', None)
         if definedRegion == "true":
             province = region + ".json"
-            ROOT_DIR = os.path.abspath(os.curdir)
-            json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor",
-                                    "workspaces",
-                                    "app_workspace", "preconfigured_geojsons", "ecuador", province)
+            app_store_path = app_workspace.path
+            json_url = os.path.join(app_store_path, "preconfigured_geojsons", "ecuador", province)
+            # ROOT_DIR = os.path.abspath(os.curdir)
+            # json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor",
+            #                         "workspaces",
+            #                         "app_workspace", "preconfigured_geojsons", "ecuador", province)
+
             f = open(json_url)
             region = json.load(f)
 
@@ -69,7 +72,7 @@ def compare(request):
     return JsonResponse(json.loads(json.dumps(values)))
 
 
-@controller(name='get-map-id', url='hydro-var-monitor/get-map-id')
+@controller(name='get-map-id', url='hydro-var-monitor/get-map-id',)
 def get_map_id(request):
     response_data = {'success': False}
 
@@ -212,8 +215,8 @@ def get_plot(request):
     return JsonResponse(json.loads(json.dumps(plot_data)))
 
 
-@controller(name='get_predefined', url='hydro-var-monitor/get-predefined')
-def get_predefined(request):
+@controller(name='get_predefined', url='hydro-var-monitor/get-predefined',app_workspace=True)
+def get_predefined(request, app_workspace):
     # read in values to variables
     name_of_area = request.GET.get("region", None)
     isPoint = request.GET.get('isPoint', None)
@@ -223,8 +226,10 @@ def get_predefined(request):
     # get json simplified version from app workspace for earth engine
     province = name_of_area + ".json"
     ROOT_DIR = os.path.abspath(os.curdir)
-    json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor", "workspaces",
-                            "app_workspace", "preconfigured_geojsons", "ecuador", province)
+    app_store_path = app_workspace.path
+    # json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor", "workspaces",
+    #                         "app_workspace", "preconfigured_geojsons", "ecuador", province)
+    json_url = os.path.join(app_store_path, "preconfigured_geojsons", "ecuador", province)
     f = open(json_url)
     region = json.load(f)
 
