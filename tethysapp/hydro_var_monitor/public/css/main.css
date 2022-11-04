@@ -1,3 +1,8 @@
+.buttons-flex{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 #inner-app-content {
     padding: 0;
 }

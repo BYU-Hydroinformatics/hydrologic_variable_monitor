@@ -12,8 +12,8 @@
 {% endblock %}
 
 {% block app_navigation_items %}
-
-    <button  id="lat-lon" type="button" class="btn btn-primary btn-block" >Ingresar Lat/Lon</button>
+  <br>
+  <button  id="lat-lon" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#lat-lon-modal">Ingresar Lat/Lon</button>
   <li class="title">1. Elija Variable</li>
   <select class="form-select" aria-label="variable selector" id="select-variable">
     <option hidden disabled selected value></option>
@@ -28,9 +28,12 @@
   <select class="form-select" aria-label="data source selector" id="select-source"></select>
 
   <li class="title">3. Cargar Datos </li>
-  <button  id="load-map" type="button" class="btn btn-primary btn-block" >Cargar Mapa</button>
-  <button id="clear-map" type="button" class="btn btn-primary btn-block">Despejar Mapa</button>
-  <button id="plot-series" class="btn btn-primary btn-block">Mostrar Gráfico</button>
+  <div class="buttons-flex">
+    <button  id="load-map" type="button" class="btn btn-primary btn-block" >Cargar Mapa</button>
+    <button id="clear-map" type="button" class="btn btn-primary btn-block">Despejar Mapa</button>
+    <button id="plot-series" class="btn btn-primary btn-block">Mostrar Gráfico</button>
+  </div>
+
 
   <li class="title">4. Comparar los Promedios</li>
   <button id="compare" class="btn btn-primary btn-block">Comparar los Promedios </button>
@@ -208,7 +211,7 @@
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         <h4 class="modal-title">Error</h4>
       </div>
       <div class="modal-body">
@@ -228,9 +231,8 @@
     <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Poner Latitud y Longitud </h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-            </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
         </div>
               <div class="modal-body">
                 <form>
