@@ -11,6 +11,7 @@ requirements:
       - conda-forge
     packages:
       - earthengine-api
+      - oauth2client
       - pandas
       - numpy
 
