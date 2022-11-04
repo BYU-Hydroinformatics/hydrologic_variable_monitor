@@ -7,13 +7,14 @@
 
 {% block app_navigation_items %}
     <button  id="instructions" type="button" class="btn btn-primary btn-block" >Instrucciones</button>
-    <button  id="lat-lon" type="button" class="btn btn-primary btn-block" >Entrar Lat/Lon</button>
+    <button  id="lat-lon" type="button" class="btn btn-primary btn-block" >Ingresar Lat/Lon</button>
   <li class="title">1. Elija Variable</li>
   <select class="form-select" aria-label="variable selector" id="select-variable">
     <option hidden disabled selected value></option>
     <option value="air_temp">Temperatura del Aire</option>
     <option value="precip">Precipitación</option>
     <option value="soil_moisture">Humedad del Suelo</option>
+    <option value="evapo">Evapotranspiración</option>
 
   </select>
 
@@ -27,7 +28,7 @@
 
   <li class="title">4. Comparar los Promedios</li>
   <button id="compare" class="btn btn-primary btn-block">Comparar los Promedios </button>
-    <li class="title">Usar una Fecha Especifica (opcional)</li>
+    <li class="title">Usar una Fecha Específica (opcional)</li>
  <select class="form-select" aria-label="variable selector" id="select-year">
     <option hidden disabled selected value></option>
     <option value="2000">2000</option>
@@ -56,7 +57,7 @@
      <option value="last12">últimos 12 meses</option>
     <option value="y2d">El año hasta la fecha</option>
   </select>
-   <li class="title">Usar una Provincia Especifica (opcional) </li>
+   <li class="title">Usar una Provincia Específica (opcional) </li>
     <select id="regions" class="form-select" name = "regions">
         <option value = "">Ninguna</option>
         <option value = "Ecuador">Ecuador</option>
@@ -151,39 +152,41 @@
       <div class="modal-body">
         <p>Bienvenido a la aplicación Tendencia de Clima!</p>
 
-        <p>La aplicación tendencia de clima permite visualizar  información satelital de los últimos 30 años y
-          comparar la misma para una variable de interés.</p>
-        <p>Para empezar, selecciona una variable de interés: la precipitación, la temperatura, y la humedad del
-          suelo. Después, escoja el satélite de interés para la variable seleccionada.</p>
-          <p><span class="bolded">Selección de un punto o región de interés:</span></p>
-        <p>1. Al hacer clic en la opción “Cargar Mapa” podrá visualizar un mapa de la variable y satélite de interés seleccionada.</p>
-        <p>2.Posteriormente, seleccione el lugar ubicando una región de interés, provincia de Ecuador o coordenadas.</p>
+        <p>La aplicación tendencias de clima permite visualizar  información
+            satelital de los últimos 30 años y comparar la misma para una variable de interés.</p>
+        <p>Para empezar, seleccione una variable de interés: precipitación, temperatura, la humedad del suelo, y la evapotranspiración.
+            Después, escoja el satélite de interés para la variable seleccionada. </p>
 
-          <p><span class="bolded">Coordenadas:</span> Hacer clic en el botón “Entrar Lat/Lon”, se desplegará una pantalla para colocar la latitud y longitud.
-            Haga clic en “Guardar”, seguidamente en “Mostrar Gráfico” para ver los resultados.</p>
-          <p><span class="bolded">Región de Interés</span></p>
-        <p>En la esquina izquierda de la aplicación, hay una opción con dos botones para dibujar en el mapa. Seleccionar cualquiera
-            de los dos botones para crear un área de interés Hacer clic en el botón “Mostrar Gráfico” para visualizar los resultados.</p>
-          <p><span class="bolded">Provincia en Ecuador</span></p>
-        <p>Al final del menú, encuentre el botón ¨Cargar datos para la región¨ y seleccione la provincia de interés en el menú
-            desplegable. Finalmente haga clic en el botón“Cargar Datos para la Región” para visualizar los resultados.</p>
+          <p>Al hacer clic en la opción <span class="bolded">“Cargar Mapa”</span> podrá visualizar un mapa de la variable y
+              satélite de interés seleccionada.</p>
+        <p>Posteriormente, seleccione el lugar ubicando una región de interés, provincia de Ecuador o coordenadas.</p>
+          <p><span class="bolded">Selección de un punto o región de interés:</span></p>
+
+          <p><span class="bolded">1. Coordenadas:</span> Hacer clic en el botón <span class="bolded">“Ingresar Lat/Lon”</span>, se desplegará una pantalla
+              para colocar la latitud y longitud. Haga clic en <span class="bolded">“Guardar”</span>, seguidamente en <span class="bolded">“Mostrar Gráfico”</span> para
+              ver los resultados.</p>
+
+          <p><span class="bolded">2. Región de Interés: </span> En la esquina izquierda de la aplicación, hay una opción con dos botones para dibujar en el mapa.
+              Seleccionar cualquiera de los dos botones para crear un área de interés Hacer clic en el botón <span class="bolded">“Mostrar Gráfico”</span> para
+              visualizar los resultados.</p>
+          <p><span class="bolded">3. Provincia en Ecuador: </span> Al final del menú, encuentre el botón <span class="bolded">¨Cargar datos para la región¨</span>
+              y seleccione la provincia de interés en el menú desplegable. Finalmente, haga clic en el botón <span class="bolded">“Cargar Datos para la Región”</span>
+              para visualizar los resultados.</p>
 
 
           <p><span class="bolded">Visualización de resultados</span></p>
-        <p>Una vez seleccionada la variable, satélite y área de interés podrá visualizar el gráfico. Los resultados los puedes
-            descargar en formato csv haciendo clic en el botón descargar. También puede descargar el gráfico en formato png al
-            hacer clic en el botón de cámara, localizado en la esquina derecha de la gráfica.</p>
-        <p>En el gráfico puede seleccionar una fecha de interés  haciendo clic y seleccionando un rango de fechas directamente en
-            el gráfico. Para visualizar el gráfico nuevamente con el periodo total de tiempo haga clic en Autoscale.</p>
-        <p>En la leyenda del gráfico puede prender y apagar las líneas de los gráficos según necesite. Por default todas las líneas
-            están encendidas.</p>
+        <p>Una vez seleccionada la variable, satélite y área de interés podrá visualizar el gráfico. Los resultados los puede descargar en formato .csv, haciendo clic en el botón
+            <span class="bolded">“Descargar”</span>. También puede descargar el gráfico en formato .png, haciendo clic en el botón de cámara, localizado en la esquina derecha
+            de la gráfica.</p>
+        <p>En el gráfico, puede seleccionar una fecha de interés haciendo clic y seleccionando un rango de fechas directamente en el mismo. Para visualizar el gráfico nuevamente
+            con el periodo total de tiempo haga clic en Autoscale, que se encuentra localizado cerca del botón de cámara.</p>
+        <p>En la leyenda del gráfico puede prender y apagar las líneas de los gráficos según necesite. Por default todas las líneas están encendidas.</p>
 
           <p><span class="bolded">Comparar los promedios por una variable</span></p>
-        <p>Seleccione la región y variable según lo descrito anteriormente,,, seleccione comparar promedios y observará un gráfico
-            con la información sobre los promedios comparando los datos obtenidos de una variable con diferentes satélites.</p>
+        <p>Seleccione la región y variable según lo descrito anteriormente, y posteriormente podrá comparar promedios. Observará un gráfico con la información sobre
+            los promedios comparando los datos obtenidos de una variable con diferentes satélites.</p>
           <p><span class="bolded">Selección de una fecha determinada</span></p>
-          <p> Podrá visualizar los resultados por un año específico en el pasado. Puede seleccionar un año donde dice “Usar una
-              Fecha Específica”. Y después cuando cargue el gráfico observará la información de este año.</p>
+          <p> Podrá visualizar los resultados por un año específico. Haciendo clic en el botón <span class="bolded">“Usar una Fecha Específica”</span>.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
