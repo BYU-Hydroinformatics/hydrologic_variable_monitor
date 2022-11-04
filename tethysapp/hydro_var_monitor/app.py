@@ -10,7 +10,7 @@ class HydroVarMonitor(TethysAppBase):
     name = 'Climate Trends'
     description = 'View maps and plots of hydrologic cycle variables recorded by satellites and global models'
     package = 'hydro_var_monitor'
-    index = 'hydro_var_monitor:home'
+    index = 'home'
     icon = f'{package}/images/logo.gif'
     root_url = 'hydro-var-monitor'
     color = '#6DA8D9'
