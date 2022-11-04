@@ -7,11 +7,11 @@ class HydroVarMonitor(TethysAppBase):
     Tethys app class for Hydrologic Trends Monitor.
     """
 
-    name = 'Climate Trends'
+    name = 'Hydrologic Variable Monitor'
     description = 'View maps and plots of hydrologic cycle variables recorded by satellites and global models'
     package = 'hydro_var_monitor'
     index = 'hydro_var_monitor:home'
-    icon = f'{package}/images/logo.gif'
+    icon = f'{package}/images/icon.gif'
     root_url = 'hydro-var-monitor'
     color = '#6DA8D9'
     tags = ['remote sensing', 'earth engine', 'hydrological cycle', 'essential water variables', 'geoglows toolbox']

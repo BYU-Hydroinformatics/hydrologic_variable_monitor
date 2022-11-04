@@ -2,35 +2,25 @@ import ee
 
 
 def ERA5(band):
-    ic = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/era5_monthly_avg/era5_monthly_{i:02}' for i in range(1, 13)]).select(band).reduce(
+    ic = ee.ImageCollection("ECMWF/ERA5_LAND/MONTHLY").filterDate('1983-01-01', '2023-01-01').select(band).reduce(
         ee.Reducer.mean())
     return ic
 
 
 def GLDAS(band):
-    ic = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_{i:02}' for i in range(1, 13)]).select(band).reduce(
-        ee.Reducer.mean())
-    return ic
-
-def GLDAS_evapo(band):
-    ic = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_evapo_{i:02}' for i in range(1, 13)]).select(band).reduce(
+    ic = ee.ImageCollection("NASA/GLDAS/V021/NOAH/G025/T3H").filterDate('2022-01-01', '2023-01-01').select(band).reduce(
         ee.Reducer.mean())
     return ic
 
 
 def IMERG(band):
-    ic = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/imerg_monthly_avg/imerg_monthly_avg_{i:02}' for i in range(1, 13)]).select(band).reduce(
+    ic = ee.ImageCollection("NASA/GPM_L3/IMERG_V06").filterDate('2022-07-01', '2023-01-01').select(band).reduce(
         ee.Reducer.mean())
     return ic
 
 
 def CHIRPS(band):
-    ic = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/chirps_monthly_avg/chirps_monthly_avg_{i:02}' for i in range(1, 13)]).select(band).reduce(
+    ic = ee.ImageCollection("UCSB-CHG/CHIRPS/PENTAD").filterDate('2022-01-01', '2023-01-01').select(band).reduce(
         ee.Reducer.mean())
     return ic
 

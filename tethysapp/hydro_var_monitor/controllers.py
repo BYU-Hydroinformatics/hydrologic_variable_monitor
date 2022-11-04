@@ -10,7 +10,7 @@ from tethys_sdk.workspaces import app_workspace
 from . import ee_auth
 import logging
 import os
-from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, GLDAS_evapo
+from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG
 from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS
 from .compare import air_temp_compare, precip_compare
 
@@ -22,9 +22,10 @@ def home(request):
         return render(request, 'hydro_var_monitor/no_auth_error.html')
     ee_sources = {
         'air_temp': ['GLDAS', 'ERA5'],
+        'ndvi': ['Landsat', ],
         'precip': ['GLDAS', 'CHIRPS', 'IMERG', 'ERA5'],
         'soil_moisture': ['GLDAS', ],
-        'evapo': ['GLDAS']
+        'soil_temperature': ['ERA5', 'GLDAS']
     }
     context = {
         'sources': json.dumps(ee_sources)
@@ -89,7 +90,7 @@ def get_map_id(request):
                               "palette": ['009392', '72aaa1', 'b1c7b3', 'f1eac8', 'e5b9ad', 'd98994', 'd0587e']}
             if var == "precip":
                 band = "total_precipitation"
-                vis_params = {"min": 0, "max": 0.008, "palette": ['00FFFF', '0000FF']}
+                vis_params = {"min": 0, "max": 0.03, "palette": ['00FFFF', '0000FF']}
             if var == "soil_temperature":
                 band = "skin_temperature"
                 vis_params = {"min": 250, "max": 300,
@@ -100,30 +101,28 @@ def get_map_id(request):
         if sensor == "GLDAS":
             if var == "precip":
                 band = "Rainf_tavg"
-                vis_params = {"min": 0, "max": 0.00006, "palette": ['00FFFF', '0000FF']}
-                imgs = GLDAS(band)
+                vis_params = {"min": 0, "max": 0.0002, "palette": ['00FFFF', '0000FF']}
             if var == "air_temp":
                 band = "Tair_f_inst"
-                vis_params = {"min": 235, "max": 320,
+                vis_params = {"min": 206, "max": 328,
                               "palette": ['009392', '72aaa1', 'b1c7b3', 'f1eac8', 'e5b9ad', 'd98994', 'd0587e']}
-                imgs = GLDAS(band)
             if var == "soil_moisture":
                 band = "RootMoist_inst"
-                vis_params = {"min": 100, "max": 400}
-                imgs = GLDAS(band)
-            if var == "evapo":
-                band = "Evap_tavg"
-                vis_params = {"min":0, "max":0.00005}
-                imgs = GLDAS_evapo(band)
+                vis_params = {"min": 1.99, "max": 48, "palette": ['00FFFF', '0000FF']}
+            if var == "soil_temperature":
+                band = "AvgSurfT_inst"
+                vis_params = {"min": 222, "max": 378,
+                              "palette": ['009392', '72aaa1', 'b1c7b3', 'f1eac8', 'e5b9ad', 'd98994', 'd0587e']}
+            imgs = GLDAS(band)
 
         if sensor == "IMERG":
             band = "HQprecipitation"
-            vis_params = {"min": 0, "max": 0.4, "palette": ['00FFFF', '0000FF']}
+            vis_params = {"min": 0, "max": 5, "palette": ['00FFFF', '0000FF']}
             imgs = IMERG(band)
 
         if sensor == "CHIRPS":
             band = "precipitation"
-            vis_params = {"min": 0, "max": 40, "palette": ['00FFFF', '0000FF']}
+            vis_params = {"min": 0, "max": 150, "palette": ['00FFFF', '0000FF']}
             imgs = CHIRPS(band)
 
         # get the url from specified image and then return it in json
@@ -193,10 +192,10 @@ def get_plot(request):
                 band = "RootMoist_inst"
                 title = "Humedad del Suelo - GLDAS (root zone)"
                 yaxis = "kg/m^2"
-            if var == "evapo":
-                band = "Evap_tavg"
-                title = "Evapotranspiración- GLDAS"
-                yaxis = "Evapotranspiración en kg/M^2/s"
+            if var == "soil_temperature":
+                band = "AvgSurfT_inst"
+                title = "Temperatura del Suelo - GLDAS"
+                yaxis = "Temperatura en Celsius"
             plot_data = plot_GLDAS(json.loads(region), band, title, yaxis, json.loads(isPoint), startDate, endDate)
 
         if sensor == "IMERG":
@@ -283,10 +282,10 @@ def get_predefined(request):
             band = "RootMoist_inst"
             title = "Humedad del Suelo - GLDAS (root zone)"
             yaxis = "kg/m^2"
-        if var == "evapo":
-            band = "Evap_tavg"
-            title = "Evapotranspiración- GLDAS"
-            yaxis = "Evapotranspiración en kg/M^2/s"
+        if var == "soil_temperature":
+            band = "AvgSurfT_inst"
+            title = "Temperatura del Suelo - GLDAS"
+            yaxis = "Temperatura en Celsius"
         plot_data = plot_GLDAS(region, band, title, yaxis, json.loads(isPoint), startDate, endDate)
 
     if sensor == "IMERG":
