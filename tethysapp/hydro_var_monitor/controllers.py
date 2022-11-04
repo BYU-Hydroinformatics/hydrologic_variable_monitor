@@ -2,11 +2,9 @@ from django.http.response import JsonResponse
 from datetime import date
 from datetime import datetime
 from django.shortcuts import render
-from tethys_sdk.permissions import login_required
 from .ee_auth import *
 import json
 from django.http import JsonResponse, HttpResponseNotAllowed
-from tethys_sdk.workspaces import app_workspace
 from tethys_sdk.routing import controller
 from . import ee_auth
 import logging
