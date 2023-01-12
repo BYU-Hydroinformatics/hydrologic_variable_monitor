@@ -1,3 +1,13 @@
+.title_modal{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+.buttons-flex{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 #inner-app-content {
     padding: 0;
 }
@@ -12,12 +22,12 @@
 }
 
 #chart_modal .modal-body {
-    height: 700px;
+    height: fit-content;
     width: 1000px;
 }
 
 #chart_modal .modal-content {
-    height: 800px;
+    height: fit-content;
     width: 1000px;
 }
 .bolded { font-weight: bold; }

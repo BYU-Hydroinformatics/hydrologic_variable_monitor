@@ -3,11 +3,17 @@
 {% load static %}
 
 {% block header_buttons %}
+<!-- <button  id="instructions" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#myModal" ><i class="bi bi-info-circle"></i></button> -->
+<div class="header-button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Instructions">
+  <a data-bs-toggle="modal" data-bs-target="#myModal">
+    <i class="bi bi-info-circle-fill"></i>
+  </a>
+</div>
 {% endblock %}
 
 {% block app_navigation_items %}
-    <button  id="instructions" type="button" class="btn btn-primary btn-block" >Instrucciones</button>
-    <button  id="lat-lon" type="button" class="btn btn-primary btn-block" >Ingresar Lat/Lon</button>
+  <br>
+  <button  id="lat-lon" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#lat-lon-modal">Ingresar Lat/Lon</button>
   <li class="title">1. Elija Variable</li>
   <select class="form-select" aria-label="variable selector" id="select-variable">
     <option hidden disabled selected value></option>
@@ -22,9 +28,12 @@
   <select class="form-select" aria-label="data source selector" id="select-source"></select>
 
   <li class="title">3. Cargar Datos </li>
-  <button  id="load-map" type="button" class="btn btn-primary btn-block" >Cargar Mapa</button>
-  <button id="clear-map" type="button" class="btn btn-primary btn-block">Despejar Mapa</button>
-  <button id="plot-series" class="btn btn-primary btn-block">Mostrar Gráfico</button>
+  <div class="buttons-flex">
+    <button  id="load-map" type="button" class="btn btn-primary btn-block" >Cargar Mapa</button>
+    <button id="clear-map" type="button" class="btn btn-primary btn-block">Despejar Mapa</button>
+    <button id="plot-series" class="btn btn-primary btn-block">Mostrar Gráfico</button>
+  </div>
+
 
   <li class="title">4. Comparar los Promedios</li>
   <button id="compare" class="btn btn-primary btn-block">Comparar los Promedios </button>
@@ -86,6 +95,7 @@
         <option value = "Tungurahua">Tungurahua</option>
         <option value = "Zamora_Chinchipe">Zamora Chinchipe</option>
     </select>
+    <br>
     <button  id="region" type="button" class="btn btn-primary btn-block" >Cargar Datos para la Región </button>
 
 
@@ -102,14 +112,14 @@
   {# Chart Modals #}
 
   <div class="modal fade" id="chart_modal" role="dialog">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                  aria-hidden="true">&times;</span></button>
-          <div class="row">
+          <div class="title_modal">
             <h2 style="text-align: center">Las Tendencias con el Tiempo <span id="request-status" class="load-status"/></h2>
           </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
         </div>
 
         <div class="modal-body">
@@ -131,8 +141,8 @@
             </div><!-- /.tab-pane -->
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-          <button id = "download" type="button" class="btn btn-default">Descargar</button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button id = "download" type="button" class="btn btn-primary">Descargar</button>
         </div>
       </div>
     </div>
@@ -141,13 +151,14 @@
 
     <!-- Modal -->
 <div id="myModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
 
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Instrucciones</h4>
+        <h5 class="modal-title">Instrucciones</h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <p>Bienvenido a la aplicación Tendencia de Clima!</p>
@@ -189,7 +200,7 @@
           <p> Podrá visualizar los resultados por un año específico. Haciendo clic en el botón <span class="bolded">“Usar una Fecha Específica”</span>.</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
 
@@ -201,14 +212,14 @@
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         <h4 class="modal-title">Error</h4>
       </div>
       <div class="modal-body">
         <p>Por favor elimine la entrada anterior.</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
 
@@ -221,9 +232,8 @@
     <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Poner Latitud y Longitud </h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-            </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
         </div>
               <div class="modal-body">
                 <form>
@@ -238,8 +248,8 @@
                 </form>
               </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-        <button id = "save" type="button" class="btn btn-default">Guardar</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button id = "save" type="button" class="btn btn-outline-secondary">Guardar</button>
       </div>
     </div>
 
@@ -263,7 +273,6 @@
       const URL_GETMAPID = "{% url 'hydro_var_monitor:get-map-id' %}"
       const URL_GETPLOT = "{% url 'hydro_var_monitor:get-plot' %}"
       const URL_COMPARE = "{% url 'hydro_var_monitor:compare' %}"
-      const URL_COMPARE_PRECIP = "{% url 'hydro_var_monitor:compare_precip' %}"
       const URL_GETPREDEFINED = "{% url 'hydro_var_monitor:get_predefined' %}"
       const SOURCES = JSON.parse('{{ sources|safe }}')
   </script>
@@ -274,9 +283,9 @@
   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
           integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
           crossorigin=""></script>
-  <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript"></script>
+  <!-- <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript"></script> -->
   <script src="{% static 'hydro_var_monitor/js/main.js' %}" type="text/javascript" defer></script>
-  <script type="module" src="main.js"></script>
+  <!-- <script type="module" src="main.js"></script> -->
 
         <!-- Load Esri Leaflet from CDN -->
   <script src="https://unpkg.com/esri-leaflet@3.0.4/dist/esri-leaflet.js"
