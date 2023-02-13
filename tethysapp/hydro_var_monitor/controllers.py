@@ -1,23 +1,29 @@
-from django.http.response import JsonResponse
-from datetime import date
-from datetime import datetime
-from django.shortcuts import render
-from .ee_auth import *
 import json
-from django.http import JsonResponse, HttpResponseNotAllowed
-from tethys_sdk.routing import controller
-from . import ee_auth
 import logging
 import os
+from datetime import date
+from datetime import datetime
+from django.http import JsonResponse, HttpResponseNotAllowed
+from django.http.response import JsonResponse
+from django.shortcuts import render
+from tethys_sdk.routing import controller
+
+from . import ee_auth
+from .compare import air_temp_compare, precip_compare
+from .ee_auth import *
 from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, GLDAS_evapo
 from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS
-from .compare import air_temp_compare, precip_compare
 
 
 @controller(name='home', url='hydro-var-monitor')
 def home(request):
-    if not EE_IS_AUTHORIZED:
-        return render(request, 'hydro_var_monitor/no_auth_error.html')
+    lang = request.GET.get('lang', 'en')
+    if lang not in ['en', 'es']:
+        lang = 'en'
+    print(lang)
+
+    # if not EE_IS_AUTHORIZED:
+    #     return render(request, 'hydro_var_monitor/no_auth_error.html')
     ee_sources = {
         'air_temp': ['GLDAS', 'ERA5'],
         'precip': ['GLDAS', 'CHIRPS', 'IMERG', 'ERA5'],
@@ -25,12 +31,21 @@ def home(request):
         'evapo': ['GLDAS']
     }
     context = {
+        'lang': lang,
         'sources': json.dumps(ee_sources)
     }
     return render(request, 'hydro_var_monitor/home.html', context)
 
+
+@controller(name='admin', url='hydro-var-monitor/admin')
+def home(request):
+    # if not EE_IS_AUTHORIZED:
+    #     return render(request, 'hydro_var_monitor/no_auth_error.html')
+    return render(request, 'hydro_var_monitor/admin.html')
+
+
 @controller(name='compare', url='hydro-var-monitor/compare', app_workspace=True)
-def compare(request,app_workspace):
+def compare(request, app_workspace):
     response_data = {'success': False}
     try:
         region = request.GET.get('region', None)
@@ -72,7 +87,7 @@ def compare(request,app_workspace):
     return JsonResponse(json.loads(json.dumps(values)))
 
 
-@controller(name='get-map-id', url='hydro-var-monitor/get-map-id',)
+@controller(name='get-map-id', url='hydro-var-monitor/get-map-id', )
 def get_map_id(request):
     response_data = {'success': False}
 
@@ -114,7 +129,7 @@ def get_map_id(request):
                 imgs = GLDAS(band)
             if var == "evapo":
                 band = "Evap_tavg"
-                vis_params = {"min":0, "max":0.00005}
+                vis_params = {"min": 0, "max": 0.00005}
                 imgs = GLDAS_evapo(band)
 
         if sensor == "IMERG":
@@ -149,6 +164,7 @@ def get_date():
 @controller(name='get-plot', url='hydro-var-monitor/get-plot')
 def get_plot(request):
     response_data = {'success': False}
+    plot_data = {}
 
     try:
         sensor = request.GET.get('source', None)
@@ -215,7 +231,7 @@ def get_plot(request):
     return JsonResponse(json.loads(json.dumps(plot_data)))
 
 
-@controller(name='get_predefined', url='hydro-var-monitor/get-predefined',app_workspace=True)
+@controller(name='get_predefined', url='hydro-var-monitor/get-predefined', app_workspace=True)
 def get_predefined(request, app_workspace):
     # read in values to variables
     name_of_area = request.GET.get("region", None)
