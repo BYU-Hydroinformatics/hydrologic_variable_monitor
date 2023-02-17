@@ -57,9 +57,8 @@
 
     <li class="title"> Use a Specific Province (optional) </li>
     <select id="regions" class="form-select" name = "regions">
-        <option value = "">None</option>
-        <option value = "Ecuador">Ecuador</option>
-        <option value = "Azuay">Azuay</option>
+        <option disabled selected> Select a file</option>
+        <!--<option value = "Azuay">Azuay</option>
         <option value = "Bolivar">Bolivar</option>
         <option value = "Canar">Canar</option>
         <option value = "Carchi">Carchi</option>
@@ -82,8 +81,27 @@
         <option value = "Santo_Domingo_de_los_Tsachilas">Santo Domingo de los Tsachilas</option>
         <option value = "Sucumbios">Sucumbios</option>
         <option value = "Tungurahua">Tungurahua</option>
-        <option value = "Zamora_Chinchipe">Zamora Chinchipe</option>
+        <option value = "Zamora_Chinchipe">Zamora Chinchipe</option> -->
     </select>
+
+
+    <li>Select Boundary Dataset (name of a directory)</li>
+    <select>
+        <option>DR Watersehds</option>
+        <option>DR Hydrologic Regions</option>
+        <option>DR Provinces</option>
+        <option>DR Cities</option>
+    </select>
+
+    <li>Choose a Boundary</li>
+    <div>empty to start with</div>
+    <select>
+        <option>Boundary 1</option>
+        <option>Boundary 2</option>
+        <option>Boundary 3</option>
+        <option>Boundary 4</option>
+    </select>
+
     <br>
     <button  id="region" type="button" class="btn btn-primary btn-block" >Load Region Data</button>
     <br>

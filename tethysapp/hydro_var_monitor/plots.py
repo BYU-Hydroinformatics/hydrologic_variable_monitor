@@ -89,18 +89,25 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
 
 
 def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
+    print("made_it_here")
     now = endDate
     y2d_start = startDate
+    print(startDate)
     if startDate == "last12":
         y2d_start = date(date.today().year - 1, date.today().month, date.today().day).strftime("%Y-%m-%d")
-
+    print(y2d_start)
     if isPoint == True:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
         get_coord = region["geometry"]
+        print(get_coord["coordinates"])
         area = ee.Geometry.Polygon(get_coord["coordinates"])
+        print(area)
 
+    print("checing gldas")
     gldas_ic = ee.ImageCollection("NASA/GLDAS/V021/NOAH/G025/T3H")
+    print(gldas_ic)
+
 
     def avg_gldas(img):
         return img.set('avg_value', img.reduceRegion(
@@ -121,7 +128,7 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
     )
     gldas_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=gldas_avg_df.index[i] + 1, day=15) for i in
                                 gldas_avg_df.index]
-
+    print("check")
     # precipitation must be summed
     curr_month = 12
     # precipitation must be cumulatively summer throughout the year
@@ -153,7 +160,7 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
         index=pd.to_datetime(np.array(gldas_ytd.aggregate_array('system:time_start').getInfo()) * 1e6)
     )
     gldas_ytd_df['date'] = gldas_ytd_df.index.strftime("%Y-%m-%d")
-
+    print("check2")
     if band == "Rainf_tavg":
         gldas_ytd_df["data_values"] = (gldas_ytd_df[band] * 10800).cumsum()
     else:
@@ -165,6 +172,8 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
     if band == "Tair_f_inst" or band == "AvgSurfT_inst":
         gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
         gldas_avg_df["data_values"] = gldas_avg_df["data_values"] - 273.15
+
+    print(gldas_ytd_df)
 
     return {'avg': gldas_avg_df, 'y2d': gldas_ytd_df, 'title': title, 'yaxis': yaxis}
 

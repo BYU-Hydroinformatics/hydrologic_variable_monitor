@@ -4,35 +4,24 @@ const App = (() => {
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
     ////////////////////////////////////////////////// DOM Elements
     const selectData = document.getElementById("select")
-    const btnSaveData = document.getElementById("save-data")
-    const btnUploadData = document.getElementById("upload-data")
-    const btnUpload = document.getElementById("upload")
+    const btnUpload = document.getElementById("upload-data")
 
-    btnSaveData.onclick = () => {
-        console.log(selectData.value)
-    }
-
-    btnUploadData.onclick = () => {
-        $('#update-data-modal').modal('show')
-    }
+    //btnSaveData.onclick = () => {
+        //console.log(selectData.value)
+    //}
 
     btnUpload.onclick = () => {
-        const zipFileInput = document.getElementById("zipFileInput");
-        const zipFile = zipFileInput.files[0];
-
-        fs.createReadStream(zipFile)
-            .pipe(unzipper.Parse())
-            .on("entry", function (entry) {
-                const fileName = entry.path;
-                const type = entry.type; // 'Directory' or 'File'
-                const size = entry.vars.uncompressedSize; // The size of the uncompressed file
-
-                if (type === "File") {
-                    entry.pipe(fs.createWriteStream(`./json-files/${fileName}`));
-                } else {
-                    entry.autodrain();
-                }
-            });
+        console.log("uploading")
+        //const exactJSONInput = document.getElementById("exact-json");
+        //const simplifiedJSONInput = document.getElementById("simplified-json");
+        const formData = new FormData();
+        formData.append('exact-json', $('#exact-json')[0].files[0]);
+        //const zipFile = zipFileInput.files[0];
+        $.ajax({
+            type: "POST", url: URL_UNZIP, data: formData, processData: false, contentType: false, success: data => {
+                console.log(data)
+            }
+        })
     }
 
     ////////////////////////////////////////////////// Map and Map Layers

@@ -13,6 +13,11 @@ from .compare import air_temp_compare, precip_compare
 from .ee_auth import *
 from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, GLDAS_evapo
 from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS
+from .unzip import unzip_and_read_files
+import zipfile
+import tempfile
+
+from .app import HydroVarMonitor as App
 
 
 @controller(name='home', url='hydro-var-monitor')
@@ -30,6 +35,13 @@ def home(request):
         'soil_moisture': ['GLDAS', ],
         'evapo': ['GLDAS']
     }
+
+    # include in context so it can be used to auto populate choices
+    # list_of_directories = []
+    # options_for_each_directory = {
+    # "nameofdirectory": os.listdir("nameofdirectory")
+    # }
+
     context = {
         'lang': lang,
         'sources': json.dumps(ee_sources)
@@ -38,10 +50,11 @@ def home(request):
 
 
 @controller(name='admin', url='hydro-var-monitor/admin')
-def home(request):
-    # if not EE_IS_AUTHORIZED:
-    #     return render(request, 'hydro_var_monitor/no_auth_error.html')
-    return render(request, 'hydro_var_monitor/admin.html')
+def admin(request):
+    context = {
+        "ee_enabled": EE_IS_AUTHORIZED,
+    }
+    return render(request, 'hydro_var_monitor/admin.html', context)
 
 
 @controller(name='compare', url='hydro-var-monitor/compare', app_workspace=True)
@@ -163,8 +176,9 @@ def get_date():
 
 @controller(name='get-plot', url='hydro-var-monitor/get-plot')
 def get_plot(request):
+    print("get plot")
     response_data = {'success': False}
-    plot_data = {}
+    # plot_data = {}
 
     try:
         sensor = request.GET.get('source', None)
@@ -172,6 +186,7 @@ def get_plot(request):
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
         year = request.GET.get('year', None)
+        print(sensor, var, region, isPoint, year)
 
         if year == "" or year == "2022" or year == "y2d":
             endDate, startDate = get_date()
@@ -184,6 +199,7 @@ def get_plot(request):
 
         if sensor == "ERA5":
             if var == "air_temp":
+                # print("what")
                 band = "temperature_2m"
                 title = "Temperatura del Aire - ERA5"
                 yaxis = "Temperature en Celsius"
@@ -231,6 +247,48 @@ def get_plot(request):
     return JsonResponse(json.loads(json.dumps(plot_data)))
 
 
+@controller(name='admin-upload-zipped-data', url='hydro-var-monitor/admin/unzip', app_workspace=True)
+def unzip(request, app_workspace):
+    try:
+        print("unzip")
+        workspace_path = app_workspace.path
+        print(workspace_path)
+        print(request.FILES['exact-json'].chunks())
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            for chunk in request.FILES['exact-json'].chunks():
+                f.write(chunk)
+                print("checking!")
+        print(workspace_path)
+
+        target_directory = app_workspace.path
+        with zipfile.ZipFile(f.name, 'r') as zip_ref:
+            zip_ref.extractall(target_directory)
+        # for file in files:
+        #   print(file)
+        #   new_observation_path = os.path.join(workspace_path, 'observations', files[file].name)
+        #  with open(new_observation_path, 'wb') as dst:
+        #      for chunk in files[file].chunks():
+        #         dst.write(chunk)
+        print("checking 3")
+
+        # step 2
+        # read the names of directories and the contents of each directory to make a datastructure that looks like
+        # include in context so it can be used to auto populate choices
+        list_of_directories = []
+        options_for_each_directory = {
+       #      "nameofdirectory": os.listdir("nameofdirectory")
+        }
+        #print("checking 4")
+        #  and then save it to the workspace as a json file
+
+        # return also options_for_each_directory
+        #return {'success': True, 'data': {}}
+        return
+
+    except Exception as e:
+        return {'success': False, 'error': f'Error Processing Request: {e}'}
+
+
 @controller(name='get_predefined', url='hydro-var-monitor/get-predefined', app_workspace=True)
 def get_predefined(request, app_workspace):
     # read in values to variables
@@ -275,6 +333,7 @@ def get_predefined(request, app_workspace):
 
     if sensor == "GLDAS":
         if var == "precip":
+            print("ingldas")
             band = "Rainf_tavg"
             title = "Acumulados de Precipitación- GLDAS"
             yaxis = "mm of precipitación"

@@ -135,6 +135,7 @@
     </div>
 {% endblock %}
 
+
 {% block content_dependent_styles %}
     {{ block.super }}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
@@ -143,7 +144,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
     <link href="{% static 'hydro_var_monitor/css/main.css' %}" rel="stylesheet"/>
 {% endblock %}
-
 {% block scripts %}
     {{ block.super }}
     {% csrf_token %}
@@ -164,12 +164,10 @@
     <!-- <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript"></script> -->
     <script src="{% static 'hydro_var_monitor/js/main.js' %}" type="text/javascript" defer></script>
     <!-- <script type="module" src="main.js"></script> -->
-
     <!-- Load Esri Leaflet from CDN -->
     <script src="https://unpkg.com/esri-leaflet@3.0.4/dist/esri-leaflet.js"
             integrity="sha512-oUArlxr7VpoY7f/dd3ZdUL7FGOvS79nXVVQhxlg6ij4Fhdc4QID43LUFRs7abwHNJ0EYWijiN5LP2ZRR2PY4hQ=="
             crossorigin=""></script>
-
     <!-- Load Esri Leaflet Vector from CDN -->
     <script src="https://unpkg.com/esri-leaflet-vector@3.1.1/dist/esri-leaflet-vector.js"
             integrity="sha512-7rLAors9em7cR3/583gZSvu1mxwPBUjWjdFJ000pc4Wpu+fq84lXF1l4dbG4ShiPQ4pSBUTb4e9xaO6xtMZIlA=="
