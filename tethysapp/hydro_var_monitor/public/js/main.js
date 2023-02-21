@@ -24,6 +24,8 @@ const App = (() => {
     const btnRegion = document.getElementById('region')
     const selectRegion = document.getElementById('regions')
     const year = document.getElementById("select-year")
+    const selectDirectory = document.getElementById("directories")
+    const selectJSON = document.getElementById("jsons")
 
 
     const download = function (data, file_name) {
@@ -48,6 +50,10 @@ const App = (() => {
         // Performing a download with click
         a.click()
     }
+
+    selectDirectory.innerHTML = DIRECTORIES.map(src => `<option value="${src}">${src}</option>`).join("")
+    selectDirectory.onchange = (e) => selectJSON.innerHTML = OPTIONS[e.target.value].map(src => `<option value="${src}">${src}</option>`).join("")
+    selectVariable.onchange = (e) => selectSource.innerHTML = SOURCES[e.target.value].map(src => `<option value="${src}">${src}</option>`).join("")
 
     ////////////////////////////////////////////////// Map and Map Layers
 
@@ -132,7 +138,7 @@ const App = (() => {
     }
     let province_json = L.geoJSON(false)
 
-    selectRegion.onchange = () => {
+    selectJSON.onchange = () => {
         if (isPoint === true) {
             map.removeLayer(point);
             isPoint = false;
@@ -140,15 +146,16 @@ const App = (() => {
         drawnItems.clearLayers()
         //get geojson url and add it to my map using fetch
         province_json.clearLayers();
-        let geojsons = selectRegion.value
-        if (geojsons != "") {
-            let url = staticGeoJSON + geojsons + ".json"
+        let directory = selectDirectory.value
+        let file = selectJSON.value
+        if (file !== "") {
+            let url = app_workspace.path + directory + file
             fetch(url)
                 .then(response => response.json())
                 .then(json => province_json.addData(json).addTo(map))
             map.flyTo([-0.987891, -80.834077], 6)
         }
-        if (geojsons == "") {
+        if (file == "") {
             map.flyTo([20, -40], 3)
         }
     }

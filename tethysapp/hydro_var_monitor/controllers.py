@@ -20,12 +20,12 @@ import tempfile
 from .app import HydroVarMonitor as App
 
 
-@controller(name='home', url='hydro-var-monitor')
-def home(request):
+@controller(name='home', url='hydro-var-monitor', app_workspace=True)
+def home(request, app_workspace):
     lang = request.GET.get('lang', 'en')
     if lang not in ['en', 'es']:
         lang = 'en'
-    print(lang)
+    #print(lang)
 
     # if not EE_IS_AUTHORIZED:
     #     return render(request, 'hydro_var_monitor/no_auth_error.html')
@@ -36,15 +36,24 @@ def home(request):
         'evapo': ['GLDAS']
     }
 
-    # include in context so it can be used to auto populate choices
-    # list_of_directories = []
-    # options_for_each_directory = {
-    # "nameofdirectory": os.listdir("nameofdirectory")
-    # }
+    target_directory = app_workspace.path
+    items = os.listdir(target_directory)
+    list_of_directories = [item for item in items if os.path.isdir(os.path.join(target_directory, item))]
+    if "__MACOSX" in list_of_directories:
+        list_of_directories.remove("__MACOSX")
+    options_for_each_directory = {}
+    for directory in list_of_directories:
+        directory_path = os.path.join(target_directory, directory)
+        files = [name for name in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, name))]
+
+        # add the directory and its list of files to the dictionary
+        options_for_each_directory[directory] = files
 
     context = {
         'lang': lang,
-        'sources': json.dumps(ee_sources)
+        'sources': json.dumps(ee_sources),
+        'option': json.dumps(options_for_each_directory),
+        'directories': json.dumps(list_of_directories)
     }
     return render(request, 'hydro_var_monitor/home.html', context)
 
@@ -257,7 +266,7 @@ def unzip(request, app_workspace):
         with tempfile.NamedTemporaryFile(delete=False) as f:
             for chunk in request.FILES['exact-json'].chunks():
                 f.write(chunk)
-                print("checking!")
+                #print("checking!")
         print(workspace_path)
 
         target_directory = app_workspace.path
@@ -274,10 +283,6 @@ def unzip(request, app_workspace):
         # step 2
         # read the names of directories and the contents of each directory to make a datastructure that looks like
         # include in context so it can be used to auto populate choices
-        list_of_directories = []
-        options_for_each_directory = {
-       #      "nameofdirectory": os.listdir("nameofdirectory")
-        }
         #print("checking 4")
         #  and then save it to the workspace as a json file
 
