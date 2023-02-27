@@ -145,19 +145,21 @@ const App = (() => {
         }
         drawnItems.clearLayers()
         //get geojson url and add it to my map using fetch
+        const region_info = {
+                "directory": selectDirectory.value,
+                "file": selectJSON.value
+            }
         province_json.clearLayers();
-        let directory = selectDirectory.value
-        let file = selectJSON.value
-        if (file !== "") {
-            let url = app_workspace.path + directory + file
-            fetch(url)
-                .then(response => response.json())
-                .then(json => province_json.addData(json).addTo(map))
-            map.flyTo([-0.987891, -80.834077], 6)
-        }
-        if (file == "") {
-            map.flyTo([20, -40], 3)
-        }
+            //get geojson url and add it to my map using fetch
+            $.ajax({
+                type: "GET", url: URL_GETJSON, datatype: "JSON", data: region_info, success: function (data) {
+                    province_json.addData(data).addTo(map)
+                    const bounds = province_json.getBounds();
+                    // Zoom in on the bounds
+                    map.fitBounds(bounds);
+
+                }
+            })
     }
 
 
@@ -276,9 +278,18 @@ const App = (() => {
         const dataParams = getVarSourceJSON()
         province_json.clearLayers();
         if (selectRegion.value != "") {
-            dataParams.definedRegion = true
-            dataParams.region = selectRegion.value
+            //dataParams.definedRegion = true
+            //dataParams.region = selectRegion.value
+            const region_info = {
+                "directory": selectDirectory.value,
+                "file": selectJSON.value
+            }
             //get geojson url and add it to my map using fetch
+            $.ajax({
+                type: "GET", url: URL_GETJSON, datatype: "JSON", data: region_info, success: function (data) {
+                    console.log(data)
+                }
+            })
             let geojsons = selectRegion.value
             let url = staticGeoJSON + geojsons + ".json"
             fetch(url)
@@ -398,7 +409,6 @@ const App = (() => {
         })
         isPoint = false;
     }
-
     btnPlotSeries.onclick = () => {
         const dataParams = getVarSourceJSON()
         if (dataParams.isPoint === true) {

@@ -25,7 +25,7 @@ def home(request, app_workspace):
     lang = request.GET.get('lang', 'en')
     if lang not in ['en', 'es']:
         lang = 'en'
-    #print(lang)
+    # print(lang)
 
     # if not EE_IS_AUTHORIZED:
     #     return render(request, 'hydro_var_monitor/no_auth_error.html')
@@ -64,6 +64,25 @@ def admin(request):
         "ee_enabled": EE_IS_AUTHORIZED,
     }
     return render(request, 'hydro_var_monitor/admin.html', context)
+
+
+@controller(name='map-region', url='hydro-var-monitor/map-region', app_workspace=True)
+def compare(request, app_workspace):
+    response_data = {'success': False}
+    try:
+        directory = request.GET.get('directory', None)
+        file = request.GET.get('file', None)
+        print(file)
+        app_store_path = app_workspace.path
+        json_url = os.path.join(app_store_path, directory, file)
+        print(json_url)
+        f = open(json_url)
+        region = json.load(f)
+        print(region["geometry"]["coordinates"])
+        print("CHECK")
+    except Exception as e:
+        response_data['error'] = f'Error Processing Request: {e}'
+    return JsonResponse(region)
 
 
 @controller(name='compare', url='hydro-var-monitor/compare', app_workspace=True)
@@ -266,7 +285,7 @@ def unzip(request, app_workspace):
         with tempfile.NamedTemporaryFile(delete=False) as f:
             for chunk in request.FILES['exact-json'].chunks():
                 f.write(chunk)
-                #print("checking!")
+                # print("checking!")
         print(workspace_path)
 
         target_directory = app_workspace.path
@@ -283,11 +302,11 @@ def unzip(request, app_workspace):
         # step 2
         # read the names of directories and the contents of each directory to make a datastructure that looks like
         # include in context so it can be used to auto populate choices
-        #print("checking 4")
+        # print("checking 4")
         #  and then save it to the workspace as a json file
 
         # return also options_for_each_directory
-        #return {'success': True, 'data': {}}
+        # return {'success': True, 'data': {}}
         return
 
     except Exception as e:

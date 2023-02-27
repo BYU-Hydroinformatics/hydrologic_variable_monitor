@@ -149,6 +149,7 @@
     {% csrf_token %}g
     <script>
         const URL_GETMAPID = "{% url 'hydro_var_monitor:get-map-id' %}"
+        const URL_GETJSON = "{% url 'hydro_var_monitor:map-region' %}"
         const URL_GETPLOT = "{% url 'hydro_var_monitor:get-plot' %}"
         const URL_COMPARE = "{% url 'hydro_var_monitor:compare' %}"
         const URL_GETPREDEFINED = "{% url 'hydro_var_monitor:get_predefined' %}"
