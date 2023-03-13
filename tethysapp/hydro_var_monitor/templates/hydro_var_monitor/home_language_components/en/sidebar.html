@@ -1,5 +1,8 @@
 <br>
-    <button  id="switch-lang" type="button" class="btn btn-primary btn-block" lang = "ab" >Cambiar a Español </button>
+    <li class = "title">Choose Language</li>
+    <select id="select-lang" class="form-select" name = "directories">
+        <option hidden disabled selected value></option>
+    </select>
     <br>
     <button  id="lat-lon" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#lat-lon-modal">Enter Lat/Lon</button>
     <li class="title"> 1. Choose a Variable</li>
@@ -56,7 +59,7 @@
   </select>
 
     <li class = "title">Select Boundary Dataset (name of a directory)</li>
-    <select id="directories" class="form-select" name = "directories">
+    <select id="directories" class="form-select" name="directories">
         <option hidden disabled selected value></option>
       <option value="geojson_ecuador" lang = "ab">Geojson Ecuador </option>
     </select>
@@ -69,5 +72,5 @@
     <br>
     <button  id="region" type="button" class="btn btn-primary btn-block" >Load Region Data</button>
     <br>
-    <button  id="compare-var" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#compare-var-modal">Compare Variables </button>
+{#   <button  id="compare-var" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#compare-var-modal">Compare Variables </button>#}
 

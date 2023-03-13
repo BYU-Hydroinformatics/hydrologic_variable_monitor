@@ -55,36 +55,15 @@
     <option value="y2d">El año hasta la fecha</option>
   </select>
 
-    <li class="title"> Usar una Provincia Específica (opcional) </li>
-    <select id="regions" class="form-select" name = "regions">
-        <option value = "">Ninguna</option>
-        <option value = "Ecuador">Ecuador</option>
-        <option value = "Azuay">Azuay</option>
-        <option value = "Bolivar">Bolivar</option>
-        <option value = "Canar">Canar</option>
-        <option value = "Carchi">Carchi</option>
-        <option value = "Chimborazo">Chimborazo</option>
-        <option value = "Cotopaxi">Cotopaxi</option>
-        <option value = "El_Oro">El Oro</option>
-        <option value = "Esmeraldas">Esmeraldas</option>
-        <option value = "Galapagos">Galapagos</option>
-        <option value = "Guayas">Guayas</option>
-        <option value = "Imbabura">Imbabura</option>
-        <option value = "Loja">Loja</option>
-        <option value = "Los_Rios">Los Rios</option>
-        <option value = "Manabi">Manabi</option>
-        <option value = "Morona_Santiago">Morona Santiago</option>
-        <option value = "Napo">Napo</option>
-        <option value = "Orellana">Orellana</option>
-        <option value = "Pastaza">Pastaza</option>
-        <option value = "Pichincha">Pichincha</option>
-        <option value = "Santa_Elena">Santa Elena</option>
-        <option value = "Santo_Domingo_de_los_Tsachilas">Santo Domingo de los Tsachilas</option>
-        <option value = "Sucumbios">Sucumbios</option>
-        <option value = "Tungurahua">Tungurahua</option>
-        <option value = "Zamora_Chinchipe">Zamora Chinchipe</option>
+   <li class = "title">Select Boundary Dataset (name of a directory)</li>
+    <select id="directories" class="form-select" name = "directories">
+        <option hidden disabled selected value></option>
     </select>
+
+    <li class = "title">Choose a Boundary</li>
+    <select id="jsons" class="form-select" name="jsons">
+        <option hidden disabled selected value></option>
+    </select>
+
     <br>
-    <button  id="region" type="button" class="btn btn-primary btn-block">Cargar Datos para la Región </button>
-    <br>
-    <button  id="compare-var" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#compare-var-modal" lang = "es">Comparar Variables </button>
+    <button  id="region" type="button" class="btn btn-primary btn-block" >Load Region Data</button>

@@ -25,7 +25,6 @@ def home(request, app_workspace):
     lang = request.GET.get('lang', 'en')
     if lang not in ['en', 'es']:
         lang = 'en'
-    # print(lang)
 
     # if not EE_IS_AUTHORIZED:
     #     return render(request, 'hydro_var_monitor/no_auth_error.html')
@@ -35,8 +34,12 @@ def home(request, app_workspace):
         'soil_moisture': ['GLDAS', ],
         'evapo': ['GLDAS']
     }
+    # lang_ops = os.path.join(request, 'hydro_var_monitor/home_language_components')
+    # langs = os.listdir(lang_ops)
+    # list_of_languages = [item for item in langs]
+    list_of_languages = ["check"]
 
-    target_directory = app_workspace.path
+    target_directory = os.path.join(app_workspace.path, "Exact")
     items = os.listdir(target_directory)
     list_of_directories = [item for item in items if os.path.isdir(os.path.join(target_directory, item))]
     if "__MACOSX" in list_of_directories:
@@ -50,6 +53,7 @@ def home(request, app_workspace):
         options_for_each_directory[directory] = files
 
     context = {
+        'language_options': json.dumps(list_of_languages),
         'lang': lang,
         'sources': json.dumps(ee_sources),
         'option': json.dumps(options_for_each_directory),
@@ -67,19 +71,15 @@ def admin(request):
 
 
 @controller(name='map-region', url='hydro-var-monitor/map-region', app_workspace=True)
-def compare(request, app_workspace):
+def mapregion(request, app_workspace):
     response_data = {'success': False}
     try:
         directory = request.GET.get('directory', None)
         file = request.GET.get('file', None)
-        print(file)
         app_store_path = app_workspace.path
-        json_url = os.path.join(app_store_path, directory, file)
-        print(json_url)
+        json_url = os.path.join(app_store_path, "Exact", directory, file)
         f = open(json_url)
         region = json.load(f)
-        print(region["geometry"]["coordinates"])
-        print("CHECK")
     except Exception as e:
         response_data['error'] = f'Error Processing Request: {e}'
     return JsonResponse(region)
@@ -88,23 +88,28 @@ def compare(request, app_workspace):
 @controller(name='compare', url='hydro-var-monitor/compare', app_workspace=True)
 def compare(request, app_workspace):
     response_data = {'success': False}
+    #print("IN COMPARE")
     try:
         region = request.GET.get('region', None)
         definedRegion = request.GET.get('definedRegion', None)
+        #print(definedRegion)
         if definedRegion == "true":
-            province = region + ".json"
-            app_store_path = app_workspace.path
-            json_url = os.path.join(app_store_path, "preconfigured_geojsons", "ecuador", province)
+            directory = request.GET.get('directory', None) + "_simplified"
+            #print(directory)
+            # get json simplified version from app workspace for earth engine
+            province = region
+            #print(region)
             # ROOT_DIR = os.path.abspath(os.curdir)
-            # json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor",
-            #                         "workspaces",
-            #                         "app_workspace", "preconfigured_geojsons", "ecuador", province)
-
+            app_store_path = app_workspace.path
+            json_url = os.path.join(app_store_path, "Simplified", directory, province)
+            #print(json_url)
             f = open(json_url)
             region = json.load(f)
 
         var = request.GET.get('variable', None)
+        #print(var)
         isPoint = request.GET.get('isPoint', None)
+        #print(isPoint)
 
         if var == "air_temp":
             if definedRegion == "true":
@@ -204,7 +209,6 @@ def get_date():
 
 @controller(name='get-plot', url='hydro-var-monitor/get-plot')
 def get_plot(request):
-    print("get plot")
     response_data = {'success': False}
     # plot_data = {}
 
@@ -214,7 +218,6 @@ def get_plot(request):
         region = request.GET.get('region', None)
         isPoint = request.GET.get('isPoint', None)
         year = request.GET.get('year', None)
-        print(sensor, var, region, isPoint, year)
 
         if year == "" or year == "2022" or year == "y2d":
             endDate, startDate = get_date()
@@ -227,7 +230,6 @@ def get_plot(request):
 
         if sensor == "ERA5":
             if var == "air_temp":
-                # print("what")
                 band = "temperature_2m"
                 title = "Temperatura del Aire - ERA5"
                 yaxis = "Temperature en Celsius"
@@ -275,38 +277,48 @@ def get_plot(request):
     return JsonResponse(json.loads(json.dumps(plot_data)))
 
 
-@controller(name='admin-upload-zipped-data', url='hydro-var-monitor/admin/unzip', app_workspace=True)
-def unzip(request, app_workspace):
+@controller(name='admin-upload-exact-zipped-data', url='hydro-var-monitor/admin/unzip-exact', app_workspace=True)
+def unzip_exact(request, app_workspace):
     try:
-        print("unzip")
         workspace_path = app_workspace.path
-        print(workspace_path)
-        print(request.FILES['exact-json'].chunks())
         with tempfile.NamedTemporaryFile(delete=False) as f:
             for chunk in request.FILES['exact-json'].chunks():
                 f.write(chunk)
-                # print("checking!")
-        print(workspace_path)
 
-        target_directory = app_workspace.path
+        target_directory = os.path.join(workspace_path, 'Exact')
         with zipfile.ZipFile(f.name, 'r') as zip_ref:
             zip_ref.extractall(target_directory)
         # for file in files:
-        #   print(file)
         #   new_observation_path = os.path.join(workspace_path, 'observations', files[file].name)
         #  with open(new_observation_path, 'wb') as dst:
         #      for chunk in files[file].chunks():
         #         dst.write(chunk)
-        print("checking 3")
 
         # step 2
         # read the names of directories and the contents of each directory to make a datastructure that looks like
         # include in context so it can be used to auto populate choices
-        # print("checking 4")
         #  and then save it to the workspace as a json file
 
         # return also options_for_each_directory
         # return {'success': True, 'data': {}}
+        return
+
+    except Exception as e:
+        return {'success': False, 'error': f'Error Processing Request: {e}'}
+
+
+@controller(name='admin-upload-simplified-zipped-data', url='hydro-var-monitor/admin/unzip-simplified',
+            app_workspace=True)
+def unzip_simplified(request, app_workspace):
+    try:
+        workspace_path = app_workspace.path
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            for chunk in request.FILES['simplified-json'].chunks():
+                f.write(chunk)
+
+        target_directory = os.path.join(workspace_path, 'Simplified')
+        with zipfile.ZipFile(f.name, 'r') as zip_ref:
+            zip_ref.extractall(target_directory)
         return
 
     except Exception as e:
@@ -321,13 +333,14 @@ def get_predefined(request, app_workspace):
     sensor = request.GET.get('source', None)
     var = request.GET.get('variable', None)
     year = request.GET.get('year', None)
+    directory = request.GET.get('directory', None) + "_simplified"
     # get json simplified version from app workspace for earth engine
-    province = name_of_area + ".json"
+    province = name_of_area
     ROOT_DIR = os.path.abspath(os.curdir)
     app_store_path = app_workspace.path
     # json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor", "workspaces",
     #                         "app_workspace", "preconfigured_geojsons", "ecuador", province)
-    json_url = os.path.join(app_store_path, "preconfigured_geojsons", "ecuador", province)
+    json_url = os.path.join(app_store_path, "Simplified", directory, province)
     f = open(json_url)
     region = json.load(f)
 
@@ -357,7 +370,6 @@ def get_predefined(request, app_workspace):
 
     if sensor == "GLDAS":
         if var == "precip":
-            print("ingldas")
             band = "Rainf_tavg"
             title = "Acumulados de Precipitación- GLDAS"
             yaxis = "mm of precipitación"

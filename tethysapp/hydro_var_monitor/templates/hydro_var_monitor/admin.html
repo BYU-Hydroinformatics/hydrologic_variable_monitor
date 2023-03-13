@@ -45,11 +45,13 @@
     </div>
     </br><br>
     <div class="form-group">
-        <p>This second zipfile should contain json files with the approximate boundaries. If there are
+        <p>This second zipfile should contain json files with the approximate boundaries. The json files must be the
+            exact same names as there corresponding json file. If there are
             too many points in the JSON file then it can cause Earth Engine to take too long to load.
             Since the remote sensing data is approximated anyway, you are able to use approximate boundaries
             for outlines when Earth Engine reads them. Therefore, include a zipfile of the simplified version
-            of all the json files.</p>
+            of all the json files. This zipfile must have the exact same name as the other zipfile, just with _simplified
+            added onto the end of it. </p>
         <label for="simplified-json" class="col-form-label">Simplified JSON:</label>
         <input type="file" class="form-control" id="simplified-json">
     </div>
@@ -82,7 +84,8 @@
     {{ block.super }}
     {% csrf_token %}
     <script>
-        const URL_UNZIP = "{% url 'hydro_var_monitor:admin-upload-zipped-data' %}"
+        const URL_EXACT_UNZIP = "{% url 'hydro_var_monitor:admin-upload-exact-zipped-data' %}"
+        const URL_SIMPLIFIED_UNZIP = "{% url 'hydro_var_monitor:admin-upload-simplified-zipped-data' %}"
     </script>
     <!-- <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript"></script> -->
     <script src="{% static 'hydro_var_monitor/js/admin.js' %}" type="text/javascript" defer></script>

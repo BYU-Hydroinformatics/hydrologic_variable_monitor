@@ -12,14 +12,11 @@
 {% endblock %}
 
 {% block app_navigation_items %}
-
     {% if lang == "en" %}
         {% include "hydro_var_monitor/home_language_components/en/sidebar.html" %}
     {% elif lang == "es" %}
         {% include "hydro_var_monitor/home_language_components/es/sidebar.html" %}
     {% endif %}
-
-
 {% endblock %}
 
 {% block app_content %}
@@ -77,7 +74,7 @@
 
             <!-- Modal content-->
             {% if lang == "en" %}
-                {% include "hydro_var_monitor/home_language_components/es/instructions.html" %}
+                {% include "hydro_var_monitor/home_language_components/en/instructions.html" %}
             {% elif lang == "es" %}
                 {% include "hydro_var_monitor/home_language_components/es/instructions.html" %}
             {% endif %}
@@ -146,7 +143,7 @@
 {% endblock %}
 {% block scripts %}
     {{ block.super }}
-    {% csrf_token %}g
+    {% csrf_token %}
     <script>
         const URL_GETMAPID = "{% url 'hydro_var_monitor:get-map-id' %}"
         const URL_GETJSON = "{% url 'hydro_var_monitor:map-region' %}"
@@ -156,9 +153,10 @@
         const SOURCES = JSON.parse('{{ sources|safe }}')
         const DIRECTORIES = JSON.parse('{{ directories|safe }}')
         const OPTIONS = JSON.parse('{{ option|safe }}')
+        const LANGUAGES = JSON.parse('{{ language_options|safe }}')
     </script>
     <script>
-        var staticGeoJSON = "{% static base_name|add:'hydro_var_monitor/geojson/' %}";
+        const staticGeoJSON = "{% static base_name|add:'hydro_var_monitor/geojson/' %}";
     </script>
     <script src='https://cdn.plot.ly/plotly-2.12.1.min.js'></script>
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
