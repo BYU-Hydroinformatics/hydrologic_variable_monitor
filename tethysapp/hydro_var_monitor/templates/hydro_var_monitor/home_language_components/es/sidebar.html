@@ -1,5 +1,9 @@
 <br>
-    <button  id="switch-lang" type="button" class="btn btn-primary btn-block" >Cambiar a Español </button>
+    <li class = "title">Selecionar Idioma</li>
+    <select id="select-lang" class="form-select" name = "languages">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+    </select>
     <br>
   <button  id="lat-lon" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#lat-lon-modal">Ingresar Lat/Lon</button>
     <li class="title">1. Elija Variable</li>
@@ -55,12 +59,12 @@
     <option value="y2d">El año hasta la fecha</option>
   </select>
 
-   <li class = "title">Select Boundary Dataset (name of a directory)</li>
+   <li class = "title">Selecionar una Carpeta</li>
     <select id="directories" class="form-select" name = "directories">
         <option hidden disabled selected value></option>
     </select>
 
-    <li class = "title">Choose a Boundary</li>
+    <li class = "title">Elija una dataset (el nombre de un d</li>
     <select id="jsons" class="form-select" name="jsons">
         <option hidden disabled selected value></option>
     </select>

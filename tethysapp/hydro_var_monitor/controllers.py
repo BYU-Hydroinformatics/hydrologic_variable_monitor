@@ -6,6 +6,8 @@ from datetime import datetime
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.http.response import JsonResponse
 from django.shortcuts import render
+from django.urls import path
+#from . import views
 from tethys_sdk.routing import controller
 
 from . import ee_auth
@@ -67,8 +69,13 @@ def admin(request):
     context = {
         "ee_enabled": EE_IS_AUTHORIZED,
     }
-    return render(request, 'hydro_var_monitor/admin.html', context)
-
+    lang = request.GET.get('lang', 'en')
+    if lang not in ['en', 'es']:
+        lang = 'en'
+    if lang == "es":
+        return render(request, 'hydro_var_monitor/home_language_components/es/admin.html', context)
+    else:
+        return render(request, 'hydro_var_monitor/home_language_components/en/admin.html', context)
 
 @controller(name='map-region', url='hydro-var-monitor/map-region', app_workspace=True)
 def mapregion(request, app_workspace):
@@ -88,28 +95,21 @@ def mapregion(request, app_workspace):
 @controller(name='compare', url='hydro-var-monitor/compare', app_workspace=True)
 def compare(request, app_workspace):
     response_data = {'success': False}
-    #print("IN COMPARE")
     try:
         region = request.GET.get('region', None)
         definedRegion = request.GET.get('definedRegion', None)
-        #print(definedRegion)
         if definedRegion == "true":
             directory = request.GET.get('directory', None) + "_simplified"
-            #print(directory)
             # get json simplified version from app workspace for earth engine
             province = region
-            #print(region)
             # ROOT_DIR = os.path.abspath(os.curdir)
             app_store_path = app_workspace.path
             json_url = os.path.join(app_store_path, "Simplified", directory, province)
-            #print(json_url)
             f = open(json_url)
             region = json.load(f)
 
         var = request.GET.get('variable', None)
-        #print(var)
         isPoint = request.GET.get('isPoint', None)
-        #print(isPoint)
 
         if var == "air_temp":
             if definedRegion == "true":

@@ -52,7 +52,6 @@ const App = (() => {
         a.click()
     }
 
-    //selectLang.innerHTML = LANGUAGES[e.target.value].map(src => `<option value="${src}">${src}</option>`).join("")
     selectDirectory.innerHTML = `<option value="">Select a directory</option>${DIRECTORIES.map(src => `<option value="${src}">${src}</option>`).join("")}`;
 
     selectDirectory.onchange = (e) => selectJSON.innerHTML = OPTIONS[e.target.value].map(src => `<option value="${src}">${src}</option>`).join("")
@@ -167,6 +166,8 @@ const App = (() => {
         })
     }
 
+    selectLang.onchange = () => window.location.href = `${URL_HOME}?lang=${selectLang.value}`
+
 
     btnRegion.onclick = () => {
         console.log("CLICK")
@@ -250,7 +251,7 @@ const App = (() => {
             point = L.marker([usrLon.value, usrLat.value]).addTo(map);
             map.flyTo([usrLon.value, usrLat.value], 5)
             isPoint = true;
-            definedRegion=false;
+            definedRegion = false;
             $('#lat-lon-modal').modal("hide");
 
 
@@ -285,7 +286,7 @@ const App = (() => {
     btnCompare.onclick = () => {
         const dataParams = getVarSourceJSON()
         province_json.clearLayers();
-        if (definedRegion==true) {
+        if (definedRegion == true) {
             //dataParams.definedRegion = true
             dataParams.region = selectJSON.value
             const region_info = {
@@ -301,10 +302,9 @@ const App = (() => {
             //let geojsons = selectRegion.value
             //let url = staticGeoJSON + geojsons + ".json"
             //fetch(url)
-               // .then(response => response.json())
-               // .then(json => province_json.addData(json).addTo(map))
-        }
-        else if (dataParams.isPoint == true) {
+            // .then(response => response.json())
+            // .then(json => province_json.addData(json).addTo(map))
+        } else if (dataParams.isPoint == true) {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }
         //
