@@ -59,18 +59,42 @@
     <button id="upload-data" class="btn btn-primary btn-block">Upload New Shapefiles for Regions</button>
     </br><br>
     <h2>Step 3: Manage Uploaded Polygons</h2>
-    <select class="form-select" aria-label="variable selector" id="select">
+    <select id="manage" class="form-select" aria-label="variable selector" name="manage">
     <option hidden disabled selected value></option>
-      <option value="air_temp" lang = "ab">Air Temperature </option>
-      <option value="precip" lang = "es">Precipitación</option>
-      <option value="soil_moisture" lang="ab">Soil Moisture</option>
-  <option value="evapo" lang="ab">Evapotranspiration</option>
   </select>
+    </br><br>
+    <button id="delete-data" class="btn btn-primary btn-block">Delete Data</button>
+    </br><br>
 
 {% endblock %}
 
 {% block after_app_content %}
     {# Chart Modals #}
+    <div id="lat-lon-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Just checking...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="lat" class="col-form-label">Are you sure you want to delete this dataset?</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">I don't want to delete it</button>
+                    <button id="confirm-delete" type="button" class="btn btn-outline-secondary">Delete it</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
     <!-- Modal -->
 
 {% endblock %}
@@ -86,6 +110,8 @@
     <script>
         const URL_EXACT_UNZIP = "{% url 'hydro_var_monitor:admin-upload-exact-zipped-data' %}"
         const URL_SIMPLIFIED_UNZIP = "{% url 'hydro_var_monitor:admin-upload-simplified-zipped-data' %}"
+        const DIRECTORIES = JSON.parse('{{ directories|safe }}')
+        const URL_DELETE = "{% url 'hydro_var_monitor:delete-data' %}"
     </script>
     <!-- <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript"></script> -->
     <script src="{% static 'hydro_var_monitor/js/admin.js' %}" type="text/javascript" defer></script>

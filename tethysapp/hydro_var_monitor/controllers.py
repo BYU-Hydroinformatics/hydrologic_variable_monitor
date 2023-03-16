@@ -7,7 +7,7 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.urls import path
-#from . import views
+# from . import views
 from tethys_sdk.routing import controller
 
 from . import ee_auth
@@ -64,18 +64,33 @@ def home(request, app_workspace):
     return render(request, 'hydro_var_monitor/home.html', context)
 
 
-@controller(name='admin', url='hydro-var-monitor/admin')
-def admin(request):
+@controller(name='admin', url='hydro-var-monitor/admin', app_workspace=True)
+def admin(request, app_workspace):
+    target_directory = os.path.join(app_workspace.path, "Exact")
+    items = os.listdir(target_directory)
+    list_of_directories = [item for item in items if os.path.isdir(os.path.join(target_directory, item))]
+    if "__MACOSX" in list_of_directories:
+        list_of_directories.remove("__MACOSX")
+    lang = request.GET.get('lang', 'en')
     context = {
         "ee_enabled": EE_IS_AUTHORIZED,
+        'directories': json.dumps(list_of_directories)
     }
-    lang = request.GET.get('lang', 'en')
     if lang not in ['en', 'es']:
         lang = 'en'
     if lang == "es":
         return render(request, 'hydro_var_monitor/home_language_components/es/admin.html', context)
     else:
         return render(request, 'hydro_var_monitor/home_language_components/en/admin.html', context)
+
+
+@controller(name="delete-data", url="hydro-var-monitor/admin/delete-data", app_workspace=True)
+def delete_data(request, app_workspace):
+    print("IN DELETE")
+    file = request.GET.get("filename")
+    print(file)
+    return
+
 
 @controller(name='map-region', url='hydro-var-monitor/map-region', app_workspace=True)
 def mapregion(request, app_workspace):
