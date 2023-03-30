@@ -10,27 +10,32 @@ def ERA5(band):
 
 def GLDAS(band):
     ic = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_{i:02}' for i in range(1, 13)]).select(band).reduce(
+        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_{i:02}' for i in range(1, 13)]).select(
+        band).reduce(
         ee.Reducer.mean())
     return ic
 
+
 def GLDAS_evapo(band):
     ic = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_evapo_{i:02}' for i in range(1, 13)]).select(band).reduce(
+        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_evapo_{i:02}' for i in range(1, 13)]).select(
+        band).reduce(
         ee.Reducer.mean())
     return ic
 
 
 def IMERG(band):
     ic = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/imerg_monthly_avg/imerg_monthly_avg_{i:02}' for i in range(1, 13)]).select(band).reduce(
+        [f'users/rachelshaylahuber55/imerg_monthly_avg/imerg_monthly_avg_{i:02}' for i in range(1, 13)]).select(
+        band).reduce(
         ee.Reducer.mean())
     return ic
 
 
 def CHIRPS(band):
     ic = ee.ImageCollection(
-        [f'users/rachelshaylahuber55/chirps_monthly_avg/chirps_monthly_avg_{i:02}' for i in range(1, 13)]).select(band).reduce(
+        [f'users/rachelshaylahuber55/chirps_monthly_avg/chirps_monthly_avg_{i:02}' for i in range(1, 13)]).select(
+        band).reduce(
         ee.Reducer.mean())
     return ic
 

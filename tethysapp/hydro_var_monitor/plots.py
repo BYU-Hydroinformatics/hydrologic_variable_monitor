@@ -101,7 +101,6 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
 
     gldas_ic = ee.ImageCollection("NASA/GLDAS/V021/NOAH/G025/T3H")
 
-
     def avg_gldas(img):
         return img.set('avg_value', img.reduceRegion(
             reducer=ee.Reducer.mean(),
@@ -163,7 +162,6 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
     if band == "Tair_f_inst" or band == "AvgSurfT_inst":
         gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
         gldas_avg_df["data_values"] = gldas_avg_df["data_values"] - 273.15
-
 
     return {'avg': gldas_avg_df, 'y2d': gldas_ytd_df, 'title': title, 'yaxis': yaxis}
 

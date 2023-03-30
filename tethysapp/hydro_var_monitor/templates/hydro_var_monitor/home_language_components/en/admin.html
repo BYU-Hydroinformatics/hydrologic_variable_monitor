@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block app_navigation_items %}
-   <li class="nav-item">
+    <li class="nav-item">
         <a class="nav-link" href="{% url 'hydro_var_monitor:admin' %}">Admin</a>
     <li class="nav-item">
         <a class="nav-link" href="{% url 'hydro_var_monitor:home' %}">Home</a>
@@ -32,6 +32,8 @@
     </br><br>
 
     <h2>Step 2: Upload Polygons</h2>
+    <p>Enter the name of your dataset:</p>
+    <input type="text" class="form-control" id="name">
     <div class="form-group">
         <p> Upload 2 zip files for your desired regions. Inside the zip files should be all the json
             files you would like included in the app. The title of each of the files should have the
@@ -50,7 +52,8 @@
             too many points in the JSON file then it can cause Earth Engine to take too long to load.
             Since the remote sensing data is approximated anyway, you are able to use approximate boundaries
             for outlines when Earth Engine reads them. Therefore, include a zipfile of the simplified version
-            of all the json files. This zipfile must have the exact same name as the other zipfile, just with _simplified
+            of all the json files. This zipfile must have the exact same name as the other zipfile, just with
+            _simplified
             added onto the end of it. </p>
         <label for="simplified-json" class="col-form-label">Simplified JSON:</label>
         <input type="file" class="form-control" id="simplified-json">
@@ -60,8 +63,8 @@
     </br><br>
     <h2>Step 3: Manage Uploaded Polygons</h2>
     <select id="manage" class="form-select" aria-label="variable selector" name="manage">
-    <option hidden disabled selected value></option>
-  </select>
+        <option hidden disabled selected value></option>
+    </select>
     </br><br>
     <button id="delete-data" class="btn btn-primary btn-block">Delete Data</button>
     </br><br>
@@ -83,12 +86,15 @@
                 <div class="modal-body">
                     <form>
                         <div class="form-group">
-                            <label for="lat" class="col-form-label">Are you sure you want to delete this dataset?</label>
+                            <label for="lat" class="col-form-label">Are you sure you want to delete this
+                                dataset?</label>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">I don't want to delete it</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">I don't want to
+                        delete it
+                    </button>
                     <button id="confirm-delete" type="button" class="btn btn-outline-secondary">Delete it</button>
                 </div>
             </div>

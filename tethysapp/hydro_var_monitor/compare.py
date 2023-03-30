@@ -13,16 +13,16 @@ def get_current_date():
 
 
 def precip_compare(region, isPoint):
-    #print("IN PRECIP COMPARE")
+    # print("IN PRECIP COMPARE")
     # get needed functions
-    #print(region)
+    # print(region)
 
     if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
         get_coord = region["geometry"]
         area = ee.Geometry.Polygon(get_coord["coordinates"])
-        #print(area)
+        # print(area)
 
     now, y2d_start = get_current_date()
 

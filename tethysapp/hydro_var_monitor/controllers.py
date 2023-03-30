@@ -1,21 +1,23 @@
 import json
 import logging
 import os
+import shutil
 from datetime import date
 from datetime import datetime
 from django.http import JsonResponse, HttpResponseNotAllowed
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import path
 # from . import views
 from tethys_sdk.routing import controller
+from tethys_sdk.permissions import permission_required
 
 from . import ee_auth
 from .compare import air_temp_compare, precip_compare
 from .ee_auth import *
 from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, GLDAS_evapo
 from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS
-from .unzip import unzip_and_read_files
+#from .unzip import unzip_and_read_files
 import zipfile
 import tempfile
 
@@ -28,8 +30,8 @@ def home(request, app_workspace):
     if lang not in ['en', 'es']:
         lang = 'en'
 
-    # if not EE_IS_AUTHORIZED:
-    #     return render(request, 'hydro_var_monitor/no_auth_error.html')
+    if not EE_IS_AUTHORIZED:
+        return render(request, 'hydro_var_monitor/no_auth_error.html')
     ee_sources = {
         'air_temp': ['GLDAS', 'ERA5'],
         'precip': ['GLDAS', 'CHIRPS', 'IMERG', 'ERA5'],
@@ -42,7 +44,10 @@ def home(request, app_workspace):
     list_of_languages = ["check"]
 
     target_directory = os.path.join(app_workspace.path, "Exact")
-    items = os.listdir(target_directory)
+    if os.path.exists(target_directory):
+        items = os.listdir(target_directory)
+    else:
+        items = []
     list_of_directories = [item for item in items if os.path.isdir(os.path.join(target_directory, item))]
     if "__MACOSX" in list_of_directories:
         list_of_directories.remove("__MACOSX")
@@ -64,6 +69,7 @@ def home(request, app_workspace):
     return render(request, 'hydro_var_monitor/home.html', context)
 
 
+# @permission_required()
 @controller(name='admin', url='hydro-var-monitor/admin', app_workspace=True)
 def admin(request, app_workspace):
     target_directory = os.path.join(app_workspace.path, "Exact")
@@ -98,10 +104,14 @@ def mapregion(request, app_workspace):
     try:
         directory = request.GET.get('directory', None)
         file = request.GET.get('file', None)
+        print(file)
         app_store_path = app_workspace.path
+        print(app_store_path)
         json_url = os.path.join(app_store_path, "Exact", directory, file)
+        print(json_url)
         f = open(json_url)
         region = json.load(f)
+        print(region)
     except Exception as e:
         response_data['error'] = f'Error Processing Request: {e}'
     return JsonResponse(region)
@@ -111,6 +121,8 @@ def mapregion(request, app_workspace):
 def compare(request, app_workspace):
     response_data = {'success': False}
     try:
+        print("HI IS THIS WORKING")
+        print(request.GET.get('checking', None))
         region = request.GET.get('region', None)
         definedRegion = request.GET.get('definedRegion', None)
         if definedRegion == "true":
@@ -295,46 +307,65 @@ def get_plot(request):
 @controller(name='admin-upload-exact-zipped-data', url='hydro-var-monitor/admin/unzip-exact', app_workspace=True)
 def unzip_exact(request, app_workspace):
     try:
+        print(request)
         workspace_path = app_workspace.path
-        with tempfile.NamedTemporaryFile(delete=False) as f:
-            for chunk in request.FILES['exact-json'].chunks():
-                f.write(chunk)
+        directory = request.POST.get('directoryName', None)
+        target_directory = os.path.join(workspace_path, 'Exact', directory)
+        with zipfile.ZipFile(request.FILES['exact-json'], 'r') as zip:
+                for zip_info in zip.infolist():
+                    if zip_info.is_dir():
+                        continue
+                    zip_info.filename = os.path.basename(zip_info.filename)
+                    if zip_info.filename.startswith("._"):
+                        continue
+                    zip.extract(zip_info, target_directory)
 
-        target_directory = os.path.join(workspace_path, 'Exact')
-        with zipfile.ZipFile(f.name, 'r') as zip_ref:
-            zip_ref.extractall(target_directory)
-        # for file in files:
-        #   new_observation_path = os.path.join(workspace_path, 'observations', files[file].name)
-        #  with open(new_observation_path, 'wb') as dst:
-        #      for chunk in files[file].chunks():
-        #         dst.write(chunk)
+        #with zipfile.ZipFile(request.FILES['exact-json'], 'r') as zip_ref:
+            #for member in zip_ref.namelist():
+                # skip directories and files in _MACOSX
+                #if not os.path.basename(member) or member.startswith('_MACOSX/'):
+                    #continue
+
+                # specify destination directory and extract file
+                #destination = os.path.join(target_directory, os.path.basename(member))
+                #zip_ref.extract(member, destination)
+                #print(member)
 
         # step 2
-        # read the names of directories and the contents of each directory to make a datastructure that looks like
-        # include in context so it can be used to auto populate choices
-        #  and then save it to the workspace as a json file
+    # read the names of directories and the contents of each directory to make a datastructure that looks like
+    # include in context so it can be used to auto populate choices
+    #  and then save it to the workspace as a json file
 
-        # return also options_for_each_directory
-        # return {'success': True, 'data': {}}
-        return
+    # return also options_for_each_directory
+        return {'success': True, 'data': {}}
+    #return HttpResponse('Files extracted successfully.')
 
     except Exception as e:
         return {'success': False, 'error': f'Error Processing Request: {e}'}
 
 
 @controller(name='admin-upload-simplified-zipped-data', url='hydro-var-monitor/admin/unzip-simplified',
-            app_workspace=True)
+        app_workspace=True)
 def unzip_simplified(request, app_workspace):
     try:
+        print(request)
+        print("CHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKING")
         workspace_path = app_workspace.path
-        with tempfile.NamedTemporaryFile(delete=False) as f:
-            for chunk in request.FILES['simplified-json'].chunks():
-                f.write(chunk)
+        directory = request.POST.get('directoryName', None)
+        target_directory = os.path.join(workspace_path, 'Simplified', directory)
+        print(target_directory)
+        with zipfile.ZipFile(request.FILES['simplified-json'], 'r') as zip:
+            print("CHECKING")
+            for zip_info in zip.infolist():
+                if zip_info.is_dir():
+                    continue
+                zip_info.filename = os.path.basename(zip_info.filename)
+                if zip_info.filename.startswith("._"):
+                    continue
+                print(zip_info.filename)
+                zip.extract(zip_info, target_directory)
 
-        target_directory = os.path.join(workspace_path, 'Simplified')
-        with zipfile.ZipFile(f.name, 'r') as zip_ref:
-            zip_ref.extractall(target_directory)
-        return
+        return HttpResponse('Files extracted successfully.')
 
     except Exception as e:
         return {'success': False, 'error': f'Error Processing Request: {e}'}

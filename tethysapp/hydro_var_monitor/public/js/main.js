@@ -153,10 +153,13 @@ const App = (() => {
             "directory": selectDirectory.value,
             "file": selectJSON.value
         }
+        console.log(selectDirectory.value)
+        console.log(selectJSON.value)
         province_json.clearLayers();
 
         $.ajax({
             type: "GET", url: URL_GETJSON, datatype: "JSON", data: region_info, success: function (data) {
+                console.log(province_json)
                 province_json.addData(data).addTo(map)
                 const bounds = province_json.getBounds();
                 // Zoom in on the bounds
@@ -312,6 +315,8 @@ const App = (() => {
         //check that it is a variable that can be compared
         if (dataParams.variable === "" || dataParams.variable === "soil_moisture" || dataParams.region === "") return
         $("#loading-icon").addClass("appear");
+
+        console.log(dataParams)
 
         $.ajax({
             type: "GET", url: URL_COMPARE, datatype: "JSON", data: dataParams, success: function (data) {

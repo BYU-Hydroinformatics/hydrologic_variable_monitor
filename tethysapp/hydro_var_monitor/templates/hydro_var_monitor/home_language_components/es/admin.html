@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block app_navigation_items %}
-   <li class="nav-item">
+    <li class="nav-item">
         <a class="nav-link" href="{% url 'hydro_var_monitor:admin' %}">Admin</a>
     <li class="nav-item">
         <a class="nav-link" href="{% url 'hydro_var_monitor:home' %}">Home</a>
@@ -32,28 +32,33 @@
     </br><br>
 
     <h2>Paso 2: Cargar Polígonos</h2>
-<div class="form-group">
-    <p>Cargue 2 archivos zip para las regiones deseadas. Dentro de los archivos zip deben estar todos los archivos json
-        que desea incluir en la aplicación. El título de cada uno de los archivos debe tener el
-        nombre que desea incluir en el menú desplegable para elegir. Los dos archivos zip
-        deben incluir los mismos nombres para cada uno de los archivos.</p>
-    <p>Este primer archivo zip debe contener archivos json con los límites exactos. Todos los puntos
-        se pueden incluir en este archivo de forma de shapefile. Este archivo mostrará cómo aparecen las regiones en el mapa en la
-        aplicación.</p>
-    <label for="exact-json" class="col-form-label">JSON Exacto:</label>
-    <input type="file" class="form-control" id="exact-json">
-</div>
-</br><br>
-<div class="form-group">
-    <p>Este segundo archivo zip debe contener archivos json con los límites aproximados. Los archivos json deben ser los
-        exactamente los mismos nombres que sus archivos json correspondientes. Si hay
-        demasiados puntos en el archivo JSON, puede hacer que Earth Engine tarde demasiado en cargarse.
-        Dado que los datos de teledetección ya están aproximados, puede usar límites aproximados
-        para los contornos cuando Earth Engine los lee. Por lo tanto, incluya un archivo zip de la versión simplificada
-        de todos los archivos json. Este archivo zip debe tener exactamente el mismo nombre que el otro archivo zip, solo con _simplified
-        agregado al final. </p>
-    <label for="simplified-json" class="col-form-label">JSON Simplificado:</label>
-    <input type="file" class="form-control" id="simplified-json">
+    <div class="form-group">
+        <p>Cargue 2 archivos zip para las regiones deseadas. Dentro de los archivos zip deben estar todos los archivos
+            json
+            que desea incluir en la aplicación. El título de cada uno de los archivos debe tener el
+            nombre que desea incluir en el menú desplegable para elegir. Los dos archivos zip
+            deben incluir los mismos nombres para cada uno de los archivos.</p>
+        <p>Este primer archivo zip debe contener archivos json con los límites exactos. Todos los puntos
+            se pueden incluir en este archivo de forma de shapefile. Este archivo mostrará cómo aparecen las regiones en
+            el mapa en la
+            aplicación.</p>
+        <label for="exact-json" class="col-form-label">JSON Exacto:</label>
+        <input type="file" class="form-control" id="exact-json">
+    </div>
+    </br><br>
+    <div class="form-group">
+        <p>Este segundo archivo zip debe contener archivos json con los límites aproximados. Los archivos json deben ser
+            los
+            exactamente los mismos nombres que sus archivos json correspondientes. Si hay
+            demasiados puntos en el archivo JSON, puede hacer que Earth Engine tarde demasiado en cargarse.
+            Dado que los datos de teledetección ya están aproximados, puede usar límites aproximados
+            para los contornos cuando Earth Engine los lee. Por lo tanto, incluya un archivo zip de la versión
+            simplificada
+            de todos los archivos json. Este archivo zip debe tener exactamente el mismo nombre que el otro archivo zip,
+            solo con _simplified
+            agregado al final. </p>
+        <label for="simplified-json" class="col-form-label">JSON Simplificado:</label>
+        <input type="file" class="form-control" id="simplified-json">
 
     </div>
     </br><br>
@@ -61,8 +66,8 @@
     </br><br>
     <h2>Step 3: Manage Uploaded Polygons</h2>
     <select class="form-select" aria-label="variable selector" id="select">
-    <option hidden disabled selected value></option>
-  </select>
+        <option hidden disabled selected value></option>
+    </select>
 
 {% endblock %}
 

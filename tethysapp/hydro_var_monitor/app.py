@@ -1,5 +1,6 @@
 from tethys_sdk.base import TethysAppBase, url_map_maker
 from tethys_sdk.app_settings import CustomSetting
+from tethys_sdk.permissions import Permission, PermissionGroup
 
 
 class HydroVarMonitor(TethysAppBase):
@@ -18,6 +19,7 @@ class HydroVarMonitor(TethysAppBase):
     enable_feedback = False
     feedback_emails = []
     controller_modules = ['controllers']
+
     # def url_maps(self):
     #     """
     #     Add controllers
@@ -69,3 +71,26 @@ class HydroVarMonitor(TethysAppBase):
                 required=False
             ),
         )
+
+    from tethys_sdk.permissions import Permission, PermissionGroup
+
+    class MyFirstApp(TethysAppBase):
+
+        def permissions(self):
+            """
+            Example permissions method.
+            """
+            # Viewer Permissions
+            admin_page = Permission(
+                name='admin_page',
+                description='Access Admin'
+            )
+
+            admin = PermissionGroup(
+                name='admin',
+                permissions=admin_page
+            )
+
+            permissions = admin
+
+            return permissions

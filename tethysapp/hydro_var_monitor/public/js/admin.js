@@ -10,7 +10,7 @@ const App = (() => {
     const btnDelete = document.getElementById('delete-data')
 
     //btnSaveData.onclick = () => {
-        //console.log(selectData.value)
+    //console.log(selectData.value)
     //}
 
     selectMang.innerHTML = `<option value="">Select a directory</option>${DIRECTORIES.map(src => `<option value="${src}">${src}</option>`).join("")}`;
@@ -18,11 +18,11 @@ const App = (() => {
         console.log("CHECL")
     }
 
-    btnDelete.onclick = () =>{
+    btnDelete.onclick = () => {
         $('#lat-lon-modal').modal("show")
         console.log("click")
         const btnconfirmDelete = document.getElementById("confirm-delete")
-        btnconfirmDelete.onclick = ()=> {
+        btnconfirmDelete.onclick = () => {
             console.log("deleting")
             $('#lat-lon-modal').modal("hide")
             const file_to_delete = selectMang.value
@@ -31,7 +31,7 @@ const App = (() => {
                 "filename": file_to_delete
             }
             $.ajax({
-                type: "GET", url: URL_DELETE, datatype: "JSON", data: delete_file, success: function (data){
+                type: "GET", url: URL_DELETE, datatype: "JSON", data: delete_file, success: function (data) {
                     console.log(data)
                 }
             })
@@ -42,19 +42,39 @@ const App = (() => {
         console.log("uploading")
         //const exactJSONInput = document.getElementById("exact-json");
         //const simplifiedJSONInput = document.getElementById("simplified-json");
+        const fileName = document.getElementById('name')
         const formDataExact = new FormData();
         const formDataSimplified = new FormData();
         //how do I get the name of the directory into the file??
-        formDataExact.append('exact-json', $('#exact-json')[0].files[0]);
-        formDataSimplified.append('simplified-json', $('#simplified-json')[0].files[0]);
+        const filename = {'directoryName': fileName.value};
+        //console.log(formDataExact)
+        console.log("CEHCKING")
+        formDataExact.append('exact-json', $('#exact-json')[0].files[0])
+        formDataExact.append('directoryName', fileName.value);
+        formDataSimplified.append('simplified-json', $('#simplified-json')[0].files[0])
+        formDataSimplified.append('directoryName', fileName.value);
+        //console.log(formDataExact)
+        //formDataSimplified.append('simplified-json', $('#simplified-json')[0].files[0]);
+        //console.log(fileName.value)
         //const zipFile = zipFileInput.files[0];
         $.ajax({
-            type: "POST", url: URL_EXACT_UNZIP, data: formDataExact, processData: false, contentType: false, success: data => {
+            type: "POST",
+            url: URL_EXACT_UNZIP,
+            data: formDataExact,
+            //.append('directoryName', fileName.value),
+            processData: false,
+            contentType: false,
+            success: data => {
                 console.log(data)
             }
         })
         $.ajax({
-            type: "POST", url: URL_SIMPLIFIED_UNZIP, data: formDataSimplified, processData: false, contentType: false, success: data => {
+            type: "POST",
+            url: URL_SIMPLIFIED_UNZIP,
+            data: formDataSimplified,
+            processData: false,
+            contentType: false,
+            success: data => {
                 console.log(data)
             }
         })
@@ -62,5 +82,5 @@ const App = (() => {
 
     ////////////////////////////////////////////////// Map and Map Layers
 
-    return{}
+    return {}
 })();
