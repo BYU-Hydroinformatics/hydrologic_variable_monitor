@@ -64,14 +64,18 @@
     </br><br>
     <button id="upload-data" class="btn btn-primary btn-block">Upload New Shapefiles for Regions</button>
     </br><br>
-    <h2>Step 3: Manage Uploaded Polygons</h2>
-    <select class="form-select" aria-label="variable selector" id="select">
+    <h2>Paso 3: Administrar Polígonos Cargados</h2>
+    <select id="manage" class="form-select" aria-label="variable selector" name="manage">
         <option hidden disabled selected value></option>
     </select>
+    </br><br>
+    <button id="delete-data" class="btn btn-primary btn-block">Borrar Datos</button>
+    </br><br>
 
 {% endblock %}
 
 {% block after_app_content %}
+
     {# Chart Modals #}
     <!-- Modal -->
 
@@ -88,6 +92,8 @@
     <script>
         const URL_EXACT_UNZIP = "{% url 'hydro_var_monitor:admin-upload-exact-zipped-data' %}"
         const URL_SIMPLIFIED_UNZIP = "{% url 'hydro_var_monitor:admin-upload-simplified-zipped-data' %}"
+        const DIRECTORIES = JSON.parse('{{ directories|safe }}')
+        const URL_DELETE = "{% url 'hydro_var_monitor:delete-data' %}"
     </script>
     <!-- <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript"></script> -->
     <script src="{% static 'hydro_var_monitor/js/admin.js' %}" type="text/javascript" defer></script>
