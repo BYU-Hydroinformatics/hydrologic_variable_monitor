@@ -16,8 +16,11 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
     if isPoint:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
-        get_coord = region["geometry"]
-        area = ee.Geometry.Polygon(get_coord["coordinates"])
+        if "geometry" in region:
+            get_coord = region["geometry"]
+            area = ee.Geometry.Polygon(get_coord["coordinates"])
+        else:
+            area = ee.Geometry.Polygon(region["coordinates"])
 
     # read in img col of averages
     img_col_avg = ee.ImageCollection(
@@ -96,8 +99,11 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
     if isPoint == True:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
-        get_coord = region["geometry"]
-        area = ee.Geometry.Polygon(get_coord["coordinates"])
+        if "geometry" in region:
+            get_coord = region["geometry"]
+            area = ee.Geometry.Polygon(get_coord["coordinates"])
+        else:
+            area = ee.Geometry.Polygon(region["coordinates"])
 
     gldas_ic = ee.ImageCollection("NASA/GLDAS/V021/NOAH/G025/T3H")
 
@@ -174,8 +180,11 @@ def plot_IMERG(region, isPoint, startDate, endDate):
     if isPoint == True:
         area = ee.Geometry.Point([float(region[0]), float(region[1])])
     else:
-        get_coord = region["geometry"]
-        area = ee.Geometry.Polygon(get_coord["coordinates"])
+        if "geometry" in region:
+            get_coord = region["geometry"]
+            area = ee.Geometry.Polygon(get_coord["coordinates"])
+        else:
+            area = ee.Geometry.Polygon(region["coordinates"])
 
     def avg_in_bounds(img):
         return img.set('avg_value', img.reduceRegion(
@@ -248,8 +257,11 @@ def plot_CHIRPS(region, isPoint, startDate, endDate):
         spot = ee.Geometry.Point([float(region[0]), float(region[1])])
         area = spot.buffer(400)
     else:
-        get_coord = region["geometry"]
-        area = ee.Geometry.Polygon(get_coord["coordinates"])
+        if "geometry" in region:
+            get_coord = region["geometry"]
+            area = ee.Geometry.Polygon(get_coord["coordinates"])
+        else:
+            area = ee.Geometry.Polygon(region["coordinates"])
     # read in daily image collection from earth engine and the averages and then the averages from assets
     chirps_daily_ic = ee.ImageCollection('UCSB-CHG/CHIRPS/DAILY')
     chirps_pentad_ic = ee.ImageCollection(

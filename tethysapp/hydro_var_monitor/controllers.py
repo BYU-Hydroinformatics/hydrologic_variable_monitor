@@ -104,14 +104,10 @@ def mapregion(request, app_workspace):
     try:
         directory = request.GET.get('directory', None)
         file = request.GET.get('file', None)
-        print(file)
         app_store_path = app_workspace.path
-        print(app_store_path)
         json_url = os.path.join(app_store_path, "Exact", directory, file)
-        print(json_url)
         f = open(json_url)
         region = json.load(f)
-        print(region)
     except Exception as e:
         response_data['error'] = f'Error Processing Request: {e}'
     return JsonResponse(region)
@@ -121,8 +117,6 @@ def mapregion(request, app_workspace):
 def compare(request, app_workspace):
     response_data = {'success': False}
     try:
-        print("HI IS THIS WORKING")
-        print(request.GET.get('checking', None))
         region = request.GET.get('region', None)
         definedRegion = request.GET.get('definedRegion', None)
         if definedRegion == "true":
@@ -307,7 +301,6 @@ def get_plot(request):
 @controller(name='admin-upload-exact-zipped-data', url='hydro-var-monitor/admin/unzip-exact', app_workspace=True)
 def unzip_exact(request, app_workspace):
     try:
-        print(request)
         workspace_path = app_workspace.path
         directory = request.POST.get('directoryName', None)
         target_directory = os.path.join(workspace_path, 'Exact', directory)
@@ -348,21 +341,16 @@ def unzip_exact(request, app_workspace):
         app_workspace=True)
 def unzip_simplified(request, app_workspace):
     try:
-        print(request)
-        print("CHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKINGCHECKING")
         workspace_path = app_workspace.path
         directory = request.POST.get('directoryName', None)
         target_directory = os.path.join(workspace_path, 'Simplified', directory)
-        print(target_directory)
         with zipfile.ZipFile(request.FILES['simplified-json'], 'r') as zip:
-            print("CHECKING")
             for zip_info in zip.infolist():
                 if zip_info.is_dir():
                     continue
                 zip_info.filename = os.path.basename(zip_info.filename)
                 if zip_info.filename.startswith("._"):
                     continue
-                print(zip_info.filename)
                 zip.extract(zip_info, target_directory)
 
         return HttpResponse('Files extracted successfully.')
@@ -379,7 +367,7 @@ def get_predefined(request, app_workspace):
     sensor = request.GET.get('source', None)
     var = request.GET.get('variable', None)
     year = request.GET.get('year', None)
-    directory = request.GET.get('directory', None) + "_simplified"
+    directory = request.GET.get('directory', None)
     # get json simplified version from app workspace for earth engine
     province = name_of_area
     ROOT_DIR = os.path.abspath(os.curdir)
