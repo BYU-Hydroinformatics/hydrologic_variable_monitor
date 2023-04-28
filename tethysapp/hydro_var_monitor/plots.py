@@ -25,6 +25,8 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
     # read in img col of averages
     img_col_avg = ee.ImageCollection(
         [f'users/rachelshaylahuber55/era5_monthly_avg/era5_monthly_updated_{i:02}' for i in range(1, 13)])
+    img_col_std = ee.ImageCollection(
+        [f'users/rachelshaylahuber55/era5_monthly_avg/era5_monthly_std_{i:02}' for i in range(1, 13)])
 
     def avg_era(img):
         return img.set('avg_value', img.reduceRegion(
@@ -45,8 +47,12 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
     # group  hourly values by date
     era_ytd_df = era_ytd_df.groupby(era_ytd_df.index.date).mean()
     avg_img = img_col_avg.select(band).map(avg_era)
+    avg_std = img_col_std.map(avg_era)
     avg_df = pd.DataFrame(
         avg_img.aggregate_array('avg_value').getInfo(),
+    )
+    std_df = pd.DataFrame(
+        avg_std.aggregate_array('avg_value').getInfo(),
     )
     # set date and data values columns that the js code will look for
     avg_df.columns = ["data_values"]
@@ -54,8 +60,9 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
     avg_df.reset_index(drop=True, inplace=True)
     # set year to date values
     era_ytd_df.columns = ["data_values"]
-    # loop through the dataframe and move necessary dates for averages in new order if doing last 12 months.
-    # Current month is assumed 12 (meaning it will not be moved), but is reset to be the current month if the last 12 months were selected.
+    # loop through the dataframe and move necessary dates for averages in new order if doing last 12 months. Current
+    # month is assumed 12 (meaning it will not be moved), but is reset to be the current month if the last 12 months
+    # were selected.
     curr_month = 12
     # change date to be a string value that can be easily graphed.
     era_ytd_df['date'] = era_ytd_df.index
@@ -71,7 +78,7 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
     avg_df.reset_index(inplace=True)
     avg_df['date'] = avg_df['datetime'].dt.strftime("%Y-%m-%d")
 
-    # rearrance dataframe to account for last 12 months if necessary
+    # rearrange dataframe to account for last 12 months if necessary
     # Then sum the values for precipitation
     if band == "total_precipitation":
         days_in_month = np.array([calendar.monthrange(int(now[:4]), i)[1] for i in range(1, 13)])
@@ -81,12 +88,17 @@ def plot_ERA5(region, band, title, yaxis, isPoint, startDate, endDate):
             days_in_month = np.insert(days_in_month, 0, extra_val)
         avg_df['data_values'] = avg_df['data_values'] * days_in_month * 1000
         avg_df['data_values'] = avg_df['data_values'].cumsum()
+        avg_df["std_below"] = avg_df["data_values"] - std_df["total_precipitation_stdDev"]* days_in_month * 1000
+        avg_df["std_above"] = avg_df["data_values"] + std_df["total_precipitation_stdDev"]* days_in_month * 1000
 
     if band == "total_precipitation":
         era_ytd_df["data_values"] = (era_ytd_df["data_values"] * 1000).cumsum()
     else:
+        print(std_df.columns)
         era_ytd_df["data_values"] = (era_ytd_df["data_values"] - 273.15)
         avg_df["data_values"] = (avg_df["data_values"] - 273.15)
+        avg_df["std_below"] = avg_df["data_values"] - std_df["temperature_2m_stdDev"]
+        avg_df["std_above"] = avg_df["data_values"] + std_df["temperature_2m_stdDev"]
 
     return {'avg': avg_df, 'y2d': era_ytd_df, 'title': title, 'yaxis': yaxis}
 
@@ -120,6 +132,12 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
     else:
         gldas_monthly = ee.ImageCollection(
             [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_avg_{i:02}' for i in range(1, 13)])
+    gldas_std = ee.ImageCollection(
+        [f'users/rachelshaylahuber55/gldas_monthly/gldas_monthly_std_{i:02}' for i in range(1, 13)])
+    gldas_std_monthly = gldas_std.map(avg_gldas)
+    gldas_std_df = pd.DataFrame(
+        gldas_std_monthly.aggregate_array('avg_value').getInfo(),
+    )
     gldas_monthly = gldas_monthly.map(avg_gldas)
     gldas_avg_df = pd.DataFrame(
         gldas_monthly.aggregate_array('avg_value').getInfo(),
@@ -146,6 +164,8 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
             days_in_month = np.delete(days_in_month, 11, 0)
             days_in_month = np.insert(days_in_month, 0, extra_val)
         gldas_avg_df['data_values'] = gldas_avg_df['data_values'].cumsum() * days_in_month * 86400
+        gldas_avg_df["std_below"] = gldas_avg_df["data_values"] - gldas_std_df["Rainf_tavg_stdDev"] * days_in_month * 86400
+        gldas_avg_df["std_above"] = gldas_avg_df["data_values"] + gldas_std_df["Rainf_tavg_stdDev"] * days_in_month * 86400
     else:
         gldas_avg_df["data_values"] = gldas_avg_df[band]
         gldas_avg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=gldas_avg_df.index[i] + 1, day=15)
@@ -164,10 +184,19 @@ def plot_GLDAS(region, band, title, yaxis, isPoint, startDate, endDate):
         gldas_ytd_df = gldas_ytd_df.groupby('date').mean()
         gldas_ytd_df.rename(index={0: 'index'}, inplace=True)
         gldas_ytd_df['date'] = gldas_ytd_df.index
+    if band == "Evap_tavg":
+        gldas_avg_df["std_below"] = gldas_avg_df["data_values"] - gldas_std_df["Evap_tavg_stdDev"]
+        gldas_avg_df["std_above"] = gldas_avg_df["data_values"] + gldas_std_df["Evap_tavg_stdDev"]
+    if band == "RootMoist_inst":
+        gldas_avg_df["std_below"] = gldas_avg_df["data_values"] - gldas_std_df["RootMoist_inst_stdDev"]
+        gldas_avg_df["std_above"] = gldas_avg_df["data_values"] + gldas_std_df["RootMoist_inst_stdDev"]
+
 
     if band == "Tair_f_inst" or band == "AvgSurfT_inst":
         gldas_ytd_df["data_values"] = gldas_ytd_df["data_values"] - 273.15
         gldas_avg_df["data_values"] = gldas_avg_df["data_values"] - 273.15
+        gldas_avg_df["std_below"] = gldas_avg_df["data_values"] - gldas_std_df["Tair_f_inst_stdDev"]
+        gldas_avg_df["std_above"] = gldas_avg_df["data_values"] + gldas_std_df["Tair_f_inst_stdDev"]
 
     return {'avg': gldas_avg_df, 'y2d': gldas_ytd_df, 'title': title, 'yaxis': yaxis}
 
@@ -205,6 +234,19 @@ def plot_IMERG(region, isPoint, startDate, endDate):
 
     imerg_df['datetime'] = [datetime.datetime(year=int(now[:4]), month=imerg_df.index[i] + 1, day=15) for i in
                             imerg_df.index]
+
+    imerg_std = ee.ImageCollection(
+        [f'users/rachelshaylahuber55/imerg_monthly_avg/imerg_monthly_std_{i:02}' for i in range(1, 13)])
+    imerg_std_monthly = imerg_std.map(avg_in_bounds)
+    imerg_std_df = pd.DataFrame(
+        imerg_std_monthly.aggregate_array('avg_value').getInfo(),
+    )
+    imerg_df['data_values'] = imerg_df['HQprecipitation']
+    #imerg_df["std_above"] = imerg_df["data_values"] + imerg_std_df["HQprecipitation_stdDev"]
+    #imerg_df["std_below"] = imerg_df["data_values"] - imerg_std_df["HQprecipitation_stdDev"]
+    print(imerg_std_df["HQprecipitation_stdDev"])
+    print(imerg_df)
+    print("loaded std")
     # sort the dataframe to match the last 12 years
     if startDate == "last12":
         curr_month = int(endDate[5:7])
@@ -217,9 +259,18 @@ def plot_IMERG(region, isPoint, startDate, endDate):
         imerg_df.sort_values(by='datetime', inplace=True)
         imerg_df.reset_index(inplace=True)
     # convert values to be cumulatively summer and also to account for all the days of the month
-    imerg_df['HQprecipitation'] = imerg_df['HQprecipitation'] * 24
-    imerg_df['data_values'] = imerg_df['HQprecipitation'].cumsum() * days_in_month
+    imerg_df['data_values'] = imerg_df['data_values'] * 24
+    imerg_df['data_values'] = imerg_df['data_values'].cumsum() * days_in_month
+    imerg_df["std_above"] = imerg_df["data_values"] + imerg_std_df["HQprecipitation_stdDev"] * 24 * days_in_month
+    imerg_df["std_below"] = imerg_df["data_values"] - imerg_std_df["HQprecipitation_stdDev"] * 24 * days_in_month
+    #imerg_df['std_above'] = imerg_df['std_above'] * 24
+    #imerg_df['std_above'] = imerg_df['std_above'] * days_in_month
+    #imerg_df['std_below'] = imerg_df['std_below'] * 24
+    #imerg_df['std_below'] = imerg_df['std_below'] * days_in_month
     imerg_df['date'] = imerg_df['datetime'].dt.strftime("%Y-%m-%d")
+
+    print("imerg_df")
+    print(imerg_df)
     # get IMERG values - they are grouped in 30 minute intervals
     imerg_30min_ic = ee.ImageCollection("NASA/GPM_L3/IMERG_V06")
 
