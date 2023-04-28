@@ -1,0 +1,77 @@
+<br>
+    <li class = "title">Choose Language</li>
+    <select id="select-lang" class="form-select" name = "languages">
+        <option value="en">English</option>
+         <option value="es">Español</option>
+    </select>
+    <br>
+    <button  id="lat-lon" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#lat-lon-modal">Enter Lat/Lon</button>
+    <li class="title"> 1. Choose a Variable</li>
+  <select class="form-select" aria-label="variable selector" id="select-variable">
+    <option hidden disabled selected value></option>
+      <option value="air_temp" lang = "ab">Air Temperature </option>
+      <option value="precip" lang = "es">Precipitation</option>
+      <option value="soil_moisture" lang="ab">Soil Moisture</option>
+  <option value="evapo" lang="ab">Evapotranspiration</option>
+
+  </select>
+
+    <li class="title">2. Choose a Satellite</li>
+  <select class="form-select" aria-label="data source selector" id="select-source"></select>
+
+    <li class="title">3. Load Data</li>
+  <div class="buttons-flex">
+      <button  id="load-map" type="button" class="btn btn-primary btn-block">Load Map</button>
+      <button id="clear-map" type="button" class="btn btn-primary btn-block">Clear Map</button>
+  <button id="plot-series" class="btn btn-primary btn-block">Show Graph</button>
+  </div>
+
+
+    <li class="title">4. Compare Averages</li>
+    <button id="compare" class="btn btn-primary btn-block" >Compare Averages</button>
+    <li class="title">Use a Specific Year (optional)</li>
+ <select class="form-select" aria-label="variable selector" id="select-year">
+    <option hidden disabled selected value></option>
+    <option value="2000">2000</option>
+    <option value="2001">2001</option>
+    <option value="2002">2002</option>
+    <option value="2003">2003</option>
+    <option value="2004">2004</option>
+    <option value="2005">2005</option>
+    <option value="2006">2006</option>
+    <option value="2007">2007</option>
+    <option value="2008">2008</option>
+    <option value="2009">2009</option>
+    <option value="2010">2010</option>
+    <option value="2011">2011</option>
+    <option value="2012">2012</option>
+    <option value="2013">2013</option>
+    <option value="2014">2014</option>
+    <option value="2015">2015</option>
+    <option value="2016">2016</option>
+    <option value="2017">2017</option>
+    <option value="2018">2018</option>
+    <option value="2019">2019</option>
+    <option value="2020">2020</option>
+    <option value="2021">2021</option>
+    <option value="2022">2022</option>
+     <option value="last12">Last 12 months</option>
+ <option value="y2d">Year to Date</option>
+  </select>
+
+    <li class = "title">Select Boundary Dataset (name of a directory)</li>
+    <select id="directories" class="form-select" name="directories">
+        <option hidden disabled selected value></option>
+    </select>
+
+    <li class = "title">Choose a Boundary</li>
+    <select id="jsons" class="form-select" name="jsons">
+        <option hidden disabled selected value></option>
+
+    </select>
+
+    <br>
+    <button  id="region" type="button" class="btn btn-primary btn-block" >Load Region Data</button>
+    <br>
+{#   <button  id="compare-var" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#compare-var-modal">Compare Variables </button>#}
+

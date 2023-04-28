@@ -1,0 +1,75 @@
+<br>
+<li class="title">Selecionar Idioma</li>
+<select id="select-lang" class="form-select" name="languages">
+    <option value="es">Español</option>
+    <option value="en">English</option>
+</select>
+<br>
+<button id="lat-lon" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal"
+        data-bs-target="#lat-lon-modal">Ingresar Lat/Lon
+</button>
+<li class="title">1. Elija Variable</li>
+<select class="form-select" aria-label="variable selector" id="select-variable">
+    <option hidden disabled selected value></option>
+    <option value="air_temp">Temperatura del Aire</option>
+    <option value="precip">Precipitación</option>
+    <option value="soil_moisture">Humedad del Suelo</option>
+    <option value="evapo">Evapotranspiración</option>
+
+</select>
+
+<li class="title">2. Elija el Satélite</li>
+<select class="form-select" aria-label="data source selector" id="select-source"></select>
+
+<li class="title"> 3. Cargar Datos</li>
+<div class="buttons-flex">
+    <button id="load-map" type="button" class="btn btn-primary btn-block">Cargar Mapa</button>
+    <button id="clear-map" type="button" class="btn btn-primary btn-block">Despejar Mapa</button>
+    <button id="plot-series" class="btn btn-primary btn-block">Mostrar Gráfico</button>
+</div>
+
+
+<li class="title">4. Comparar los Promedios</li>
+<button id="compare" class="btn btn-primary btn-block">Comparar los Promedios</button>
+<li class="title">Usar una Fecha Específica (opcional)</li>
+<select class="form-select" aria-label="variable selector" id="select-year">
+    <option hidden disabled selected value></option>
+    <option value="2000">2000</option>
+    <option value="2001">2001</option>
+    <option value="2002">2002</option>
+    <option value="2003">2003</option>
+    <option value="2004">2004</option>
+    <option value="2005">2005</option>
+    <option value="2006">2006</option>
+    <option value="2007">2007</option>
+    <option value="2008">2008</option>
+    <option value="2009">2009</option>
+    <option value="2010">2010</option>
+    <option value="2011">2011</option>
+    <option value="2012">2012</option>
+    <option value="2013">2013</option>
+    <option value="2014">2014</option>
+    <option value="2015">2015</option>
+    <option value="2016">2016</option>
+    <option value="2017">2017</option>
+    <option value="2018">2018</option>
+    <option value="2019">2019</option>
+    <option value="2020">2020</option>
+    <option value="2021">2021</option>
+    <option value="2022">2022</option>
+    <option value="last12">últimos 12 meses</option>
+    <option value="y2d">El año hasta la fecha</option>
+</select>
+
+<li class="title">Selecionar una Carpeta</li>
+<select id="directories" class="form-select" name="directories">
+    <option hidden disabled selected value></option>
+</select>
+
+<li class="title">Elija una dataset (el nombre de un d</li>
+<select id="jsons" class="form-select" name="jsons">
+    <option hidden disabled selected value></option>
+</select>
+
+<br>
+<button id="region" type="button" class="btn btn-primary btn-block">Load Region Data</button>

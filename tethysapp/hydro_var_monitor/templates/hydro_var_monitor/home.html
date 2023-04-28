@@ -3,298 +3,155 @@
 {% load static %}
 
 {% block header_buttons %}
-<!-- <button  id="instructions" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#myModal" ><i class="bi bi-info-circle"></i></button> -->
-<div class="header-button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Instructions">
-  <a data-bs-toggle="modal" data-bs-target="#myModal">
-    <i class="bi bi-info-circle-fill"></i>
-  </a>
-</div>
+    <!-- <button  id="instructions" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#myModal" ><i class="bi bi-info-circle"></i></button> -->
+    <div class="header-button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Instructions">
+        <a data-bs-toggle="modal" data-bs-target="#myModal">
+            <i class="bi bi-info-circle-fill"></i>
+        </a>
+    </div>
 {% endblock %}
 
 {% block app_navigation_items %}
-  <br>
-  <button  id="lat-lon" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#lat-lon-modal">Ingresar Lat/Lon</button>
-  <li class="title">1. Elija Variable</li>
-  <select class="form-select" aria-label="variable selector" id="select-variable">
-    <option hidden disabled selected value></option>
-    <option value="air_temp">Temperatura del Aire</option>
-    <option value="precip">Precipitación</option>
-    <option value="soil_moisture">Humedad del Suelo</option>
-    <option value="evapo">Evapotranspiración</option>
-
-  </select>
-
-  <li class="title">2. Elija el Satélite </li>
-  <select class="form-select" aria-label="data source selector" id="select-source"></select>
-
-  <li class="title">3. Cargar Datos </li>
-  <div class="buttons-flex">
-    <button  id="load-map" type="button" class="btn btn-primary btn-block" >Cargar Mapa</button>
-    <button id="clear-map" type="button" class="btn btn-primary btn-block">Despejar Mapa</button>
-    <button id="plot-series" class="btn btn-primary btn-block">Mostrar Gráfico</button>
-  </div>
-
-
-  <li class="title">4. Comparar los Promedios</li>
-  <button id="compare" class="btn btn-primary btn-block">Comparar los Promedios </button>
-    <li class="title">Usar una Fecha Específica (opcional)</li>
- <select class="form-select" aria-label="variable selector" id="select-year">
-    <option hidden disabled selected value></option>
-    <option value="2000">2000</option>
-    <option value="2001">2001</option>
-    <option value="2002">2002</option>
-    <option value="2003">2003</option>
-    <option value="2004">2004</option>
-    <option value="2005">2005</option>
-    <option value="2006">2006</option>
-    <option value="2007">2007</option>
-    <option value="2008">2008</option>
-    <option value="2009">2009</option>
-    <option value="2010">2010</option>
-    <option value="2011">2011</option>
-    <option value="2012">2012</option>
-    <option value="2013">2013</option>
-    <option value="2014">2014</option>
-    <option value="2015">2015</option>
-    <option value="2016">2016</option>
-    <option value="2017">2017</option>
-    <option value="2018">2018</option>
-    <option value="2019">2019</option>
-    <option value="2020">2020</option>
-    <option value="2021">2021</option>
-    <option value="2022">2022</option>
-     <option value="last12">últimos 12 meses</option>
-    <option value="y2d">El año hasta la fecha</option>
-  </select>
-   <li class="title">Usar una Provincia Específica (opcional) </li>
-    <select id="regions" class="form-select" name = "regions">
-        <option value = "">Ninguna</option>
-        <option value = "Ecuador">Ecuador</option>
-        <option value = "Azuay">Azuay</option>
-        <option value = "Bolivar">Bolivar</option>
-        <option value = "Canar">Canar</option>
-        <option value = "Carchi">Carchi</option>
-        <option value = "Chimborazo">Chimborazo</option>
-        <option value = "Cotopaxi">Cotopaxi</option>
-        <option value = "El_Oro">El Oro</option>
-        <option value = "Esmeraldas">Esmeraldas</option>
-        <option value = "Galapagos">Galapagos</option>
-        <option value = "Guayas">Guayas</option>
-        <option value = "Imbabura">Imbabura</option>
-        <option value = "Loja">Loja</option>
-        <option value = "Los_Rios">Los Rios</option>
-        <option value = "Manabi">Manabi</option>
-        <option value = "Morona_Santiago">Morona Santiago</option>
-        <option value = "Napo">Napo</option>
-        <option value = "Orellana">Orellana</option>
-        <option value = "Pastaza">Pastaza</option>
-        <option value = "Pichincha">Pichincha</option>
-        <option value = "Santa_Elena">Santa Elena</option>
-        <option value = "Santo_Domingo_de_los_Tsachilas">Santo Domingo de los Tsachilas</option>
-        <option value = "Sucumbios">Sucumbios</option>
-        <option value = "Tungurahua">Tungurahua</option>
-        <option value = "Zamora_Chinchipe">Zamora Chinchipe</option>
-    </select>
-    <br>
-    <button  id="region" type="button" class="btn btn-primary btn-block" >Cargar Datos para la Región </button>
-
-
+    {% if lang == "en" %}
+        {% include "hydro_var_monitor/home_language_components/en/sidebar.html" %}
+    {% elif lang == "es" %}
+        {% include "hydro_var_monitor/home_language_components/es/sidebar.html" %}
+    {% endif %}
 {% endblock %}
 
 {% block app_content %}
-  <div id="map"></div>
-  <div id="loading-icon">
-    <img src="{% static 'hydro_var_monitor/images/loader.gif' %}"/>
-  </div>
+    <div id="map"></div>
+    <div id="loading-icon">
+        <img src="{% static 'hydro_var_monitor/images/loader.gif' %}"/>
+    </div>
 {% endblock %}
 
 {% block after_app_content %}
-  {# Chart Modals #}
+    {# Chart Modals #}
 
-  <div class="modal fade" id="chart_modal" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="title_modal">
-            <h2 style="text-align: center">Las Tendencias con el Tiempo <span id="request-status" class="load-status"/></h2>
-          </div>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="chart_modal" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="title_modal">
+                        <h2 style="text-align: center">Las Tendencias con el Tiempo <span id="request-status"
+                                                                                          class="load-status"></span>
+                        </h2>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="forecast">
+                            <div class="panel panel-default">
+                                <div id="chart"></div>
+                                <div id="forecast-chart"></div>
+                                <div id="forecast-table"></div>
+                            </div>
+                        </div> <!-- /.tab-pane -->
+
+                        <div role="tabpanel" class="tab-pane" id="flow_duration">
+                            <div class="panel panel-default">
+                                <div id='flowduration-chart' class="panel-body"></div>
+                            </div>
+                        </div><!-- /.tab-pane -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button id="download" type="button" class="btn btn-primary">Descargar</button>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="modal-body">
-
-          <!-- Tab panes -->
-          <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="forecast">
-              <div class="panel panel-default">
-                 <div id="chart"></div>
-                <div id="forecast-chart"></div>
-                <div id="forecast-table"></div>
-              </div>
-            </div> <!-- /.tab-pane -->
-
-            <div role="tabpanel" class="tab-pane" id="flow_duration">
-              <div class="panel panel-default">
-                <div id='flowduration-chart' class="panel-body"></div>
-              </div>
-            </div><!-- /.tab-pane -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-          <button id = "download" type="button" class="btn btn-primary">Descargar</button>
-        </div>
-      </div>
     </div>
-  </div>
-</div>
 
     <!-- Modal -->
-<div id="myModal" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-lg">
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Instrucciones</h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>Bienvenido a la aplicación Tendencia de Clima!</p>
-
-        <p>La aplicación tendencias de clima permite visualizar  información
-            satelital de los últimos 30 años y comparar la misma para una variable de interés.</p>
-        <p>Para empezar, seleccione una variable de interés: precipitación, temperatura, la humedad del suelo, y la evapotranspiración.
-            Después, escoja el satélite de interés para la variable seleccionada. </p>
-
-          <p>Al hacer clic en la opción <span class="bolded">“Cargar Mapa”</span> podrá visualizar un mapa de la variable y
-              satélite de interés seleccionada.</p>
-        <p>Posteriormente, seleccione el lugar ubicando una región de interés, provincia de Ecuador o coordenadas.</p>
-          <p><span class="bolded">Selección de un punto o región de interés:</span></p>
-
-          <p><span class="bolded">1. Coordenadas:</span> Hacer clic en el botón <span class="bolded">“Ingresar Lat/Lon”</span>, se desplegará una pantalla
-              para colocar la latitud y longitud. Haga clic en <span class="bolded">“Guardar”</span>, seguidamente en <span class="bolded">“Mostrar Gráfico”</span> para
-              ver los resultados.</p>
-
-          <p><span class="bolded">2. Región de Interés: </span> En la esquina izquierda de la aplicación, hay una opción con dos botones para dibujar en el mapa.
-              Seleccionar cualquiera de los dos botones para crear un área de interés Hacer clic en el botón <span class="bolded">“Mostrar Gráfico”</span> para
-              visualizar los resultados.</p>
-          <p><span class="bolded">3. Provincia en Ecuador: </span> Al final del menú, encuentre el botón <span class="bolded">¨Cargar datos para la región¨</span>
-              y seleccione la provincia de interés en el menú desplegable. Finalmente, haga clic en el botón <span class="bolded">“Cargar Datos para la Región”</span>
-              para visualizar los resultados.</p>
-
-
-          <p><span class="bolded">Visualización de resultados</span></p>
-        <p>Una vez seleccionada la variable, satélite y área de interés podrá visualizar el gráfico. Los resultados los puede descargar en formato .csv, haciendo clic en el botón
-            <span class="bolded">“Descargar”</span>. También puede descargar el gráfico en formato .png, haciendo clic en el botón de cámara, localizado en la esquina derecha
-            de la gráfica.</p>
-        <p>En el gráfico, puede seleccionar una fecha de interés haciendo clic y seleccionando un rango de fechas directamente en el mismo. Para visualizar el gráfico nuevamente
-            con el periodo total de tiempo haga clic en Autoscale, que se encuentra localizado cerca del botón de cámara.</p>
-        <p>En la leyenda del gráfico puede prender y apagar las líneas de los gráficos según necesite. Por default todas las líneas están encendidas.</p>
-
-          <p><span class="bolded">Comparar los promedios por una variable</span></p>
-        <p>Seleccione la región y variable según lo descrito anteriormente, y posteriormente podrá comparar promedios. Observará un gráfico con la información sobre
-            los promedios comparando los datos obtenidos de una variable con diferentes satélites.</p>
-          <p><span class="bolded">Selección de una fecha determinada</span></p>
-          <p> Podrá visualizar los resultados por un año específico. Haciendo clic en el botón <span class="bolded">“Usar una Fecha Específica”</span>.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-<div id="errorModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        <h4 class="modal-title">Error</h4>
-      </div>
-      <div class="modal-body">
-        <p>Por favor elimine la entrada anterior.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-<div id="lat-lon-modal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Poner Latitud y Longitud </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Modal content-->
+            {% if lang == "en" %}
+                {% include "hydro_var_monitor/home_language_components/en/instructions.html" %}
+            {% elif lang == "es" %}
+                {% include "hydro_var_monitor/home_language_components/es/instructions.html" %}
+            {% endif %}
 
         </div>
-              <div class="modal-body">
-                <form>
-                  <div class="form-group">
-                    <label for="lat" class="col-form-label">Longitud:</label>
-                    <input type="text" class="form-control" id="lat">
-                  </div>
-                  <div class="form-group">
-                    <label for="lon" class="col-form-label">Latitud:</label>
-                    <input type="text" class="form-control" id="lon">
-                  </div>
-                </form>
-              </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button id = "save" type="button" class="btn btn-outline-secondary">Guardar</button>
-      </div>
     </div>
+    <div id="errorModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
 
-  </div>
-</div>
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title">Error</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Por favor elimine la entrada anterior.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="lat-lon-modal" class="modal fade" role="dialog">
+        {% if lang == "en" %}
+            {% include "hydro_var_monitor/home_language_components/en/long_lat.html" %}
+        {% elif lang == "es" %}
+            {% include "hydro_var_monitor/home_language_components/es/long_lat.html" %}
+        {% endif %}
+    </div>
 {% endblock %}
+
 
 {% block content_dependent_styles %}
-  {{ block.super }}
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
-        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
-        crossorigin=""/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
-  <link href="{% static 'hydro_var_monitor/css/main.css' %}" rel="stylesheet"/>
+    {{ block.super }}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+          integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+          crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+    <link href="{% static 'hydro_var_monitor/css/main.css' %}" rel="stylesheet"/>
 {% endblock %}
-
 {% block scripts %}
-  {{ block.super }}
-  {% csrf_token %}
-  <script>
-      const URL_GETMAPID = "{% url 'hydro_var_monitor:get-map-id' %}"
-      const URL_GETPLOT = "{% url 'hydro_var_monitor:get-plot' %}"
-      const URL_COMPARE = "{% url 'hydro_var_monitor:compare' %}"
-      const URL_GETPREDEFINED = "{% url 'hydro_var_monitor:get_predefined' %}"
-      const SOURCES = JSON.parse('{{ sources|safe }}')
-  </script>
-  <script>
-    var staticGeoJSON = "{% static base_name|add:'hydro_var_monitor/geojson/' %}";
-  </script>
-  <script src='https://cdn.plot.ly/plotly-2.12.1.min.js'></script>
-  <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
-          integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
-          crossorigin=""></script>
-  <!-- <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript"></script> -->
-  <script src="{% static 'hydro_var_monitor/js/main.js' %}" type="text/javascript" defer></script>
-  <!-- <script type="module" src="main.js"></script> -->
-
-        <!-- Load Esri Leaflet from CDN -->
-  <script src="https://unpkg.com/esri-leaflet@3.0.4/dist/esri-leaflet.js"
-    integrity="sha512-oUArlxr7VpoY7f/dd3ZdUL7FGOvS79nXVVQhxlg6ij4Fhdc4QID43LUFRs7abwHNJ0EYWijiN5LP2ZRR2PY4hQ=="
-    crossorigin=""></script>
-
-  <!-- Load Esri Leaflet Vector from CDN -->
-  <script src="https://unpkg.com/esri-leaflet-vector@3.1.1/dist/esri-leaflet-vector.js"
-    integrity="sha512-7rLAors9em7cR3/583gZSvu1mxwPBUjWjdFJ000pc4Wpu+fq84lXF1l4dbG4ShiPQ4pSBUTb4e9xaO6xtMZIlA=="
-    crossorigin=""></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+    {{ block.super }}
+    {% csrf_token %}
+    <script>
+        const URL_GETMAPID = "{% url 'hydro_var_monitor:get-map-id' %}"
+        const URL_GETJSON = "{% url 'hydro_var_monitor:map-region' %}"
+        const URL_GETPLOT = "{% url 'hydro_var_monitor:get-plot' %}"
+        const URL_COMPARE = "{% url 'hydro_var_monitor:compare' %}"
+        const URL_GETPREDEFINED = "{% url 'hydro_var_monitor:get_predefined' %}"
+        const URL_HOME = "{% url 'hydro_var_monitor:home' %}"
+        const SOURCES = JSON.parse('{{ sources|safe }}')
+        const DIRECTORIES = JSON.parse('{{ directories|safe }}')
+        const OPTIONS = JSON.parse('{{ option|safe }}')
+        const LANGUAGES = JSON.parse('{{ language_options|safe }}')
+    </script>
+    <script>
+        const staticGeoJSON = "{% static base_name|add:'hydro_var_monitor/geojson/' %}";
+    </script>
+    <script src='https://cdn.plot.ly/plotly-2.12.1.min.js'></script>
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+            integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+            crossorigin=""></script>
+    <!-- <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript"></script> -->
+    <script src="{% static 'hydro_var_monitor/js/main.js' %}" type="text/javascript" defer></script>
+    <!-- <script type="module" src="main.js"></script> -->
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@3.0.4/dist/esri-leaflet.js"
+            integrity="sha512-oUArlxr7VpoY7f/dd3ZdUL7FGOvS79nXVVQhxlg6ij4Fhdc4QID43LUFRs7abwHNJ0EYWijiN5LP2ZRR2PY4hQ=="
+            crossorigin=""></script>
+    <!-- Load Esri Leaflet Vector from CDN -->
+    <script src="https://unpkg.com/esri-leaflet-vector@3.1.1/dist/esri-leaflet-vector.js"
+            integrity="sha512-7rLAors9em7cR3/583gZSvu1mxwPBUjWjdFJ000pc4Wpu+fq84lXF1l4dbG4ShiPQ4pSBUTb4e9xaO6xtMZIlA=="
+            crossorigin=""></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
 {% endblock %}

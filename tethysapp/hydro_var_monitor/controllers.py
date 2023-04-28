@@ -1,21 +1,35 @@
-from django.http.response import JsonResponse
-from datetime import date
-from datetime import datetime
-from django.shortcuts import render
-from .ee_auth import *
 import json
-from django.http import JsonResponse, HttpResponseNotAllowed
-from tethys_sdk.routing import controller
-from . import ee_auth
 import logging
 import os
+import shutil
+from datetime import date
+from datetime import datetime
+from django.http import JsonResponse, HttpResponseNotAllowed
+from django.http.response import JsonResponse, HttpResponse
+from django.shortcuts import render
+from django.urls import path
+# from . import views
+from tethys_sdk.routing import controller
+from tethys_sdk.permissions import permission_required
+
+from . import ee_auth
+from .compare import air_temp_compare, precip_compare
+from .ee_auth import *
 from .ee_tools import ERA5, get_tile_url, GLDAS, CHIRPS, IMERG, GLDAS_evapo
 from .plots import plot_ERA5, plot_GLDAS, plot_IMERG, plot_CHIRPS
-from .compare import air_temp_compare, precip_compare
+#from .unzip import unzip_and_read_files
+import zipfile
+import tempfile
+
+from .app import HydroVarMonitor as App
 
 
-@controller(name='home', url='hydro-var-monitor')
-def home(request):
+@controller(name='home', url='hydro-var-monitor', app_workspace=True)
+def home(request, app_workspace):
+    lang = request.GET.get('lang', 'en')
+    if lang not in ['en', 'es']:
+        lang = 'en'
+
     if not EE_IS_AUTHORIZED:
         return render(request, 'hydro_var_monitor/no_auth_error.html')
     ee_sources = {
@@ -24,26 +38,94 @@ def home(request):
         'soil_moisture': ['GLDAS', ],
         'evapo': ['GLDAS']
     }
+    # lang_ops = os.path.join(request, 'hydro_var_monitor/home_language_components')
+    # langs = os.listdir(lang_ops)
+    # list_of_languages = [item for item in langs]
+    list_of_languages = ["check"]
+
+    target_directory = os.path.join(app_workspace.path, "Exact")
+    if os.path.exists(target_directory):
+        items = os.listdir(target_directory)
+    else:
+        items = []
+    list_of_directories = [item for item in items if os.path.isdir(os.path.join(target_directory, item))]
+    if "__MACOSX" in list_of_directories:
+        list_of_directories.remove("__MACOSX")
+    options_for_each_directory = {}
+    for directory in list_of_directories:
+        directory_path = os.path.join(target_directory, directory)
+        files = [name for name in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, name))]
+
+        # add the directory and its list of files to the dictionary
+        options_for_each_directory[directory] = files
+
     context = {
-        'sources': json.dumps(ee_sources)
+        'language_options': json.dumps(list_of_languages),
+        'lang': lang,
+        'sources': json.dumps(ee_sources),
+        'option': json.dumps(options_for_each_directory),
+        'directories': json.dumps(list_of_directories)
     }
     return render(request, 'hydro_var_monitor/home.html', context)
 
+
+# @permission_required()
+@controller(name='admin', url='hydro-var-monitor/admin', app_workspace=True)
+def admin(request, app_workspace):
+    target_directory = os.path.join(app_workspace.path, "Exact")
+    items = os.listdir(target_directory)
+    list_of_directories = [item for item in items if os.path.isdir(os.path.join(target_directory, item))]
+    if "__MACOSX" in list_of_directories:
+        list_of_directories.remove("__MACOSX")
+    lang = request.GET.get('lang', 'en')
+    context = {
+        "ee_enabled": EE_IS_AUTHORIZED,
+        'directories': json.dumps(list_of_directories)
+    }
+    if lang not in ['en', 'es']:
+        lang = 'en'
+    if lang == "es":
+        return render(request, 'hydro_var_monitor/home_language_components/es/admin.html', context)
+    else:
+        return render(request, 'hydro_var_monitor/home_language_components/en/admin.html', context)
+
+
+@controller(name="delete-data", url="hydro-var-monitor/admin/delete-data", app_workspace=True)
+def delete_data(request, app_workspace):
+    print("IN DELETE")
+    file = request.GET.get("filename")
+    print(file)
+    return
+
+
+@controller(name='map-region', url='hydro-var-monitor/map-region', app_workspace=True)
+def mapregion(request, app_workspace):
+    response_data = {'success': False}
+    try:
+        directory = request.GET.get('directory', None)
+        file = request.GET.get('file', None)
+        app_store_path = app_workspace.path
+        json_url = os.path.join(app_store_path, "Exact", directory, file)
+        f = open(json_url)
+        region = json.load(f)
+    except Exception as e:
+        response_data['error'] = f'Error Processing Request: {e}'
+    return JsonResponse(region)
+
+
 @controller(name='compare', url='hydro-var-monitor/compare', app_workspace=True)
-def compare(request,app_workspace):
+def compare(request, app_workspace):
     response_data = {'success': False}
     try:
         region = request.GET.get('region', None)
         definedRegion = request.GET.get('definedRegion', None)
         if definedRegion == "true":
-            province = region + ".json"
-            app_store_path = app_workspace.path
-            json_url = os.path.join(app_store_path, "preconfigured_geojsons", "ecuador", province)
+            directory = request.GET.get('directory', None) + "_simplified"
+            # get json simplified version from app workspace for earth engine
+            province = region
             # ROOT_DIR = os.path.abspath(os.curdir)
-            # json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor",
-            #                         "workspaces",
-            #                         "app_workspace", "preconfigured_geojsons", "ecuador", province)
-
+            app_store_path = app_workspace.path
+            json_url = os.path.join(app_store_path, "Simplified", directory, province)
             f = open(json_url)
             region = json.load(f)
 
@@ -72,7 +154,7 @@ def compare(request,app_workspace):
     return JsonResponse(json.loads(json.dumps(values)))
 
 
-@controller(name='get-map-id', url='hydro-var-monitor/get-map-id',)
+@controller(name='get-map-id', url='hydro-var-monitor/get-map-id', )
 def get_map_id(request):
     response_data = {'success': False}
 
@@ -114,7 +196,7 @@ def get_map_id(request):
                 imgs = GLDAS(band)
             if var == "evapo":
                 band = "Evap_tavg"
-                vis_params = {"min":0, "max":0.00005}
+                vis_params = {"min": 0, "max": 0.00005}
                 imgs = GLDAS_evapo(band)
 
         if sensor == "IMERG":
@@ -149,6 +231,7 @@ def get_date():
 @controller(name='get-plot', url='hydro-var-monitor/get-plot')
 def get_plot(request):
     response_data = {'success': False}
+    # plot_data = {}
 
     try:
         sensor = request.GET.get('source', None)
@@ -215,7 +298,68 @@ def get_plot(request):
     return JsonResponse(json.loads(json.dumps(plot_data)))
 
 
-@controller(name='get_predefined', url='hydro-var-monitor/get-predefined',app_workspace=True)
+@controller(name='admin-upload-exact-zipped-data', url='hydro-var-monitor/admin/unzip-exact', app_workspace=True)
+def unzip_exact(request, app_workspace):
+    try:
+        workspace_path = app_workspace.path
+        directory = request.POST.get('directoryName', None)
+        target_directory = os.path.join(workspace_path, 'Exact', directory)
+        with zipfile.ZipFile(request.FILES['exact-json'], 'r') as zip:
+                for zip_info in zip.infolist():
+                    if zip_info.is_dir():
+                        continue
+                    zip_info.filename = os.path.basename(zip_info.filename)
+                    if zip_info.filename.startswith("._"):
+                        continue
+                    zip.extract(zip_info, target_directory)
+
+        #with zipfile.ZipFile(request.FILES['exact-json'], 'r') as zip_ref:
+            #for member in zip_ref.namelist():
+                # skip directories and files in _MACOSX
+                #if not os.path.basename(member) or member.startswith('_MACOSX/'):
+                    #continue
+
+                # specify destination directory and extract file
+                #destination = os.path.join(target_directory, os.path.basename(member))
+                #zip_ref.extract(member, destination)
+                #print(member)
+
+        # step 2
+    # read the names of directories and the contents of each directory to make a datastructure that looks like
+    # include in context so it can be used to auto populate choices
+    #  and then save it to the workspace as a json file
+
+    # return also options_for_each_directory
+        return {'success': True, 'data': {}}
+    #return HttpResponse('Files extracted successfully.')
+
+    except Exception as e:
+        return {'success': False, 'error': f'Error Processing Request: {e}'}
+
+
+@controller(name='admin-upload-simplified-zipped-data', url='hydro-var-monitor/admin/unzip-simplified',
+        app_workspace=True)
+def unzip_simplified(request, app_workspace):
+    try:
+        workspace_path = app_workspace.path
+        directory = request.POST.get('directoryName', None)
+        target_directory = os.path.join(workspace_path, 'Simplified', directory)
+        with zipfile.ZipFile(request.FILES['simplified-json'], 'r') as zip:
+            for zip_info in zip.infolist():
+                if zip_info.is_dir():
+                    continue
+                zip_info.filename = os.path.basename(zip_info.filename)
+                if zip_info.filename.startswith("._"):
+                    continue
+                zip.extract(zip_info, target_directory)
+
+        return HttpResponse('Files extracted successfully.')
+
+    except Exception as e:
+        return {'success': False, 'error': f'Error Processing Request: {e}'}
+
+
+@controller(name='get_predefined', url='hydro-var-monitor/get-predefined', app_workspace=True)
 def get_predefined(request, app_workspace):
     # read in values to variables
     name_of_area = request.GET.get("region", None)
@@ -223,13 +367,14 @@ def get_predefined(request, app_workspace):
     sensor = request.GET.get('source', None)
     var = request.GET.get('variable', None)
     year = request.GET.get('year', None)
+    directory = request.GET.get('directory', None)
     # get json simplified version from app workspace for earth engine
-    province = name_of_area + ".json"
+    province = name_of_area
     ROOT_DIR = os.path.abspath(os.curdir)
     app_store_path = app_workspace.path
     # json_url = os.path.join(ROOT_DIR, "tethysapp", "hydro_var_monitor", "workspaces",
     #                         "app_workspace", "preconfigured_geojsons", "ecuador", province)
-    json_url = os.path.join(app_store_path, "preconfigured_geojsons", "ecuador", province)
+    json_url = os.path.join(app_store_path, "Simplified", directory, province)
     f = open(json_url)
     region = json.load(f)
 

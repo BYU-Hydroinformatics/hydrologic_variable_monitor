@@ -22,8 +22,11 @@ const App = (() => {
     const usrLon = document.getElementById('lon')
     //const btnComparePrecip = document.getElementById('compare-humedad')
     const btnRegion = document.getElementById('region')
-    const selectRegion = document.getElementById('regions')
+    //const selectRegion = document.getElementById('regions')
     const year = document.getElementById("select-year")
+    const selectDirectory = document.getElementById("directories")
+    const selectJSON = document.getElementById("jsons")
+    const selectLang = document.getElementById('select-lang')
 
 
     const download = function (data, file_name) {
@@ -48,6 +51,11 @@ const App = (() => {
         // Performing a download with click
         a.click()
     }
+
+    selectDirectory.innerHTML = `<option value="">Select a directory</option>${DIRECTORIES.map(src => `<option value="${src}">${src}</option>`).join("")}`;
+
+    selectDirectory.onchange = (e) => selectJSON.innerHTML = OPTIONS[e.target.value].map(src => `<option value="${src}">${src}</option>`).join("")
+    selectVariable.onchange = (e) => selectSource.innerHTML = SOURCES[e.target.value].map(src => `<option value="${src}">${src}</option>`).join("")
 
     ////////////////////////////////////////////////// Map and Map Layers
 
@@ -127,37 +135,44 @@ const App = (() => {
             "region": input_spatial,
             "isPoint": isPoint,
             "year": year.value,
-            "definedRegion": false
+            "definedRegion": definedRegion,
+            "directory": selectDirectory.value
         }
     }
     let province_json = L.geoJSON(false)
 
-    selectRegion.onchange = () => {
+    selectJSON.onchange = () => {
+        definedRegion = true
         if (isPoint === true) {
             map.removeLayer(point);
             isPoint = false;
         }
         drawnItems.clearLayers()
         //get geojson url and add it to my map using fetch
+        const region_info = {
+            "directory": selectDirectory.value,
+            "file": selectJSON.value
+        }
         province_json.clearLayers();
-        let geojsons = selectRegion.value
-        if (geojsons != "") {
-            let url = staticGeoJSON + geojsons + ".json"
-            fetch(url)
-                .then(response => response.json())
-                .then(json => province_json.addData(json).addTo(map))
-            map.flyTo([-0.987891, -80.834077], 6)
-        }
-        if (geojsons == "") {
-            map.flyTo([20, -40], 3)
-        }
+
+        $.ajax({
+            type: "GET", url: URL_GETJSON, datatype: "JSON", data: region_info, success: function (data) {
+                province_json.addData(data).addTo(map)
+                const bounds = province_json.getBounds();
+                // Zoom in on the bounds
+                map.fitBounds(bounds);
+
+            }
+        })
     }
+
+    selectLang.onchange = () => window.location.href = `${URL_HOME}?lang=${selectLang.value}`
 
 
     btnRegion.onclick = () => {
         const dataParams = getVarSourceJSON()
         if (dataParams.variable === "" || dataParams.source === "") return
-        dataParams.region = selectRegion.value
+        dataParams.region = selectJSON.value
         //check that it is a variable that can be compared
         $("#loading-icon").addClass("appear");
         $.ajax({
@@ -234,6 +249,7 @@ const App = (() => {
             point = L.marker([usrLon.value, usrLat.value]).addTo(map);
             map.flyTo([usrLon.value, usrLat.value], 5)
             isPoint = true;
+            definedRegion = false;
             $('#lat-lon-modal').modal("hide");
 
 
@@ -268,22 +284,31 @@ const App = (() => {
     btnCompare.onclick = () => {
         const dataParams = getVarSourceJSON()
         province_json.clearLayers();
-        if (selectRegion.value != "") {
-            dataParams.definedRegion = true
-            dataParams.region = selectRegion.value
+        if (definedRegion == true) {
+            //dataParams.definedRegion = true
+            dataParams.region = selectJSON.value
+            const region_info = {
+                "directory": selectDirectory.value,
+                "file": selectJSON.value
+            }
             //get geojson url and add it to my map using fetch
-            let geojsons = selectRegion.value
-            let url = staticGeoJSON + geojsons + ".json"
-            fetch(url)
-                .then(response => response.json())
-                .then(json => province_json.addData(json).addTo(map))
-        }
-        if (dataParams.isPoint == true) {
+            $.ajax({
+                type: "GET", url: URL_GETJSON, datatype: "JSON", data: region_info, success: function (data) {
+                }
+            })
+            //let geojsons = selectRegion.value
+            //let url = staticGeoJSON + geojsons + ".json"
+            //fetch(url)
+            // .then(response => response.json())
+            // .then(json => province_json.addData(json).addTo(map))
+        } else if (dataParams.isPoint == true) {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }
+        //
         //check that it is a variable that can be compared
         if (dataParams.variable === "" || dataParams.variable === "soil_moisture" || dataParams.region === "") return
         $("#loading-icon").addClass("appear");
+
 
         $.ajax({
             type: "GET", url: URL_COMPARE, datatype: "JSON", data: dataParams, success: function (data) {
@@ -391,12 +416,13 @@ const App = (() => {
         })
         isPoint = false;
     }
-
     btnPlotSeries.onclick = () => {
+        console.log("CHECK")
         const dataParams = getVarSourceJSON()
         if (dataParams.isPoint === true) {
             dataParams.region = JSON.stringify([usrLat.value, usrLon.value])
         }
+        console.log("In function")
         if (dataParams.variable === "" || dataParams.source === "" || dataParams.region === "") return
         $("#loading-icon").addClass("appear");
 
@@ -406,19 +432,32 @@ const App = (() => {
                 $("#loading-icon").removeClass("appear");
                 //data = JSON.parse(data)
                 //get variable for plan from json
+                console.log("In function")
                 const averages = JSON.parse(data['avg'])
                 const y2d = JSON.parse(data['y2d'])
                 const title = data['title']
                 const yaxis = data['yaxis']
 
                 const temp_extracted_avg = Object.values(averages.data_values)
+                const line_below = Object.values(averages.std_below)
+                const line_above = Object.values(averages.std_above)
                 const temp_extracted_y2d = Object.values(y2d.data_values)
+
+                console.log(temp_extracted_avg)
+                console.log(line_below)
 
                 const date_extracted_avg = Object.values(averages.date)
                 const date_extracted_y2d = Object.values(y2d.date)
 
                 const year_2_date = {
                     x: date_extracted_y2d, y: temp_extracted_y2d, mode: 'lines', name: "El año hasta la fecha"
+                };
+
+                const std_under = {
+                    x: date_extracted_avg, y: line_below, mode: 'lines', name: "una desviación estándar por debajo del promedio"
+                };
+                const std_above = {
+                    x: date_extracted_avg, y: line_above, mode: 'lines', name: "una desviación estándar por encima del promedio"
                 };
 
                 const average = {
@@ -428,7 +467,7 @@ const App = (() => {
                     name: "Los promedios de los últimos 30 años"
                 };
 
-                const date_plt = [year_2_date, average];
+                const date_plt = [year_2_date, average, std_under, std_above];
                 const layout = {
                     legend: {
                         x: 0, y: 1, traceorder: 'normal', font: {
@@ -468,6 +507,10 @@ const App = (() => {
         if (isPoint === true) {
             map.removeLayer(point);
             isPoint = false;
+        }
+        if (definedRegion === true) {
+            //map.removeLayer(bounds);
+            definedRegion = false;
         }
         drawnItems.clearLayers()
         drawnItems.addLayer(e.layer);

@@ -1,0 +1,98 @@
+{% extends "hydro_var_monitor/base.html" %}
+
+{% load static %}
+
+{% block header_buttons %}
+    <!-- <button  id="instructions" type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#myModal" ><i class="bi bi-info-circle"></i></button> -->
+    <div class="header-button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Instructions">
+        <a data-bs-toggle="modal" data-bs-target="#myModal">
+            <i class="bi bi-info-circle-fill"></i>
+        </a>
+    </div>
+{% endblock %}
+
+{% block app_navigation_items %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'hydro_var_monitor:admin' %}">Admin</a>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'hydro_var_monitor:home' %}">Home</a>
+    </li>
+
+{% endblock %}
+
+{% block app_content %}
+    <h2>Step 1: Is EE Enabled?</h2>
+    <div>EE Enabled?: {{ ee_enabled }}</div>
+    <div>
+        If Earth Engine isn't enabled on this portal with a service account,
+        <a href="https://developers.google.com/earth-engine/service_account" target="_blank">
+            click here to learn how to do this.</a>
+    </div>
+    <!--break-->
+    </br><br>
+
+    <h2>Step 2: Upload Polygons</h2>
+    <p>Enter the name of your dataset:</p>
+    <input type="text" class="form-control" id="name">
+    <div class="form-group">
+        <p> Upload 2 zip files for your desired regions. Inside the zip files should be all the json
+            files you would like included in the app. The title of each of the files should have the
+            name you would like included on the dropdown menu to choose from. The two zip files
+            should include the exact same names for each of the files.</p>
+        <p>This first zipfile should contain json files with the exact boundaries. All the points
+            can be included in this shapefile. This file will show how the regions appear on the map in the
+            app.</p>
+        <label for="exact-json" class="col-form-label">Exact JSON:</label>
+        <input type="file" class="form-control" id="exact-json">
+    </div>
+    </br><br>
+    <div class="form-group">
+        <p>This second zipfile should contain json files with the approximate boundaries. The json files must be the
+            exact same names as there corresponding json file. If there are
+            too many points in the JSON file then it can cause Earth Engine to take too long to load.
+            Since the remote sensing data is approximated anyway, you are able to use approximate boundaries
+            for outlines when Earth Engine reads them. Therefore, include a zipfile of the simplified version
+            of all the json files. This zipfile must have the exact same name as the other zipfile, just with
+            _simplified
+            added onto the end of it. </p>
+        <label for="simplified-json" class="col-form-label">Simplified JSON:</label>
+        <input type="file" class="form-control" id="simplified-json">
+    </div>
+    </br><br>
+    <button id="upload-data" class="btn btn-primary btn-block">Upload New Shapefiles for Regions</button>
+    </br><br>
+    <h2>Step 3: Manage Uploaded Polygons</h2>
+    <select id="manage" class="form-select" aria-label="variable selector" name="manage">
+        <option hidden disabled selected value></option>
+    </select>
+    </br><br>
+    <button id="delete-data" class="btn btn-primary btn-block">Delete Data</button>
+    </br><br>
+
+{% endblock %}
+
+{% block after_app_content %}
+    {# Chart Modals #}
+    <!-- Modal -->
+
+{% endblock %}
+
+{% block content_dependent_styles %}
+    {{ block.super }}
+    <link href="{% static 'hydro_var_monitor/css/main.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    {% csrf_token %}
+    <script>
+        const URL_EXACT_UNZIP = "{% url 'hydro_var_monitor:admin-upload-exact-zipped-data' %}"
+        const URL_SIMPLIFIED_UNZIP = "{% url 'hydro_var_monitor:admin-upload-simplified-zipped-data' %}"
+        const DIRECTORIES = JSON.parse('{{ directories|safe }}')
+        const URL_DELETE = "{% url 'hydro_var_monitor:delete-data' %}"
+    </script>
+    <!-- <script src="{% static 'hydro_var_monitor/js/regionIndex.js' %}" type="text/javascript"></script> -->
+    <script src="{% static 'hydro_var_monitor/js/admin.js' %}" type="text/javascript" defer></script>
+    <!-- <script type="module" src="main.js"></script> -->
+
+{% endblock %}
